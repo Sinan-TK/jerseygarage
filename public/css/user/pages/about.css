@@ -1,0 +1,187 @@
+    :root{
+      --bg: #ffffff;
+      --text: #111;
+      --muted: #6b6b6b;
+      --accent: #00a499;
+      --dark: #111;
+      --card-shadow: 0 6px 20px rgba(16,24,40,0.06);
+      --maxw: 1200px;
+      --pad: clamp(16px, 4vw, 48px);
+    }
+
+    /* *{box-sizing:border-box} */
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
+    } 
+
+/* -------- SIMPLE ABOUT HEADER -------- */
+    .top-header{
+      width:100%;
+      background:transparent;
+      color:var(--dark);
+      padding:24px 0px;
+      border-bottom:1px solid #eee;
+    }
+    .top-header h1{
+      margin:0;
+      font-size:22px;
+      font-weight:800;
+      text-align:center;
+      letter-spacing:0px;
+    }
+
+    .main-body{
+      max-width:var(--maxw);
+      margin:0 auto;
+      padding-inline:var(--pad);
+    }
+
+    /* Page header */
+    .page-head{
+      padding:48px 0 12px;
+      text-align:left;
+    }
+    .eyebrow{
+      color:var(--muted);
+      font-weight:600;
+      font-size:13px;
+      letter-spacing:0.6px;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+    .title{
+      font-size:clamp(28px,3.6vw,40px);
+      font-weight:800;
+      line-height:1.05;
+      margin-bottom:12px;
+    }
+    .lede{
+      color:var(--muted);
+      max-width:78ch;
+      font-size:16px;
+    }
+
+    /* The Store */
+    .the-store{
+      display:grid;
+      gap:28px;
+      grid-template-columns: 1fr 520px;
+      align-items:center;
+      margin:48px 0;
+    }
+
+    .store-text h3{
+      margin:0 0 12px;
+      font-size:22px;
+      font-weight:700;
+    }
+    .store-text p{color:var(--muted); margin:0 0 18px}
+    .store-btn{
+      background:var(--dark);
+      color:#fff;
+      padding:10px 20px;
+      border-radius:8px;
+      font-weight:700;
+      border:none;
+      cursor:pointer;
+      box-shadow:var(--card-shadow);
+      transition:0.25s;
+    }
+    .store-btn:hover{
+      background:var(--accent);
+    }
+
+    .store-image{
+      height:360px;
+      background:linear-gradient(180deg,#f2f2f2,#eaeaea);
+      border-radius:10px;
+      box-shadow:var(--card-shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .store-image .placeholder{
+      width:86%;
+      height:86%;
+      background:#f9f9f9;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#ccc;
+      font-weight:800;
+      letter-spacing:1.4px;
+      font-size:18px;
+    }
+
+    /* Why section */
+    .why{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:28px;
+      align-items:stretch;
+      margin-bottom:40px;
+    }
+    .why-card{
+      background:#fff;
+      border:1px solid #eee;
+      padding:26px;
+      border-radius:10px;
+      box-shadow:var(--card-shadow);
+    }
+    .why-card h4{margin:0 0 10px; font-size:18px}
+    .why-card p{color:var(--muted); margin:0}
+
+    /* Quote block */
+    .quote-block{
+      background:#111;
+      color:#fff;
+      border-radius:10px;
+      padding:36px;
+      margin:36px 0;
+      display:flex;
+      gap:20px;
+      align-items:center;
+      box-shadow:var(--card-shadow);
+    }
+    .quote-block .q-left{
+      flex:1;
+    }
+    .quote-block .q-left blockquote{
+      margin:0;
+      font-size:20px;
+      font-weight:700;
+      line-height:1.25;
+      letter-spacing:0.2px;
+    }
+    .quote-block .q-right{
+      width:200px;
+      text-align:center;
+      opacity:0.9;
+      color:rgba(255,255,255,0.9);
+      font-weight:600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px){
+      .the-store{grid-template-columns:1fr}
+      .store-image{height:320px}
+      .why{grid-template-columns:1fr}
+      .quote-block{flex-direction:column; text-align:left}
+      .quote-block .q-right{width:100%; margin-top:12px}
+    }
+    @media (max-width:480px){
+      .store-image{height:240px}
+      .hero .title{font-size:26px}
+      .main-body{padding-inline:18px}
+      .top-header h1{font-size:20px;}
+    }

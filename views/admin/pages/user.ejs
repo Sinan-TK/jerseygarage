@@ -1,0 +1,156 @@
+<div class="users-page">
+
+  <div class="page-header">
+    <h2>Users</h2>
+    <p class="subtext">View and manage all registered users.</p>
+  </div>
+
+  <div class="users-card">
+
+    <form action="/admin/users/search" method="GET">
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+
+        <input id="filterInput" class="search-users" name="searchContent" placeholder="Search users..."
+          value="<%= typeof searchContent !== 'undefined' ? searchContent : '' %>">
+
+        <div class="custom-dropdown">
+          <div class="dropdown-selected">All Users</div>
+          <ul class="dropdown-options">
+            <li data-value="all">All Users</li>
+            <li data-value="active">Active Users</li>
+            <li data-value="blocked">Blocked Users</li>
+          </ul>
+
+        </div>
+        <input type="hidden" id="statusFilter" name="userStatus" value="all">
+
+        <button class="apply-btn" type="submit">Apply</button>
+
+        <button id="clearFilter" type="submit" class="clear-btn">Clear</button>
+
+    </form>
+
+  </div>
+
+  <table class="users-table">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Contact</th>
+        <th>Orders</th>
+        <th>Total Spent</th>
+        <th>Join Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="userTableBody">
+
+      <% if (users.length===0) { %>
+        <tr>
+          <td colspan="7" style="text-align:center; padding:20px;">No users found</td>
+        </tr>
+        <% } %>
+
+          <% users.forEach(user=> { %>
+            <tr data-name="<%= user.full_name %>" data-status="<%= user.is_blocked ? 'blocked' : 'active' %>"
+              data-userid="<%= user._id %>">
+
+              <td class="user-info">
+                <img src="<%= user.avatar || '/img/default-user.png' %>" class="avatar">
+                <%= user.full_name %>
+              </td>
+
+              <td>
+                <strong>
+                  <i class="fa-solid fa-envelope"></i>
+                  <%= user.email %><br>
+                </strong>
+
+                <i class="fa-solid fa-phone"></i>
+                <%= user.phone_no || "N/A" %>
+              </td>
+
+              <td>
+                <%= user.orderCount %>
+              </td>
+
+              <td>₹<%= user.totalSpent.toLocaleString() %>
+              </td>
+
+              <td>
+                <%= user.createdAt.toDateString() %>
+              </td>
+
+              <td>
+                <span class="status <%= user.is_blocked ? 'inactive' : 'active' %>" data-id="<%= user._id %>">
+                  <%= user.is_blocked ? 'Blocked' : 'Active' %>
+                </span>
+              </td>
+
+              <td>
+                <% if (user.is_blocked) { %><!-- unblock -->
+                  <div id="unblock">
+                    <i class="fa-solid fa-unlock block-icon unblock"></i>
+                  </div>
+                  <% } else { %>
+                    <div id="block">
+                      <i class="fa-solid fa-ban block-icon"></i>
+                    </div>
+                    <% } %>
+              </td>
+
+            </tr>
+            <% }) %>
+
+    </tbody>
+  </table>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+
+    <!-- LEFT ARROW: show ONLY if NOT first page -->
+    <% if (currentPage> 1) { %>
+      <a href="/admin/users?page=<%= currentPage - 1 %>" class="arrow-btn">
+        <i class="fa-solid fa-chevron-left"></i>
+      </a>
+      <% } %>
+
+        <!-- CURRENT PAGE NUMBER -->
+        <span class="current-page-display">
+          <%= currentPage %>
+        </span>
+
+        <!-- RIGHT ARROW: show ONLY if NOT last page -->
+        <% if (currentPage < totalPages) { %>
+          <a href="/admin/users?page=<%= currentPage + 1 %>" class="arrow-btn">
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+          <% } %>
+
+  </div>
+
+
+
+</div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Confirm Action</h3>
+    <p id="modalMessage">Are you sure?</p>
+
+    <div class="modal-buttons">
+      <button id="cancelBtn" class="cancel-btn">Cancel</button>
+      <button id="confirmBtn" type="button" class="confirm-btn">Yes, Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>window.userStatusFromServer = "<%= typeof userStatus !== 'undefined' ? userStatus : 'all' %>";</script>
+
+

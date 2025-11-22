@@ -1,0 +1,243 @@
+:root {
+  --bg: #ffffff;
+  --card-border: #f0f0f0;
+  --muted: #666666;
+  --black: #000000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--black);
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 30px;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 40px;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--black);
+  text-align: center;
+}
+
+.logo .icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  border: 2px solid var(--black);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 600;
+}
+
+/* Card */
+.card {
+  width: 420px;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px 44px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.card h2 {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.card p.lead {
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+label {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.input-group {
+  margin-bottom: 24px;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  font-size: 15px;
+  background: #fafafa;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  font-weight: 400;
+}
+
+input:focus {
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.03);
+  background: #fff;
+}
+
+.password-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.password-row a {
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--black);
+  font-weight: 500;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  background: var(--black);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Error popup */
+.error-box {
+  background: #ffe5e5;
+  border: 1px solid #ffb3b3;
+  color: #d9534f;
+  padding: 12px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.error-box i {
+  font-size: 18px;
+  color: #d9534f;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ---------------------------
+       RESPONSIVE DESIGN
+       --------------------------- */
+@media (max-width: 768px) {
+  body {
+    padding: 20px;
+  }
+
+  .logo {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .logo .icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .card {
+    width: 100%;
+    padding: 28px 24px;
+  }
+
+  .card h2 {
+    font-size: 22px;
+  }
+
+  .card p.lead {
+    font-size: 14px;
+  }
+
+  label,
+  input,
+  .btn {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 16px;
+  }
+
+  .card {
+    border-radius: 10px;
+    padding: 24px 20px;
+  }
+
+  .logo {
+    font-size: 15px;
+  }
+
+  .logo .icon {
+    width: 36px;
+    height: 36px;
+    font-size: 17px;
+  }
+
+  .card h2 {
+    font-size: 20px;
+  }
+
+  .btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+}

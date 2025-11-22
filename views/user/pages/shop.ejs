@@ -1,0 +1,165 @@
+<section class="body">
+
+    <div class="shop-wrapper">
+
+        <div class="layout">
+
+            <aside class="filters-box">
+
+                <h2>Filter</h2>
+                <div class="dropdown" id="catDD">
+                    <button class="dropdown-toggle" onclick="toggleDD('catDD')">
+                        Categories <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <label><input type="checkbox"> Retro Jerseys</label>
+                        <label><input type="checkbox"> Five Sleeves</label>
+                        <label><input type="checkbox"> Classic Jerseys</label>
+                        <label><input type="checkbox"> Limited Edition</label>
+                        <label><input type="checkbox"> National Teams</label>
+                        <label><input type="checkbox"> Club Jerseys</label>
+                    </div>
+                </div>
+
+                <div class="dropdown" id="teamDD">
+                    <button class="dropdown-toggle" onclick="toggleDD('teamDD')">
+                        Teams <span>▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <label><input type="checkbox"> Manchester United</label>
+                        <label><input type="checkbox"> Real Madrid</label>
+                        <label><input type="checkbox"> Barcelona</label>
+                        <label><input type="checkbox"> Bayern Munich</label>
+                        <label><input type="checkbox"> Liverpool</label>
+                        <label><input type="checkbox"> PSG</label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <p class="filter-title">Size</p>
+                    <div class="filter-content">
+                        <label><input type="checkbox"> S</label>
+                        <label><input type="checkbox"> M</label>
+                        <label><input type="checkbox"> L</label>
+                        <label><input type="checkbox"> XL</label>
+                        <label><input type="checkbox"> XXL</label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <p class="filter-title">Price Range</p>
+                    <div class="price-slider">
+                        <div class="range-container">
+                            <input type="range" id="minRange" min="0" max="2000" value="200">
+                            <input type="range" id="maxRange" min="0" max="2000" value="1800">
+                        </div>
+                        <p id="priceDisplay">₹200 - ₹1800</p>
+                    </div>
+                </div>
+
+            </aside>
+
+            <div>
+
+                <h1 class="page-title">Shop Jerseys</h1>
+                <p class="page-subtitle">Discover your perfect jersey</p>
+
+                <div class="sort-box">
+                    <select>
+                        <option>Sort by: Featured</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Newest Arrivals</option>
+                    </select>
+                </div>
+
+                <div class="shop-grid">
+
+                    <div class="shop-card">
+                        <img class="product-img" src="https://i.ibb.co/DzNQn07/retro1.jpg"
+                            alt="Manchester United Retro Jersey">
+                        <div class="shop-card-body">
+                            <p class="product-title">Manchester United Retro 1999</p>
+                            <p class="product-team">Manchester United</p>
+                            <div class="price-row">
+                                <p class="price">₹1,799</p>
+                                <button class="add-btn">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <img class="product-img" src="https://i.ibb.co/HF7W6jZ/realball.jpg"
+                            alt="Real Madrid Home Jersey">
+                        <div class="shop-card-body">
+                            <p class="product-title">Real Madrid Home 2023</p>
+                            <p class="product-team">Real Madrid</p>
+                            <div class="price-row">
+                                <p class="price">₹1,599</p>
+                                <button class="add-btn">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <img class="product-img" src="https://i.ibb.co/kgf3mgk/barca.jpg"
+                            alt="Barcelona Classic Jersey">
+                        <div class="shop-card-body">
+                            <p class="product-title">Barcelona Classic 2015</p>
+                            <p class="product-team">Barcelona</p>
+                            <div class="price-row">
+                                <p class="price">₹1,399</p>
+                                <button class="add-btn">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <img class="product-img" src="https://i.ibb.co/4JRf2k8/bayern.jpg"
+                            alt="Bayern Munich Limited Edition Jersey">
+                        <div class="shop-card-body">
+                            <p class="product-title">Bayern Munich Limited</p>
+                            <p class="product-team">Bayern Munich</p>
+                            <div class="price-row">
+                                <p class="price">₹1,999</p>
+                                <button class="add-btn">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <img class="product-img" src="https://i.ibb.co/HVb76ox/liverpool.jpg"
+                            alt="Liverpool Five Sleeves Jersey">
+                        <div class="shop-card-body">
+                            <p class="product-title">Liverpool Five Sleeves</p>
+                            <p class="product-team">Liverpool</p>
+                            <div class="price-row">
+                                <p class="price">₹1,699</p>
+                                <button class="add-btn">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-card">
+                        <img class="product-img" src="https://i.ibb.co/HYpcqgn/psg.jpg" alt="PSG Away Jersey">
+                        <div class="shop-card-body">
+                            <p class="product-title">PSG Away 2024</p>
+                            <p class="product-team">Paris Saint-Germain</p>
+                            <div class="price-row">
+                                <p class="price">₹1,499</p>
+                                <button class="add-btn">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <script src="/js/user/shop.js"></script>
+
+</section>

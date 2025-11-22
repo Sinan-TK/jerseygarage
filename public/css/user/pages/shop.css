@@ -1,0 +1,298 @@
+/* ===========================================
+        GLOBAL
+        =========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Added common sans-serif fonts */
+}
+
+.body {
+    background: #fff;
+    color: #111;
+}
+
+.shop-wrapper {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* Responsive padding for smaller screens */
+@media (max-width: 600px) {
+    .shop-wrapper {
+        padding: 0 15px;
+    }
+}
+
+/* ===========================================
+        LAYOUT
+        =========================================== */
+.layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    padding-block: 40px;
+}
+
+/* Stack layout on tablets and smaller */
+@media (max-width: 900px) {
+    .layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* ===========================================
+        FILTERS BOX
+        =========================================== */
+.filters-box {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 12px;
+    height: fit-content;
+}
+
+/* New Filter Heading Style */
+.filters-box h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #111;
+    /* Stronger divider for the main heading */
+}
+
+/* Styles for filter sections that ARE dropdowns (Categories, Teams) */
+.dropdown {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.dropdown-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 10px 0;
+}
+
+.dropdown-content {
+    margin-top: 10px;
+    display: none;
+}
+
+.dropdown.open .dropdown-content {
+    display: block;
+}
+
+/* Styles for filter sections that ARE NOT dropdowns (Size, Price) */
+.filter-section {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.filter-section:last-child {
+    border-bottom: none;
+    /* Remove border from the last item */
+}
+
+.filter-title {
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 10px 0;
+    margin-top: 0;
+}
+
+
+.dropdown label,
+.filter-section label {
+    display: block;
+    margin: 5px 0;
+    font-size: .9rem;
+    color: #444;
+}
+
+/* Checkbox color change */
+input[type="checkbox"] {
+    accent-color: black;
+    /* This changes the checkbox fill color when checked */
+    margin-right: 5px;
+    /* Add some space between checkbox and label text */
+}
+
+
+/* ===========================================
+        DOUBLE RANGE SLIDER
+        =========================================== */
+.price-slider {
+    margin-top: 10px;
+}
+
+.range-container {
+    position: relative;
+    height: 40px;
+}
+
+input[type=range] {
+    position: absolute;
+    width: 100%;
+    pointer-events: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+}
+
+/* Black track */
+input[type=range]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #000;
+    border-radius: 3px;
+}
+
+/* Pointer */
+input[type=range]::-webkit-slider-thumb {
+    pointer-events: auto;
+    -webkit-appearance: none;
+    height: 18px;
+    width: 18px;
+    background: #000;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -7px;
+    /* Adjust to center on track */
+}
+
+/* Price Display */
+#priceDisplay {
+    margin-top: 5px;
+    text-align: center;
+    font-weight: 600;
+}
+
+
+/* ===========================================
+        PRODUCT GRID & CARDS
+        =========================================== */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* Responsive grid adjustment for smaller screens */
+@media (max-width: 600px) {
+    .shop-grid {
+        grid-template-columns: 1fr;
+        /* Single column on very small screens */
+    }
+}
+
+
+.shop-card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.shop-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
+}
+
+.product-img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+}
+
+/* Smaller image height on mobile */
+@media (max-width: 600px) {
+    .product-img {
+        height: 300px;
+    }
+}
+
+
+.shop-card-body {
+    padding: 15px;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.product-team {
+    font-size: .85rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.add-btn {
+    background: #000;
+    color: #fff;
+    padding: 8px 14px;
+    font-size: .85rem;
+    border: none;
+    /* Add border: none for button */
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.add-btn:hover {
+    background: #333;
+}
+
+.sort-box {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+/* Full width sort box on smaller screens */
+@media (max-width: 900px) {
+    .sort-box {
+        text-align: left;
+    }
+}
+
+
+.sort-box select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* title & subtitle */
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.page-subtitle {
+    color: #666;
+    margin-bottom: 20px;
+}

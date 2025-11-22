@@ -1,0 +1,111 @@
+:root {
+      --bg: #f9fafb;
+      --text: #111;
+      --muted: #6b6b6b;
+      --accent: #000;
+      --gray: #e5e7eb;
+      --maxw: 600px;
+      --shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    .body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color: var(--text);
+    }
+
+    .container {
+      text-align: center;
+      padding: 60px 24px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 90%;
+      max-width: var(--maxw);
+    }
+
+    /* Better clean warning icon */
+    .icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 44px;
+      font-weight: 900;
+      color: #000;
+      border: 2px solid #ddd;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 420px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      font-weight: 600;
+      padding: 12px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn.primary:hover {
+      background: #333;
+    }
+
+    .btn.secondary {
+      background: #f3f4f6;
+      color: #111;
+    }
+    .btn.secondary:hover {
+      background: #e5e7eb;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 40px 18px;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      p {
+        font-size: 14px;
+      }
+      .icon {
+        width: 64px;
+        height: 64px;
+        font-size: 36px;
+      }
+    }

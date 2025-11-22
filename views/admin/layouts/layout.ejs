@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= title || "Admin Panel" %> - JerseyGarage
+  </title>
+
+  <!-- toastr -->
+  <link rel="stylesheet" href="/vendor/toastr/toastr.min.css">
+  <script src="/vendor/toastr/jquery.min.js"></script>
+  <script src="/vendor/toastr/toastr.min.js"></script>
+
+
+  <!-- Global Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <% if (showLayout !==false) { %>
+    <link rel="stylesheet" href="/css/admin/layout.css">
+    <% } %>
+
+      <!-- Optional Page-Specific CSS -->
+      <% if (cssFile) { %>
+        <link rel="stylesheet" href="<%= cssFile %>">
+        <% } %>
+
+          <style>
+
+          </style>
+</head>
+
+<body>
+  <% if (showLayout !==false) { %>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="top">
+        <div class="logo">
+          <div class="logo-icon">JG</div>
+          <div class="logo-text">JerseyGarage</div>
+        </div>
+
+        <nav class="nav-links">
+          <a href="/admin/dashboard" class="nav-item <%= title === 'Dashboard' ? 'active' : '' %> ">
+            <i class="fa-solid fa-chart-simple"></i> <span>Dashboard</span>
+          </a>
+          <a href="/admin/users" class="nav-item <%= title === 'Users' ? 'active' : '' %>">
+            <i class="fa-regular fa-user"></i> <span>Users</span>
+          </a>
+          <a href="/admin/products" class="nav-item <%= title === 'Products' ? 'active' : '' %>">
+            <i class="fa-solid fa-box"></i> <span>Products</span>
+          </a>
+          <a href="/admin/categories" class="nav-item <%= title === 'Categories' ? 'active' : '' %>">
+            <i class="fa-solid fa-layer-group"></i> <span>Categories</span>
+          </a>
+          <a href="/admin/offers" class="nav-item <%= title === 'Offers' ? 'active' : '' %>">
+            <i class="fa-solid fa-percent"></i> <span>Offers</span>
+          </a>
+          <a href="/admin/orders" class="nav-item <%= title === 'Orders' ? 'active' : '' %>">
+            <i class="fa-solid fa-cart-shopping"></i> <span>Orders</span>
+          </a>
+          <a href="/admin/payments" class="nav-item <%= title === 'Payments' ? 'active' : '' %>">
+            <i class="fa-regular fa-credit-card"></i> <span>Payments</span>
+          </a>
+          <a href="/admin/refunds" class="nav-item <%= title === 'Refunds' ? 'active' : '' %>">
+            <i class="fa-solid fa-rotate"></i> <span>Refunds</span>
+          </a>
+          <a href="/admin/reviews" class="nav-item <%= title === 'Reviews' ? 'active' : '' %>">
+            <i class="fa-regular fa-star"></i> <span>Review</span>
+          </a>
+        </nav>
+      </div>
+
+      <form action="/admin/logout" method="GET">
+        <button class="logout">
+          <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+        </button>
+      </form>
+
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="topbar">
+        <div class="search-bar">
+          <input type="text" placeholder="Search orders, products..." />
+        </div>
+        <div class="right-section">
+          <div class="notification"><i class="fa-regular fa-bell"></i></div>
+          <div class="user-profile">
+            <div class="admin-info">
+              <div class="name">Admin</div>
+              <div class="role">Administrator</div>
+            </div>
+            <div class="avatar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Page Content -->
+      <main class="dashboard-section">
+        <%- body %>
+      </main>
+    </div>
+    <% } else { %>
+      <%- body %>
+        <% } %>
+
+          <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+          <script>
+            toastr.options = {
+              closeButton: true,
+              progressBar: true,
+              positionClass: "toast-top-right",
+              timeOut: 5000,
+            };
+          </script>
+
+          <% if (pageJS) { %>
+            <script src="/js/admin/<%= pageJS %>"></script>
+            <% } %>
+
+</body>
+
+</html>

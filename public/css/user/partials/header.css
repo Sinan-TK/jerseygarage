@@ -1,0 +1,351 @@
+/* ---------------------- HEADER ---------------------- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 60px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+.hamburger-icon {
+  font-size: 26px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.3s ease;
+  display: block; /* ✅ Always visible */
+}
+
+.hamburger-icon:hover {
+  transform: scale(1.1);
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: black;
+}
+
+/* ---------------------- LOGO ---------------------- */
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ---------------------- HEADER RIGHT ---------------------- */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.search,
+.account,
+.cart {
+  font-size: 20px;
+  text-decoration: none;
+  color: black;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-text {
+  font-size: 15px;
+  margin-left: 5px;
+  color: #333;
+  transition: color 0.3s;
+  padding-left: 8px;
+}
+
+.cart-count {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: black;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+/* ---------------------- SIDEBAR ---------------------- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -340px;
+  width: 320px;
+  height: 100vh;
+  background-color: #fff;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+/* ---------------------- SIDEBAR HEADER ---------------------- */
+.sidebar-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 25px;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-btn {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* ---------------------- SCROLLABLE CONTENT ---------------------- */
+.menu-container {
+  flex: 1;
+  overflow-y: auto; /* ✅ Scrolls when content overflows */
+  overflow-x: hidden;
+  padding: 10px 25px 20px;
+  -webkit-overflow-scrolling: touch; /* Smooth mobile scrolling */
+  scrollbar-width: none; /* Hide scrollbar on Firefox */
+}
+
+.menu-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar on Chrome/Safari */
+}
+
+/* ---------------------- MENU SECTION TITLE ---------------------- */
+.section-title {
+  color: #9a9a9a;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 25px 0 10px;
+}
+
+/* ---------------------- MENU ITEMS ---------------------- */
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #222;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+}
+
+.menu-item span.icon {
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.menu-item:hover {
+  background-color: #f1f1f1;
+  color: #000;
+}
+
+/* ---------------------- CATEGORY ITEMS ---------------------- */
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #444;
+  padding: 15px 15px;
+  font-size: 15px;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: background 0.2s ease;
+}
+
+.category-item:hover {
+  background-color: #f1f1f1;
+  color: #000;
+}
+
+/* ---------------------- SIDEBAR FOOTER ---------------------- */
+.sidebar-footer {
+  flex-shrink: 0;
+  border-top: 1px solid #eee;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-footer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.account-btn {
+  background-color: #000;
+  color: white;
+}
+
+.account-btn:hover {
+  opacity: 0.85;
+}
+
+.cart-btn {
+  border: 1.5px solid #000;
+  color: black;
+  background: none;
+}
+
+.cart-btn:hover {
+  background-color: #000;
+  color: white;
+}
+
+.sidebar-footer-btn span {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+/* ---------------------- OVERLAY ---------------------- */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ---------------------- BODY SCROLL LOCK ---------------------- */
+body.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+  touch-action: none;
+}
+
+/* ---------------------- SCROLLBAR ---------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 5px;
+}
+
+/* ---------------------- RESPONSIVE ---------------------- */
+@media (max-width: 1024px) {
+  .header {
+    padding: 20px 40px;
+  }
+
+  .header-left {
+    gap: 40px;
+  }
+
+  .logo {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-nav,
+  .header-right {
+    display: none; /* hide right icons on smaller screens */
+  }
+
+  .hamburger-icon {
+    display: block; /* ✅ Always visible */
+  }
+
+  .logo {
+    position: static;
+    transform: none;
+    margin: 0 auto;
+  }
+
+  .header {
+    padding: 20px 25px;
+  }
+
+  .sidebar {
+    width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 15px 20px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .sidebar {
+    width: 260px;
+  }
+
+  .menu-item,
+  .category-item {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .sidebar-footer-btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+}

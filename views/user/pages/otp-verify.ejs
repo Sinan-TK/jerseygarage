@@ -1,0 +1,57 @@
+<main class="account-section">
+  <section class="otp-card" id="section">
+    <h3 class="otp-heading">Verify OTP</h3>
+
+    
+    <p class="otp-subtext">
+      Please enter the 6-digit verification code sent to your email address.
+      You will need to verify your account to continue.
+    </p>
+    <!-- ERROR MESSAGE -->
+      <div id="otpError" class="error-box" style="display:none;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="otpErrorText"></span>
+      </div>
+
+    <!-- OTP FORM -->
+    <div class="otp-form">
+      <div class="otp-inputs">
+        <input type="number" maxlength="1" name="otp[]" required />
+        <input type="number" maxlength="1" name="otp[]" required />
+        <input type="number" maxlength="1" name="otp[]" required />
+        <input type="number" maxlength="1" name="otp[]" required />
+        <input type="number" maxlength="1" name="otp[]" required />
+        <input type="number" maxlength="1" name="otp[]" required />
+      </div>
+
+      <!-- Verify Button -->
+      <button type="submit" onclick="verifyOtp()" class="verify-btn">Verify OTP</button>
+    </div>
+
+    <!-- OTP EXPIRY TIMER -->
+    <p class="timer" id="otp-expire">
+      OTP will expire in <span id="expire-timer">02:00</span>
+    </p>
+
+    <!-- RESEND SECTION -->
+    <div class="resend-wrapper">
+      <span>Didn’t receive the code?</span>
+
+      <div id="resendForm">
+        <button type="button" id="resend-link">Resend OTP</button>
+      </div>
+    </div>
+
+    <p class="timer" id="resend-timer">
+      Resend available in <span id="resend-count">30</span>s
+    </p>
+
+    <p class="back-login">
+      Remember your password? <a href="/login">Back to Login</a>
+    </p>
+
+    <!-- Dynamic Expired Message -->
+    <p class="otp-expired-message" id="otp-expired-msg"></p>
+
+  </section>
+</main>

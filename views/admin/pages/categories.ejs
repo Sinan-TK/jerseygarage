@@ -1,0 +1,314 @@
+<div class="categories-page">
+
+    <div class="top-header">
+        <div>
+            <h2>Categories</h2>
+            <p>Organize your product categories</p>
+
+            <!-- <form action="/categories/add" method="POST"> -->
+            <button type="button" class="add-btn" onclick="openCategoryModal()">
+                <span>+</span> Add Category
+            </button>
+            <!-- </form> -->
+        </div>
+        <div class="category-card">
+
+            <form action="/admin/categories/search" method="GET">
+
+                <!-- FILTER BAR -->
+                <div class="filter-bar">
+
+                    <input id="filterInput" class="search-category" name="searchContent"
+                        value="<%= typeof searchContent !== 'undefined' ? searchContent : '' %>" placeholder="Search categories...">
+
+                    <div class="custom-dropdown">
+                        <div class="dropdown-selected">All Categories</div>
+                        <ul class="dropdown-options">
+                            <li data-value="all">All Categories</li>
+                            <li data-value="active">Active Categories</li>
+                            <li data-value="blocked">Blocked Categories</li>
+                        </ul>
+
+                    </div>
+                    <input type="hidden" id="statusFilter" name="categoryStatus" value="all">
+
+                    <button class="apply-btn">Apply</button>
+
+                    <button id="clearFilter" type="submit" class="clear-btn">Clear</button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<div class="categories-grid">
+
+    <!-- Category Card -->
+
+    <% if(categories.length===0){ %>
+        <div class="cat-card" style="--bg:#f7f7f7;">
+            <div class="icon-box"><i class="fa-solid fa-exclamation"></i></div>
+            <h3>No category found</h3>
+            <p class="desc"></p>
+            <p class="coun"><strong></strong> </p>
+            <div class="actions">
+            </div>
+        </div>
+        <% } %>
+
+            <% categories.forEach(category=> { %>
+                <div class="cat-card" data-id="<%= category._id %>" data-name="<%= category.name %>"
+                    style="--bg:<%= category.color %>;">
+                    <div class="icon-box"><i class="fa-regular fa-folder"></i></div>
+                    <h3>
+                        <%= category.name %>
+                    </h3>
+                    <p class="desc">
+                        <%= category.description %>
+                    </p>
+
+                    <p class="status <%= category.is_active ? 'active' : 'inactive' %>" data-id="<%= category._id %>">
+                        <%= category.is_active ? 'Active' : 'Blocked' %>
+                    </p>
+
+
+                    <div class="actions">
+                        <button class="edit" data-id="<%= category._id %>" data-name="<%= category.name %>"
+                            data-description="<%= category.description %>" data-color="<%= category.color %>"
+                            onclick="openEditModal()">Edit</button>
+                        <button class="view" onclick="openModalProductList()">View Products</button>
+                        <button
+                            class="cat-action <%= category.is_active ? 'block block-category' : 'unblock unblock-category' %>"
+                            data-name="<%= category.name %>" data-id="<%= category._id %>">
+                            <%= category.is_active ? 'Block' : 'Unblock' %>
+                        </button>
+                    </div>
+                </div>
+
+                <% }); %>
+
+</div>
+</div>
+
+<div class="pagination">
+
+    <!-- LEFT ARROW: show ONLY if NOT first page -->
+    <% if (currentPage> 1) { %>
+        <a href="/admin/categories?page=<%= currentPage - 1 %>" class="arrow-btn">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        <% } %>
+
+            <!-- CURRENT PAGE NUMBER -->
+            <span class="current-page-display">
+                <%= currentPage %>
+            </span>
+
+            <!-- RIGHT ARROW: show ONLY if NOT last page -->
+            <% if (currentPage < totalPages) { %>
+                <a href="/admin/categories?page=<%= currentPage + 1 %>" class="arrow-btn">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+                <% } %>
+
+</div>
+
+<!-- view products modal -->
+
+<!-- Overlay -->
+<div id="viewProductsModal" class="modal-overlay">
+
+    <!-- Modal Box -->
+    <div class="modal-box">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <div>
+                <h2>NBA Jerseys</h2>
+                <p>45 products in this category</p>
+            </div>
+            <button class="close-modal">&times;</button>
+        </div>
+
+        <!-- Product List -->
+        <div class="modal-products">
+
+            <!-- Product Item -->
+            <div class="product-item">
+                <img src="https://via.placeholder.com/90" alt="">
+                <div class="info">
+                    <h3>Bulls Classic Jersey</h3>
+                    <div class="meta">
+                        <span>₹99.99</span>
+                        <span>•</span>
+                        <span>12 in stock</span>
+                    </div>
+                    <a class="details" href="#">View Details →</a>
+                </div>
+            </div>
+
+            <div class="product-item">
+                <img src="https://via.placeholder.com/90" alt="">
+                <div class="info">
+                    <h3>Celtics Home Jersey</h3>
+                    <div class="meta">
+                        <span>₹89.99</span>
+                        <span>•</span>
+                        <span>31 in stock</span>
+                    </div>
+                    <a class="details" href="#">View Details →</a>
+                </div>
+            </div>
+
+            <div class="product-item">
+                <img src="https://via.placeholder.com/90" alt="">
+                <div class="info">
+                    <h3>Celtics Home Jersey</h3>
+                    <div class="meta">
+                        <span>₹89.99</span>
+                        <span>•</span>
+                        <span>31 in stock</span>
+                    </div>
+                    <a class="details" href="#">View Details →</a>
+                </div>
+            </div>
+
+            <div class="product-item">
+                <img src="https://via.placeholder.com/90" alt="">
+                <div class="info">
+                    <h3>Celtics Home Jersey</h3>
+                    <div class="meta">
+                        <span>₹89.99</span>
+                        <span>•</span>
+                        <span>31 in stock</span>
+                    </div>
+                    <a class="details" href="#">View Details →</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="close-footer">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Overlay modal add category -->
+<div id="categoryModal" class="modal-overlay">
+    <div class="modal">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Add Category</h2>
+            <span class="close-btn close-category-modal" id="closeModal">&times;</span>
+        </div>
+
+        <!-- ERROR MESSAGE -->
+        <div id="editError" class="error-box" style="display:none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="editErrorText"></span>
+        </div>
+
+        <!-- Form -->
+        <div id="categoryForm" action="/admin/categories/add" method="POST">
+
+            <label>Category Name</label>
+            <input type="text" name="name" id="addCategoryName" class="input-field" placeholder="Category Name">
+
+            <label>Description</label>
+            <textarea name="description" id="addCategoryDescription" class="input-field" rows="3" placeholder="Write description..."></textarea>
+
+            <label>Color Theme</label>
+
+            <div class="color-grid">
+                <div class="color-box" data-color="#dfeafe" style="background:#dfeafe"></div>
+                <div class="color-box" data-color="#f4e9ff" style="background:#f4e9ff"></div>
+                <div class="color-box" data-color="#e2ffe9" style="background:#e2ffe9"></div>
+                <div class="color-box" data-color="#fff5c6" style="background:#fff5c6"></div>
+                <div class="color-box" data-color="#ffe1e1" style="background:#ffe1e1"></div>
+                <div class="color-box" data-color="#f7f7f7" style="background:#f7f7f7"></div>
+            </div>
+
+            <input type="hidden"  name="color" id="selectedColor">
+
+            <!-- Buttons -->
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn close-category-modal">Cancel</button>
+                <button type="submit" class="save-btn" onclick="addCategory()">Save</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Overlay modal edit category -->
+<div id="editCategoryModal" class="modal-overlay">
+    <div class="modal">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Edit Category</h2>
+            <span class="close-btn close-category-modal close-edit-modal" id="closeModal">&times;</span>
+        </div>
+
+        <!-- ERROR MESSAGE -->
+        <div id="editError" class="error-box" style="display:none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="editErrorText"></span>
+        </div>
+
+        <!-- Form -->
+        <div id="editCategoryForm">
+
+            <!-- <input type="text" type="hidden" id="categoryId" value="" > -->
+
+            <label>Category Name</label>
+            <input type="text" name="name" class="input-field" id="editCategoryName" placeholder="Category Name">
+
+            <label>Description</label>
+            <textarea name="description" id="editCategoryDescription" class="input-field" rows="3"
+                placeholder="Write description..."></textarea>
+
+            <label>Color Theme</label>
+
+            <div class="color-grid">
+                <div class="color-box color-box-edit" data-color="#dfeafe" style="background:#dfeafe"></div>
+                <div class="color-box color-box-edit" data-color="#f4e9ff" style="background:#f4e9ff"></div>
+                <div class="color-box color-box-edit" data-color="#e2ffe9" style="background:#e2ffe9"></div>
+                <div class="color-box color-box-edit" data-color="#fff5c6" style="background:#fff5c6"></div>
+                <div class="color-box color-box-edit" data-color="#ffe1e1" style="background:#ffe1e1"></div>
+                <div class="color-box color-box-edit" data-color="#f7f7f7" style="background:#f7f7f7"></div>
+            </div>
+
+            <input type="hidden" id="editCategoryColor" name="color">
+
+            <!-- Buttons -->
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn close-category-modal close-edit-modal">Cancel</button>
+                <button type="submit" class="save-btn" onclick="editConfirm()">Save Changes</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="confirm-modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Confirm Action</h3>
+        <p id="modalMessage">Are you sure?</p>
+
+        <div class="modal-buttons">
+            <button id="cancelBtn" class="cancel-btn">Cancel</button>
+            <a id="confirmBtn" class="confirm-btn" onclick="blockConfirm()">Yes, Continue</a>
+        </div>
+    </div>
+</div>
+
+<script>window.userStatusFromServer = "<%= typeof categoryStatus !== 'undefined' ? categoryStatus : 'all' %>";</script>

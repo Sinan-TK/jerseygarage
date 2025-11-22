@@ -1,0 +1,60 @@
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const User = require("../models/userModel");
+
+module.exports = () => {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "/google/callback",
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const email = profile.emails[0].value;
+
+          // 🟢 1. Check if user already exists by email (normal signup user)
+          let existingUser = await User.findOne({ email });
+
+          if (existingUser) {
+            // If user signed up normally before, but now using Google login
+            if (!existingUser.googleId) {
+              existingUser.googleId = profile.id;
+              existingUser.is_verified = true; // because Google email verified
+              await existingUser.save();
+            }
+            return done(null, existingUser);
+          }
+          
+
+          // 🔵 2. If new Google user, create new record
+          let newUser = await User.create({
+            googleId: profile.id,
+            full_name: profile.displayName,
+            email: email,
+            avatar: profile.photos?.[0]?.value || "/img/default-user.png",
+            password_hash: null,
+            is_verified: true,
+          });
+
+          return done(null, newUser);
+        } catch (err) {
+          console.log(err);
+          return done(err, null);
+        }
+      }
+    )
+  );
+
+  // Save user to session
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
+  // Retrieve user from session
+  passport.deserializeUser(async (id, done) => {
+    const user = await User.findById(id);
+    done(null, user);
+  });
+};

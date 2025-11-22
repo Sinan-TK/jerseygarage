@@ -1,0 +1,38 @@
+  
+  <!-- <% if (errorMessage) { %>
+      <div class="popup"><%= errorMessage %></div>
+  <% } %> -->
+  
+  <div class="logo">
+    <div class="icon">i</div>
+    <div>JerseyGarage Admin Panel</div>
+  </div>
+
+  <main class="card" aria-labelledby="title">
+    <h2 id="title">Admin Sign In</h2>
+
+    <p class="lead">Welcome back. Please enter your credentials to log in.</p>
+
+    <!-- ERROR MESSAGE -->
+      <div id="loginError" class="error-box" style="display:none;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="loginErrorText"></span>
+      </div>
+
+    <div>
+        <div class="input-group">
+      <label for="email">Email Address</label>
+      <input id="email" type="text" name="email" placeholder="Enter your email" />
+    </div>
+
+    <div class="input-group">
+      <div class="password-row">
+        <label for="pw">Password</label>
+        <!-- <a href="#" tabindex="-1">Forgot Password?</a> -->
+      </div>
+      <input id="pw" type="password" name="password" placeholder="Enter your password" />
+    </div>
+    <button class="btn" type="button" onclick="loginVerification()">Sign In</button>
+  </div>
+
+  </main>

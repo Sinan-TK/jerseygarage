@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= title %>
+  </title>
+
+  <!-- Global / Layout CSS -->
+  <link rel="stylesheet" href="/css/user/layout.css">
+
+  <!-- toastr -->
+  <link rel="stylesheet" href="/vendor/toastr/toastr.min.css">
+  <script src="/vendor/toastr/jquery.min.js"></script>
+  <script src="/vendor/toastr/toastr.min.js"></script>
+
+  <!-- Partials CSS -->
+  <link rel="stylesheet" href="/css/user/partials/header.css">
+  <link rel="stylesheet" href="/css/user/partials/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+  <!-- Page-specific CSS -->
+  <% if (pageCSS) { %>
+    <link rel="stylesheet" href="/css/user/pages/<%= pageCSS %>.css">
+    <% } %>
+</head>
+
+<body>
+  <% if (showHeader) { %>
+    <%- include('../partials/header') %>
+      <% } %>
+
+        <main>
+          <%- body %>
+        </main>
+
+        <% if (showFooter) { %>
+          <%- include('../partials/footer') %>
+            <% } %>
+
+              <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+              <script>
+                toastr.options = {
+                  closeButton: true,
+                  progressBar: true,
+                  positionClass: "toast-top-right",
+                  timeOut: 5000,
+                };
+              </script>
+
+              <% if (pageJS) { %>
+                <script src="/js/user/<%= pageJS %>"></script>
+                <% } %>
+
+</body>
+
+</html>

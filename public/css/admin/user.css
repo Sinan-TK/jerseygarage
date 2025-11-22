@@ -1,0 +1,285 @@
+/* ============================
+   GLOBAL
+============================= */
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+}
+
+.users-page {
+  padding: 32px 40px;
+}
+
+.page-header h2 {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.subtext {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.users-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px;
+  border: 1px solid #eee;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================
+   FILTER BAR
+============================= */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.search-users {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.clear-btn {
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #eee;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.apply-btn {
+  padding: 12px 20px;
+  background: #000;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* ============================
+   CUSTOM DROPDOWN
+============================= */
+.custom-dropdown {
+  position: relative;
+  min-width: 180px;
+}
+
+.dropdown-selected {
+  padding: 12px 15px;
+  background: #fff;
+  border: 1px solid #111;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #000;
+  position: relative;
+}
+
+.dropdown-selected::after {
+  content: "▼";
+  font-size: 11px;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: 0.2s;
+}
+
+.dropdown-selected.active::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.dropdown-options {
+  display: none;
+  position: absolute;
+  top: 48px;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #111;
+  border-radius: 10px;
+  list-style: none;
+  padding: 0;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  z-index: 150;
+}
+
+.dropdown-options li {
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.dropdown-options li:hover {
+  background: #000;
+  color: #fff;
+}
+
+.show-options {
+  display: block !important;
+}
+
+/* ============================
+   TABLE
+============================= */
+.users-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+thead th {
+  color: #666;
+  font-size: 13px;
+  padding-bottom: 10px;
+}
+
+#userTableBody tr {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+td {
+  padding: 14px 65px;
+  font-size: 14px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.active {
+  background: #d6f6df;
+  color: #29984c;
+}
+
+.inactive {
+  background: #ffeaea;
+  color: #d9534f;
+}
+
+.block-icon {
+  font-size: 18px;
+  cursor: pointer;
+  color: #555;
+}
+
+/* ============================
+   PAGINATION
+============================= */
+.pagination {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.arrow-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #f7f7f7;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.current-page-display {
+  background: #000;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ============================
+   MODAL
+============================= */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  width: 360px;
+  padding: 28px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.modal-content h3 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.red-title { color: #d9534f; }
+.green-title { color: #28a745; }
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.cancel-btn {
+  background: #eee;
+  padding: 10px 18px;
+  border-radius: 6px;
+}
+
+.confirm-btn {
+  background: #111;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+  .users-page { padding: 20px; }
+  .users-table { display: block; overflow-x: auto; }
+}
