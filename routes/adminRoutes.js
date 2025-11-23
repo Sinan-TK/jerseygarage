@@ -31,7 +31,7 @@ router.patch("/categories/block/:id",adminMiddleware.isLoggedIn, adminController
 
 router.patch("/categories/edit/:id", adminController.editCategory);
 
-router.get("/products",adminMiddleware.isLoggedIn,adminController.featureNotAvailable);
+router.get("/products",adminMiddleware.isLoggedIn,adminController.productsPageRender);
 
 router.get("/categories",adminMiddleware.isLoggedIn,adminController.featureNotAvailable);
 

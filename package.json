@@ -67,6 +67,7 @@
     "nocache": "^4.0.0",
     "node-addon-api": "^8.5.0",
     "node-gyp-build": "^4.8.4",
+    "nodemailer": "^7.0.10",
     "object-inspect": "^1.13.4",
     "on-finished": "^2.4.1",
     "once": "^1.4.0",

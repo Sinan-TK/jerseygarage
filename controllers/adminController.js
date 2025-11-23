@@ -5,6 +5,7 @@ const Category = require("../models/categoryModel");
 const { ObjectId } = require("mongodb");
 const { message } = require("statuses");
 
+
 // ======================================================================
 // 1. RENDER LOGIN PAGE
 // ======================================================================
@@ -168,7 +169,7 @@ const unblockUser = async (req, res) => {
 const getCategories = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
-    const limit = 6;
+    const limit = 8;
     const totalCategory = await Category.countDocuments();
     const totalPages = Math.ceil(totalCategory / limit);
 
@@ -348,6 +349,23 @@ const logOut = (req, res) => {
 };
 
 // ======================================================================
+// PRODUCT PAGE RENDER
+// ======================================================================
+
+const productsPageRender = (req, res) => {
+  res.render("admin/pages/products", {
+    title: "Products",
+    showLayout: true,
+    cssFile: "/css/admin/products.css",
+    errorMessage: "",
+    pageJS: "products.js",
+    categories:[],
+    currentPage:1,
+    totalPages:1,
+  });
+};
+
+// ======================================================================
 // FEATURE NOT AVAILABLE
 // ======================================================================
 
@@ -477,19 +495,6 @@ const searchCategory = async (req, res) => {
     categoryStatus: req.query.categoryStatus || "all",
     searchContent: req.query.searchContent,
   });
-
-  // res.render("admin/pages/c", {
-  //   title: "Users",
-  //   showLayout: true,
-  //   page: "admin/pages/users",
-  //   cssFile: "/css/admin/user.css",
-  //   Ca,
-  //   currentPage: page,
-  //   totalPages,
-  //   userStatus: req.query.userStatus || "all",
-  //   searchContent: req.query.searchContent,
-  //   pageJS: "user.js",
-  // });
 };
 
 // ======================================================================
@@ -510,4 +515,5 @@ module.exports = {
   featureNotAvailable,
   searchUser,
   searchCategory,
+  productsPageRender,
 };

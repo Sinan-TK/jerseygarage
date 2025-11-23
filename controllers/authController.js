@@ -1,9 +1,8 @@
-
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Otp = require("../models/otpModel");
 const otpGenerator = require("otp-generator");
-
+const sendOTP = require("../utils/sendOtp");
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -21,7 +20,7 @@ const loginPage = (req, res) => {
 };
 
 // ======================================================================
-// 2. GOOGLE AUTHENTICATION TRUE 
+// 2. GOOGLE AUTHENTICATION TRUE
 // ======================================================================
 
 const googleCallback = (req, res) => {
@@ -147,7 +146,8 @@ const getEmail = async (req, res) => {
     req.session.tempEmail = email;
     req.session.otpPurpose = "signup";
 
-    // return res.redirect("/verify-otp");
+    await sendOTP(email, otp, "SignUp OTP");
+
     return res.json({
       success: true,
       message: "OTP sended successfully!",
@@ -260,6 +260,8 @@ const resendOtp = async (req, res) => {
     await Otp.deleteMany({ email, purpose });
     await Otp.create({ email, otp_code: otp, purpose });
 
+    await sendOTP(email, otp, "Resend OTP");
+
     return res.json({
       success: true,
       message: "OTP resended successfully!",
@@ -281,7 +283,7 @@ const renderSignupDetails = (req, res) => {
     showHeader: true,
     showFooter: true,
     error: "",
-    pageJS:"register.js"
+    pageJS: "register.js",
   });
 };
 
@@ -292,28 +294,30 @@ const renderSignupDetails = (req, res) => {
 const saveSignupDetails = async (req, res) => {
   try {
     const { fullName, password, confirmPassword } = req.body;
-    console.log(`fullname:${fullName},password:${password},conform password:${confirmPassword}`);
+    console.log(
+      `fullname:${fullName},password:${password},conform password:${confirmPassword}`
+    );
     const email = req.session.tempEmail;
 
-    if (!email){
+    if (!email) {
       return res.json({
-        success:false,
-        message:"Session expired. Please try again!",
+        success: false,
+        message: "Session expired. Please try again!",
         toast: true,
       });
-    } 
+    }
 
     if (!fullName || !password || !confirmPassword) {
       return res.json({
-        success:false,
-        message:"All fields are required!"
+        success: false,
+        message: "All fields are required!",
       });
     }
 
     if (password !== confirmPassword) {
       return res.json({
-        success:false,
-        message:"Passwords do not match!"
+        success: false,
+        message: "Passwords do not match!",
       });
     }
 
@@ -322,8 +326,9 @@ const saveSignupDetails = async (req, res) => {
 
     if (!passwordRegex.test(password)) {
       return res.json({
-        success:false,
-        message:"Password must be at least 8 characters and include uppercase, lowercase, number & special character."
+        success: false,
+        message:
+          "Password must be at least 8 characters and include uppercase, lowercase, number & special character.",
       });
     }
 
@@ -339,9 +344,9 @@ const saveSignupDetails = async (req, res) => {
     delete req.session.otpPurpose;
 
     return res.json({
-      success:true,
-      message:"Account Created Successfully!"
-    })
+      success: true,
+      message: "Account Created Successfully!",
+    });
     return res.redirect("/login");
   } catch (err) {
     console.log(err);
@@ -408,6 +413,8 @@ const emailVerification = async (req, res) => {
 
     req.session.tempEmail = email;
     req.session.otpPurpose = "forget_password";
+
+    await sendOTP(email, otp, "Forgot Password OTP");
 
     return res.json({
       success: true,
