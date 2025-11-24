@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 async function sendOTP(email, otp, message) {
   const transporter = nodemailer.createTransport({
@@ -14,8 +14,6 @@ async function sendOTP(email, otp, message) {
     },
   });
 
-  //   ezri yacj wecb vddm
-
   const mailOptions = {
     from: "jerseygarageofficial@gmail.com",
     to: email,
@@ -26,4 +24,4 @@ async function sendOTP(email, otp, message) {
   await transporter.sendMail(mailOptions);
 }
 
-module.exports = sendOTP;
+export default sendOTP;

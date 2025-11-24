@@ -1,13 +1,13 @@
-const User = require("../models/userModel");
+import User from "../models/userModel.js";
 
-const isLoggedIn = (req, res, next) => {
+export const isLoggedIn = (req, res, next) => {
   // if (req.session.userId) {
   //   return res.redirect("/");
   // }
   next();
 };
 
-const isMailFound = (req, res, next) => {
+export const isMailFound = (req, res, next) => {
   // if (!req.session.tempEmail) {
   //   return res.redirect("/");
   // }
@@ -20,15 +20,15 @@ const isMailFound = (req, res, next) => {
 //     }
 // }
 
-const isNotLoggedIn = (req, res, next) => {
+export const isNotLoggedIn = (req, res, next) => {
   // if (req.session.userId) {
   //   return res.redirect("/");
   // }
   next();
 };
 
-module.exports = {
-  isLoggedIn,
-  isNotLoggedIn,
-  isMailFound,
-};
+// module.exports = {
+//   isLoggedIn,
+//   isNotLoggedIn,
+//   isMailFound,
+// };

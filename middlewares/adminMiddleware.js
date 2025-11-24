@@ -1,20 +1,20 @@
-const Admin = require("../models/adminModel");
+import Admin from "../models/adminModel.js";
 
-const isLoggedIn = (req, res, next) => {
+export const isLoggedIn = (req, res, next) => {
   // if (!req.session.Admin) {
   //   return res.redirect("/admin/login");
   // }
   next();
 };
 
-const adminExists = (req,res,next) => {
+export const adminExists = (req,res,next) => {
     // if(req.session.Admin){
     //     return res.redirect('/admin/dashboard');
     // }
     next();
 }
 
-module.exports = {
-  isLoggedIn,
-  adminExists,
-};
+// module.exports = {
+//   isLoggedIn,
+//   adminExists,
+// };

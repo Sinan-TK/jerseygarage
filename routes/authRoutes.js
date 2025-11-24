@@ -1,7 +1,9 @@
-const router = require("express").Router();
-const authController = require("../controllers/authController");
-const authMiddleware = require("../middlewares/authMiddleware");
-const passport = require("passport");
+import express from "express";
+import * as authController from "../controllers/authController.js";
+import * as authMiddleware from "../middlewares/authMiddleware.js";
+import passport from "passport";
+
+const router = express.Router();
 
 router.use((req, res, next) => {
   res.locals.layout = "user/layouts/layout";
@@ -12,7 +14,7 @@ router.get("/google",passport.authenticate("google", { scope: ["profile", "email
 
 router.get("/google/callback",passport.authenticate("google", { failureRedirect: "/login" }),authController.googleCallback);
 
-router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
+// router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
 
 router.get('/login' ,authMiddleware.isLoggedIn , authController.loginPage);
 
@@ -44,4 +46,4 @@ router.post('/newpassword',authController.newPassValidation);
 
 router.get('/shop',authController.renderShopPage);
 
-module.exports = router;
+export default router;

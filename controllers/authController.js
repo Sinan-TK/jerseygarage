@@ -1,14 +1,19 @@
-const bcrypt = require("bcrypt");
-const User = require("../models/userModel");
-const Otp = require("../models/otpModel");
-const otpGenerator = require("otp-generator");
-const sendOTP = require("../utils/sendOtp");
+// const bcrypt = require("bcrypt");
+// const User = require("../models/userModel");
+// const Otp = require("../models/otpModel");
+// const otpGenerator = require("otp-generator");
+// const sendOTP = require("../utils/sendOtp");
+import bcrypt from "bcrypt";
+import User from "../models/userModel.js";
+import Otp from "../models/otpModel.js";
+import otpGenerator from "otp-generator";
+import sendOTP from "../utils/sendOtp.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
 // ======================================================================
 
-const loginPage = (req, res) => {
+export const loginPage = (req, res) => {
   res.render("user/pages/login", {
     title: "Login",
     error: "",
@@ -23,16 +28,16 @@ const loginPage = (req, res) => {
 // 2. GOOGLE AUTHENTICATION TRUE
 // ======================================================================
 
-const googleCallback = (req, res) => {
+export const googleCallback = (req, res) => {
   // User logged in successfully
   res.redirect("/");
 };
 
 // ======================================================================
-// 2. USER LOGIN VERIFICATION
+// 3. USER LOGIN VERIFICATION
 // ======================================================================
 
-const userVerification = async (req, res) => {
+export const userVerification = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -78,10 +83,10 @@ const userVerification = async (req, res) => {
 };
 
 // ======================================================================
-// 3. SIGNUP PAGE (EMAIL PAGE)
+// 4. SIGNUP PAGE (EMAIL PAGE)
 // ======================================================================
 
-const signUpPage = (req, res) => {
+export const signUpPage = (req, res) => {
   res.render("user/pages/signup", {
     title: "Email SignUp",
     pageCSS: "signup",
@@ -93,10 +98,10 @@ const signUpPage = (req, res) => {
 };
 
 // ======================================================================
-// 4. USER SUBMITS EMAIL (SIGNUP) → GENERATE OTP
+// 5. USER SUBMITS EMAIL (SIGNUP) → GENERATE OTP
 // ======================================================================
 
-const getEmail = async (req, res) => {
+export const getEmail = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -159,10 +164,10 @@ const getEmail = async (req, res) => {
 };
 
 // ======================================================================
-// 5. RENDER OTP PAGE
+// 6. RENDER OTP PAGE
 // ======================================================================
 
-const renderOtpPage = (req, res) => {
+export const renderOtpPage = (req, res) => {
   res.render("user/pages/otp-verify", {
     title: "OTP Verification",
     errorMessage: "",
@@ -174,10 +179,10 @@ const renderOtpPage = (req, res) => {
 };
 
 // ======================================================================
-// 6. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
+// 7. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
 // ======================================================================
 
-const otpVerification = async (req, res) => {
+export const otpVerification = async (req, res) => {
   try {
     const { otpValue } = req.body;
     const email = req.session.tempEmail;
@@ -232,10 +237,10 @@ const otpVerification = async (req, res) => {
 };
 
 // ======================================================================
-// 7. RESEND OTP
+// 8. RESEND OTP
 // ======================================================================
 
-const resendOtp = async (req, res) => {
+export const resendOtp = async (req, res) => {
   try {
     const email = req.session.tempEmail;
     const purpose = req.session.otpPurpose;
@@ -273,10 +278,10 @@ const resendOtp = async (req, res) => {
 };
 
 // ======================================================================
-// 8. SHOW REGISTER PAGE
+// 9. SHOW REGISTER PAGE
 // ======================================================================
 
-const renderSignupDetails = (req, res) => {
+export const renderSignupDetails = (req, res) => {
   res.render("user/pages/register", {
     title: "Register",
     pageCSS: "register",
@@ -288,10 +293,10 @@ const renderSignupDetails = (req, res) => {
 };
 
 // ======================================================================
-// 9. SAVE NEW USER (FINAL REGISTER PAGE)
+// 10. SAVE NEW USER (FINAL REGISTER PAGE)
 // ======================================================================
 
-const saveSignupDetails = async (req, res) => {
+export const saveSignupDetails = async (req, res) => {
   try {
     const { fullName, password, confirmPassword } = req.body;
     console.log(
@@ -355,10 +360,10 @@ const saveSignupDetails = async (req, res) => {
 };
 
 // ======================================================================
-// 10. FORGET PASSWORD PAGE
+// 11. FORGET PASSWORD PAGE
 // ======================================================================
 
-const renderForgetPasswordPage = (req, res) => {
+export const renderForgetPasswordPage = (req, res) => {
   res.render("user/pages/signup", {
     title: "Forget Password",
     pageCSS: "signup",
@@ -370,10 +375,10 @@ const renderForgetPasswordPage = (req, res) => {
 };
 
 // ======================================================================
-// 11. EMAIL SUBMIT (FORGOT PASSWORD)
+// 12. EMAIL SUBMIT (FORGOT PASSWORD)
 // ======================================================================
 
-const emailVerification = async (req, res) => {
+export const emailVerification = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -427,10 +432,10 @@ const emailVerification = async (req, res) => {
 };
 
 // ======================================================================
-// 12. NEW PASSWORD PAGE
+// 13. NEW PASSWORD PAGE
 // ======================================================================
 
-const renderNewPassPage = (req, res) => {
+export const renderNewPassPage = (req, res) => {
   res.render("user/pages/newpassword", {
     title: "New Password",
     pageCSS: "newpassword",
@@ -441,10 +446,10 @@ const renderNewPassPage = (req, res) => {
 };
 
 // ======================================================================
-// 13. UPDATE PASSWORD
+// 14. UPDATE PASSWORD
 // ======================================================================
 
-const newPassValidation = async (req, res) => {
+export const newPassValidation = async (req, res) => {
   try {
     const email = req.session.tempEmail;
     if (!email) return res.redirect("/forgotpassword");
@@ -510,10 +515,10 @@ const newPassValidation = async (req, res) => {
 };
 
 // ======================================================================
-// HOME PAGE
+// 15.HOME PAGE
 // ======================================================================
 
-const renderHomePage = (req, res) => {
+export const renderHomePage = (req, res) => {
   res.render("user/pages/home", {
     title: "Home",
     pageCSS: "home",
@@ -524,10 +529,10 @@ const renderHomePage = (req, res) => {
 };
 
 // ======================================================================
-// SHOP PAGE
+// 16.SHOP PAGE
 // ======================================================================
 
-const renderShopPage = (req, res) => {
+export const renderShopPage = (req, res) => {
   res.render("user/pages/shop", {
     title: "Shop",
     pageCSS: "shop",
@@ -541,21 +546,21 @@ const renderShopPage = (req, res) => {
 // EXPORT ALL
 // ======================================================================
 
-module.exports = {
-  loginPage,
-  googleCallback,
-  userVerification,
-  signUpPage,
-  getEmail,
-  renderOtpPage,
-  otpVerification,
-  resendOtp,
-  renderSignupDetails,
-  saveSignupDetails,
-  renderHomePage,
-  renderForgetPasswordPage,
-  emailVerification,
-  renderNewPassPage,
-  newPassValidation,
-  renderShopPage,
-};
+// module.exports = {
+//   loginPage,
+//   googleCallback,
+//   userVerification,
+//   signUpPage,
+//   getEmail,
+//   renderOtpPage,
+//   otpVerification,
+//   resendOtp,
+//   renderSignupDetails,
+//   saveSignupDetails,
+//   renderHomePage,
+//   renderForgetPasswordPage,
+//   emailVerification,
+//   renderNewPassPage,
+//   newPassValidation,
+//   renderShopPage,
+// };

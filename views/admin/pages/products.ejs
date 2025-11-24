@@ -1,142 +1,249 @@
 <div class="product-page">
 
-  <div class="page-header">
-    <h2>Products</h2>
-    <p class="page-subtext">View product inventory and prices.</p>
+    <div class="page-header">
+        <h2>Products</h2>
+        <p class="page-subtext">View product inventory and prices.</p>
 
-    <button class="add-btn" ><span>+</span>Add Product</button>
-  </div>
-
-  <div class="product-container">
-
-    <!-- FILTER BAR -->
-    <div class="product-filter-bar">
-
-      <input 
-        type="text"
-        id="searchInput"
-        class="product-search"
-        placeholder="Search products..."
-      >
-
-      <div class="filter-dropdown" id="statusDropdown">
-        <div class="dropdown-selected">All Products</div>
-        <ul class="dropdown-options">
-          <li data-value="all">All Products</li>
-          <li data-value="active">Active</li>
-          <li data-value="inactive">Inactive</li>
-        </ul>
-      </div>
-
-      <button id="applyFilter" class="btn-apply">Apply</button>
-      <button id="clearFilter" class="btn-clear">Clear</button>
+        <button class="add-btn"><span>+</span>Add Product</button>
     </div>
 
-    <!-- PRODUCT TABLE -->
-    <table class="product-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Image</th>
-          <th>Product</th>
-          <th>Category</th>
-          <th>Status</th>
-          <th>Edit</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+    <div class="product-container">
 
-      <tbody id="productTableBody">
+        <!-- FILTER BAR -->
+        <div class="product-filter-bar">
 
-        <% products.forEach(product => { %>
+            <input type="text" id="searchInput" class="product-search" placeholder="Search products...">
 
-        <!-- MAIN PRODUCT ROW -->
-        <tr class="product-row"
-            data-id="<%= product._id %>"
-            data-name="<%= product.name.toLowerCase() %>"
-            data-status="<%= product.is_active ? 'active' : 'inactive' %>">
-
-          <!-- DROPDOWN ARROW -->
-          <td class="arrow-cell">
-            <i class="fa-solid fa-chevron-down row-arrow" data-id="<%= product._id %>"></i>
-          </td>
-
-          <!-- IMAGE -->
-          <td class="image-cell">
-            <img src="<%= product.image %>" class="product-thumb">
-          </td>
-
-          <!-- PRODUCT NAME -->
-          <td><%= product.name %></td>
-
-          <!-- CATEGORY -->
-          <td><%= product.category ? product.category.name : "Uncategorized" %></td>
-
-          <!-- STATUS -->
-          <td>
-            <span class="status-badge <%= product.is_active ? 'active' : 'inactive' %>">
-              <%= product.is_active ? 'List' : 'Unlist' %>
-            </span>
-          </td>
-
-          <!-- EDIT -->
-          <td>
-            <a href="/admin/products/edit/<%= product._id %>" class="edit-btn">
-              <i class="fa-solid fa-pen-to-square"></i> Edit
-            </a>
-          </td>
-
-          <!-- ACTION -->
-          <td >
-            <% if (product.is_active) { %>
-              <span class="action-btn block" ><i class="fa-solid fa-ban block-icon"></i> Block</span>
-            <% } else { %>
-              <span class="action-btn list"><i class="fa-solid fa-unlock unblock-icon"></i> List</span>
-            <% } %>
-          </td>
-        </tr>
-
-        <!-- DROPDOWN ROW -->
-        <tr class="dropdown-row" id="drop-<%= product._id %>">
-          <td colspan="7">
-            <div class="dropdown-box">
-              <table class="size-preview-table">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>S</th>
-                    <th>M</th>
-                    <th>L</th>
-                    <th>XL</th>
-                    <th>XXL</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr>
-                    <td>Stock</td>
-                    <td>10</td><td>8</td><td>6</td><td>4</td><td>2</td>
-                  </tr>
-
-                  <tr>
-                    <td>Normal Price</td>
-                    <td>999</td><td>1099</td><td>1199</td><td>1299</td><td>1399</td>
-                  </tr>
-
-                  <tr>
-                    <td>Base Price</td>
-                    <td>799</td><td>899</td><td>999</td><td>1099</td><td>1199</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="filter-dropdown" id="statusDropdown">
+                <div class="dropdown-selected">All Products</div>
+                <ul class="dropdown-options">
+                    <li data-value="all">All Products</li>
+                    <li data-value="active">Active</li>
+                    <li data-value="inactive">Inactive</li>
+                </ul>
             </div>
-          </td>
-        </tr>
 
-        <% }) %>
+            <button id="applyFilter" class="btn-apply">Apply</button>
+            <button id="clearFilter" class="btn-clear">Clear</button>
+        </div>
 
-      </tbody>
-    </table>
+        <!-- PRODUCT TABLE -->
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
-  </div>
+            <tbody id="productTableBody">
+
+                <% products.forEach(product=> { %>
+
+                    <!-- MAIN PRODUCT ROW -->
+                    <tr class="product-row" data-id="<%= product._id %>" data-name="<%= product.name.toLowerCase() %>"
+                        data-status="<%= product.is_active ? 'active' : 'inactive' %>">
+
+                        <!-- DROPDOWN ARROW -->
+                        <td class="arrow-cell">
+                            <i class="fa-solid fa-chevron-down row-arrow" data-id="<%= product._id %>"></i>
+                        </td>
+
+                        <!-- IMAGE -->
+                        <td class="image-cell">
+                            <img src="<%= product.image %>" class="product-thumb">
+                        </td>
+
+                        <!-- PRODUCT NAME -->
+                        <td>
+                            <%= product.name %>
+                        </td>
+
+                        <!-- CATEGORY -->
+                        <td>
+                            <%= product.category ? product.category.name : "Uncategorized" %>
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            <span class="status-badge <%= product.is_active ? 'active' : 'inactive' %>">
+                                <%= product.is_active ? 'List' : 'Unlist' %>
+                            </span>
+                        </td>
+
+                        <!-- EDIT -->
+                        <td>
+                            <a href="/admin/products/edit/<%= product._id %>" class="edit-btn">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </a>
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                            <% if (product.is_active) { %>
+                                <span class="action-btn block"><i class="fa-solid fa-ban block-icon"></i> Block</span>
+                                <% } else { %>
+                                    <span class="action-btn list"><i class="fa-solid fa-unlock unblock-icon"></i>
+                                        List</span>
+                                    <% } %>
+                        </td>
+                    </tr>
+
+                    <!-- DROPDOWN ROW -->
+                    <tr class="dropdown-row" id="drop-<%= product._id %>">
+                        <td colspan="7">
+                            <div class="dropdown-box">
+                                <table class="size-preview-table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>S</th>
+                                            <th>M</th>
+                                            <th>L</th>
+                                            <th>XL</th>
+                                            <th>XXL</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>Stock</td>
+                                            <td>10</td>
+                                            <td>8</td>
+                                            <td>6</td>
+                                            <td>4</td>
+                                            <td>2</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Normal Price</td>
+                                            <td>999</td>
+                                            <td>1099</td>
+                                            <td>1199</td>
+                                            <td>1299</td>
+                                            <td>1399</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Base Price</td>
+                                            <td>799</td>
+                                            <td>899</td>
+                                            <td>999</td>
+                                            <td>1099</td>
+                                            <td>1199</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <% }) %>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+
+
+<!-- ADD PRODUCT MODAL -->
+<div id="addProductModal" class="modal-overlay">
+    <div class="modal">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h2>Add New Product</h2>
+            <span class="close-btn" onclick="closeAddProductModal()">✕</span>
+        </div>
+
+        <!-- PRODUCT NAME + CATEGORY -->
+        <div class="form-row">
+            <div class="input-group">
+                <label>Product Name *</label>
+                <input type="text" name="productName" placeholder="e.g., Warriors #30 Curry Jersey">
+            </div>
+            <div class="input-group">
+                <label>Category *</label>
+                <input type="text" name="category" placeholder="Select Category">
+            </div>
+        </div>
+
+        <!-- SKU + TEAM NAME -->
+        <div class="form-row">
+            <!-- <div class="input-group">
+                <label>SKU *</label>
+                <input type="text" name="sku" placeholder="e.g., WSJ-30-2024">
+            </div> -->
+            <div class="input-group">
+                <label>Team/Club Name <span>*</span></label>
+                <input type="text" name="teamName" placeholder="e.g., Golden State Warriors">
+            </div>
+        </div>
+
+        <!-- PRODUCT IMAGES -->
+        <label>Product Images <span>*</span></label>
+        <div class="images-container">
+      <div class="img-box">
+        <label for="fileInput"  class="custom-file-upload">Upload Images</label>
+        <input id="fileInput" type="file" name="images" accept="image/*" multiple>
+      </div>
+    </div>
+
+
+
+        <!-- STOCK AND PRICING TABLE -->
+        <label>Stock and Pricing by Size *</label>
+        <table class="stockTable">
+            <tr>
+                <th></th>
+                <th>S</th>
+                <th>M</th>
+                <th>L</th>
+                <th>XL</th>
+                <th>XXL</th>
+            </tr>
+
+            <tr>
+                <td>Stock</td>
+                <% ['S','M','L','XL','XXL'].forEach(size=> { %>
+                    <td><input class="stockInput" type="number" name="stock_<%= size %>"></td>
+                    <% }) %>
+            </tr>
+
+            <tr>
+                <td>Normal Price</td>
+                <% ['S','M','L','XL','XXL'].forEach(size=> { %>
+                    <td><input class="stockInput" type="number" name="normalPrice_<%= size %>"></td>
+                    <% }) %>
+            </tr>
+
+            <tr>
+                <td>Base Price</td>
+                <% ['S','M','L','XL','XXL'].forEach(size=> { %>
+                    <td><input class="stockInput" type="number" name="basePrice_<%= size %>"></td>
+                    <% }) %>
+            </tr>
+        </table>
+
+        <!-- DESCRIPTION -->
+        <div class="input-group">
+            <label>Description *</label>
+            <textarea name="description"  placeholder="Enter product description..."></textarea>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button class="btn cancel-btn" onclick="closeAddProductModal()">Cancel</button>
+            <button class="btn add-btn-confirm" onclick="submitProduct()">Add Product</button>
+        </div>
+
+    </div>
 </div>

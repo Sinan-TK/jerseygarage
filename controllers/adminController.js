@@ -1,15 +1,15 @@
-const bcrypt = require("bcrypt");
-const Admin = require("../models/adminModel");
-const User = require("../models/userModel");
-const Category = require("../models/categoryModel");
-const { ObjectId } = require("mongodb");
-const { message } = require("statuses");
+import bcrypt from "bcrypt";
+import Admin from "../models/adminModel.js";
+import User from "../models/userModel.js";
+import Category from "../models/categoryModel.js";
+import { ObjectId } from "mongodb";
+// import { message } from "statuses";
 
 // ======================================================================
 // 1. RENDER LOGIN PAGE
 // ======================================================================
 
-const renderLoginPage = (req, res) => {
+export const renderLoginPage = (req, res) => {
   res.render("admin/pages/login", {
     showLayout: false,
     title: "Admin-Login",
@@ -20,9 +20,9 @@ const renderLoginPage = (req, res) => {
 };
 
 // ======================================================================
-// 1. ADMIN LOGIN CONTROLLER (POST /admin/login)
+// 2. ADMIN LOGIN CONTROLLER (POST /admin/login)
 // ======================================================================
-const loginAdmin = async (req, res) => {
+export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -82,9 +82,9 @@ const loginAdmin = async (req, res) => {
 };
 
 // ======================================================================
-// 2. GET USERS LIST (ADMIN USERS PAGE)
+// 3. GET USERS LIST (ADMIN USERS PAGE)
 // ======================================================================
-const getUsers = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
     const limit = 5;
@@ -123,9 +123,9 @@ const getUsers = async (req, res) => {
 };
 
 // ======================================================================
-// 3. BLOCK USER
+// 4. BLOCK USER
 // ======================================================================
-const blockUser = async (req, res) => {
+export const blockUser = async (req, res) => {
   const id = req.params.id;
   const updatedUser = await User.findByIdAndUpdate(
     id,
@@ -143,9 +143,9 @@ const blockUser = async (req, res) => {
 };
 
 // ======================================================================
-// 4. UNBLOCK USER
+// 5. UNBLOCK USER
 // ======================================================================
-const unblockUser = async (req, res) => {
+export const unblockUser = async (req, res) => {
   const id = req.params.id;
   const updatedUser = await User.findByIdAndUpdate(
     id,
@@ -163,9 +163,9 @@ const unblockUser = async (req, res) => {
 };
 
 // ======================================================================
-// 5. GET CATEGORY LIST (ADMIN CATEGORIES PAGE)
+// 6. GET CATEGORY LIST (ADMIN CATEGORIES PAGE)
 // ======================================================================
-const getCategories = async (req, res) => {
+export const getCategories = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
     const limit = 8;
@@ -208,9 +208,9 @@ const getCategories = async (req, res) => {
 };
 
 // ======================================================================
-// 6. ADD CATEGORY (POST /admin/categories/add)
+// 7. ADD CATEGORY (POST /admin/categories/add)
 // ======================================================================
-const addCategory = async (req, res) => {
+export const addCategory = async (req, res) => {
   try {
     const { name, description, color } = req.body;
 
@@ -242,9 +242,9 @@ const addCategory = async (req, res) => {
 };
 
 // ======================================================================
-// 7. BLOCK CATEGORY
+// 8. BLOCK CATEGORY
 // ======================================================================
-const blockCategory = async (req, res) => {
+export const blockCategory = async (req, res) => {
   const id = req.params.id;
   const updatedData = await Category.findByIdAndUpdate(
     id,
@@ -262,9 +262,9 @@ const blockCategory = async (req, res) => {
 };
 
 // ======================================================================
-// 8. UNBLOCK CATEGORY
+// 9. UNBLOCK CATEGORY
 // ======================================================================
-const unblockCategory = async (req, res) => {
+export const unblockCategory = async (req, res) => {
   const id = req.params.id;
   const updatedData = await Category.findByIdAndUpdate(
     id,
@@ -282,10 +282,10 @@ const unblockCategory = async (req, res) => {
 };
 
 // ======================================================================
-// 9. EDIT CATEGORY
+// 10. EDIT CATEGORY
 // ======================================================================
 
-const editCategory = async (req, res) => {
+export const editCategory = async (req, res) => {
   try {
     const id = new ObjectId(req.params.id);
     const { name, description, color } = req.body;
@@ -338,20 +338,20 @@ const editCategory = async (req, res) => {
 };
 
 // ======================================================================
-// LOGOUT
+// 11.LOGOUT
 // ======================================================================
 
-const logOut = (req, res) => {
+export const logOut = (req, res) => {
   console.log("hell");
   delete req.session.Admin;
   return res.redirect("/admin/login");
 };
 
 // ======================================================================
-// PRODUCT PAGE RENDER
+// 12.PRODUCT PAGE RENDER
 // ======================================================================
 
-const productsPageRender = (req, res) => {
+export const productsPageRender = (req, res) => {
   const products = [
     {
       _id: "679a12f9c1a41b00123a1111",
@@ -419,10 +419,10 @@ const productsPageRender = (req, res) => {
 };
 
 // ======================================================================
-// FEATURE NOT AVAILABLE
+// 13.FEATURE NOT AVAILABLE
 // ======================================================================
 
-const featureNotAvailable = (req, res) => {
+export const featureNotAvailable = (req, res) => {
   res.render("admin/pages/featurenotavailable", {
     title: "featurenotavailable",
     showLayout: true,
@@ -433,10 +433,10 @@ const featureNotAvailable = (req, res) => {
 };
 
 // ======================================================================
-// SEARCH USER
+// 14.SEARCH USER
 // ======================================================================
 
-const searchUser = async (req, res) => {
+export const searchUser = async (req, res) => {
   const search = req.query.searchContent || "";
   const status = req.query.userStatus || "all";
 
@@ -492,10 +492,10 @@ const searchUser = async (req, res) => {
 };
 
 // ======================================================================
-// SEARCH CATEGORY
+// 15.SEARCH CATEGORY
 // ======================================================================
 
-const searchCategory = async (req, res) => {
+export const searchCategory = async (req, res) => {
   const search = req.query.searchContent || "";
   const status = req.query.categoryStatus || "all";
 
@@ -553,20 +553,20 @@ const searchCategory = async (req, res) => {
 // ======================================================================
 // EXPORTS
 // ======================================================================
-module.exports = {
-  renderLoginPage,
-  loginAdmin,
-  getUsers,
-  blockUser,
-  unblockUser,
-  getCategories,
-  addCategory,
-  blockCategory,
-  unblockCategory,
-  editCategory,
-  logOut,
-  featureNotAvailable,
-  searchUser,
-  searchCategory,
-  productsPageRender,
-};
+// module.exports = {
+//   renderLoginPage,
+//   loginAdmin,
+//   getUsers,
+//   blockUser,
+//   unblockUser,
+//   getCategories,
+//   addCategory,
+//   blockCategory,
+//   unblockCategory,
+//   editCategory,
+//   logOut,
+//   featureNotAvailable,
+//   searchUser,
+//   searchCategory,
+//   productsPageRender,
+// };

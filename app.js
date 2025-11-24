@@ -1,19 +1,27 @@
-require('dotenv').config();
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express");
-const path = require('path');
-const expressLayouts = require("express-ejs-layouts"); 
-const session = require("express-session");
-const connectDB = require('./config/database');
-const passport = require("passport");
-const toastHandler = require("./middlewares/toastHandler");
-const nocache = require('nocache');
+import express from "express";
+import path from "path";
+import expressLayouts from "express-ejs-layouts";
+import session from "express-session";
+import nocache from "nocache";
+import passport from "passport";
 
-require("./config/passport")();
+// ESM fix for __dirname
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const adminRoutes = require("./routes/adminRoutes");
-const userRoutes = require("./routes/userRoutes");
-const authRoutes = require('./routes/authRoutes');
+// Config imports
+import connectDB from "./config/database.js";
+import toastHandler from "./middlewares/toastHandler.js";
+import "./config/passport.js"; // runs passport config
+
+// Routes imports
+import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 app.use(nocache());
@@ -23,23 +31,28 @@ connectDB();
 
 // 🧩 Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // parse form data
-app.use(express.static(path.join(__dirname, "public"),{ maxAge:0 })); // serve static files
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, "public"), { maxAge: 0 }));
+
 app.use(expressLayouts);
-app.use(session({
-  secret: process.env.SESSION_SECRET_KEY,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 1000 * 60 * 10 }  // 10 min
-}));
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET_KEY,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 10 }, // 10 min
+  })
+);
 
-// 🧩 View engine setup
-app.set("views", path.join(__dirname, 'views'));
+// 🧩 View Engine
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-app.set('view cache', false);
+app.set("view cache", false);
 
 app.use(toastHandler);
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -48,10 +61,8 @@ app.use("/admin", adminRoutes);
 app.use("/user", userRoutes);
 app.use("/", authRoutes);
 
-
-
 // 🧩 Server
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log("server is running");
+  console.log(`🔥 Server running on port ${PORT}`);
 });

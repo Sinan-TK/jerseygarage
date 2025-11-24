@@ -1,5 +1,5 @@
-const express = require("express");
-// const userController = require('../controllers/adminController');
+import express from "express";
+
 const router = express.Router();
 
 router.use((req, res, next) => {
@@ -7,12 +7,9 @@ router.use((req, res, next) => {
   next();
 });
 
-
-
-
 router.get("/verify-otp", (req, res) => {
   res.render("user/pages/otp-verify", {
-    title: " OTP verification",
+    title: "OTP Verification",
     error: false,
     pageCSS: "otp-verify",
     showHeader: true,
@@ -20,6 +17,4 @@ router.get("/verify-otp", (req, res) => {
   });
 });
 
-
-
-module.exports = router;
+export default router;

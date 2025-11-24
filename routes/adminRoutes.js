@@ -1,6 +1,7 @@
-const express = require('express');
-const adminController = require('../controllers/adminController');
-const adminMiddleware = require('../middlewares/adminMiddleware');
+import express from "express";
+import * as adminController from "../controllers/adminController.js";
+import * as adminMiddleware from "../middlewares/adminMiddleware.js";
+
 const router = express.Router();
 
 // router.set('layout', 'admin/layouts/layout');
@@ -53,4 +54,4 @@ router.get('/categories/search', adminController.searchCategory);
 
 // router.get('/featureNotAvailable',adminController.featureNotAvailable);
 
-module.exports = router;
+export default router;
