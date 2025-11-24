@@ -1,8 +1,3 @@
-// const bcrypt = require("bcrypt");
-// const User = require("../models/userModel");
-// const Otp = require("../models/otpModel");
-// const otpGenerator = require("otp-generator");
-// const sendOTP = require("../utils/sendOtp");
 import bcrypt from "bcrypt";
 import User from "../models/userModel.js";
 import Otp from "../models/otpModel.js";

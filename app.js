@@ -16,7 +16,9 @@ const __dirname = path.dirname(__filename);
 // Config imports
 import connectDB from "./config/database.js";
 import toastHandler from "./middlewares/toastHandler.js";
-import "./config/passport.js"; // runs passport config
+import googlePassportConfig from "./config/passport.js";
+googlePassportConfig();   // <-- REQUIRED
+
 
 // Routes imports
 import adminRoutes from "./routes/adminRoutes.js";

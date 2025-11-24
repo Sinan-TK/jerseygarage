@@ -9,10 +9,16 @@ export default () => {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: "/google/callback",
+        userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
           const email = profile.emails[0].value;
+
+          // const avatar =
+          //   profile._json?.picture ||
+          //   profile.photos?.[0]?.value ||
+          //   "https://res.cloudinary.com/dn6i64qk6/image/upload/v1763988711/user-default-image_ifyyaj.webp";
 
           // 🟢 1. Check if user already exists by email (normal signup user)
           let existingUser = await User.findOne({ email });
@@ -26,14 +32,13 @@ export default () => {
             }
             return done(null, existingUser);
           }
-          
 
           // 🔵 2. If new Google user, create new record
           let newUser = await User.create({
             googleId: profile.id,
             full_name: profile.displayName,
             email: email,
-            avatar: profile.photos?.[0]?.value || "/img/default-user.png",
+            avatar:"https://res.cloudinary.com/dn6i64qk6/image/upload/v1763988711/user-default-image_ifyyaj.webp",
             password_hash: null,
             is_verified: true,
           });
