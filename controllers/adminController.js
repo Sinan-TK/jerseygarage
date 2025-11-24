@@ -5,7 +5,6 @@ const Category = require("../models/categoryModel");
 const { ObjectId } = require("mongodb");
 const { message } = require("statuses");
 
-
 // ======================================================================
 // 1. RENDER LOGIN PAGE
 // ======================================================================
@@ -233,8 +232,8 @@ const addCategory = async (req, res) => {
 
     await Category.create({ name, description, color });
     res.json({
-      success:true,
-      message:"Category added successfully!"
+      success: true,
+      message: "Category added successfully!",
     });
   } catch (err) {
     console.error(err);
@@ -353,15 +352,69 @@ const logOut = (req, res) => {
 // ======================================================================
 
 const productsPageRender = (req, res) => {
+  const products = [
+    {
+      _id: "679a12f9c1a41b00123a1111",
+      name: "Nike Air Max 270",
+      image: "/uploads/products/airmax270.jpg",
+      category: { name: "Footwear" },
+      is_active: true,
+    },
+    {
+      _id: "679a12f9c1a41b00123a2222",
+      name: "Adidas Ultraboost 23",
+      image: "/uploads/products/ultraboost.jpg",
+      category: { name: "Footwear" },
+      is_active: false,
+    },
+    {
+      _id: "679a12f9c1a41b00123a3333",
+      name: "Apple iPhone 15 Pro",
+      image: "/uploads/products/iphone15pro.jpg",
+      category: { name: "Mobiles" },
+      is_active: true,
+    },
+    {
+      _id: "679a12f9c1a41b00123a4444",
+      name: "Samsung Galaxy S24",
+      image: "/uploads/products/s24.jpg",
+      category: { name: "Mobiles" },
+      is_active: true,
+    },
+    {
+      _id: "679a12f9c1a41b00123a5555",
+      name: "Sony WH-1000XM5",
+      image: "/uploads/products/xm5.jpg",
+      category: { name: "Headphones" },
+      is_active: false,
+    },
+    {
+      _id: "679a12f9c1a41b00123a6666",
+      name: "Red Hoodie Oversized",
+      image: "/uploads/products/redhoodie.jpg",
+      category: { name: "Clothing" },
+      is_active: true,
+    },
+    {
+      _id: "679a12f9c1a41b00123a7777",
+      name: "Cotton T-Shirt",
+      image: "/img/default-product.png",
+      category: null,
+      is_active: true,
+    },
+  ];
+
   res.render("admin/pages/products", {
     title: "Products",
     showLayout: true,
     cssFile: "/css/admin/products.css",
     errorMessage: "",
     pageJS: "products.js",
-    categories:[],
-    currentPage:1,
-    totalPages:1,
+    products,
+    currentPage: 1,
+    totalPages: 1,
+    searchContent :"",
+    status :"",
   });
 };
 
