@@ -56,7 +56,7 @@
 
                         <!-- IMAGE -->
                         <td class="image-cell">
-                            <img src="<%= product.image %>" class="product-thumb">
+                            <img src="<%= product.images[0] %>" class="product-thumb">
                         </td>
 
                         <!-- PRODUCT NAME -->
@@ -66,7 +66,10 @@
 
                         <!-- CATEGORY -->
                         <td>
-                            <%= product.category ? product.category.name : "Uncategorized" %>
+                            <%categoriesName.forEach(category=>{if(category._id.toString() == product.category.toString()){%>
+                                <%=category.name%>
+                                    <%}})%>
+
                         </td>
 
                         <!-- STATUS -->
@@ -101,6 +104,7 @@
                                 <table class="size-preview-table">
                                     <thead>
                                         <tr>
+                                            
                                             <th></th>
                                             <th>S</th>
                                             <th>M</th>
@@ -113,29 +117,29 @@
                                     <tbody>
                                         <tr>
                                             <td>Stock</td>
-                                            <td>10</td>
-                                            <td>8</td>
-                                            <td>6</td>
-                                            <td>4</td>
-                                            <td>2</td>
+                                            <td><%= product.sizes[0].stock%></td>
+                                            <td><%= product.sizes[1].stock%></td>
+                                            <td><%= product.sizes[2].stock%></td>
+                                            <td><%= product.sizes[3].stock%></td>
+                                            <td><%= product.sizes[4].stock%></td>
                                         </tr>
 
                                         <tr>
                                             <td>Normal Price</td>
-                                            <td>999</td>
-                                            <td>1099</td>
-                                            <td>1199</td>
-                                            <td>1299</td>
-                                            <td>1399</td>
+                                            <td><%= product.sizes[0].normalPrice%></td>
+                                            <td><%= product.sizes[1].normalPrice%></td>
+                                            <td><%= product.sizes[2].normalPrice%></td>
+                                            <td><%= product.sizes[3].normalPrice%></td>
+                                            <td><%= product.sizes[4].normalPrice%></td>
                                         </tr>
 
                                         <tr>
                                             <td>Base Price</td>
-                                            <td>799</td>
-                                            <td>899</td>
-                                            <td>999</td>
-                                            <td>1099</td>
-                                            <td>1199</td>
+                                            <td><%= product.sizes[0].basePrice%></td>
+                                            <td><%= product.sizes[1].basePrice%></td>
+                                            <td><%= product.sizes[2].basePrice%></td>
+                                            <td><%= product.sizes[3].basePrice%></td>
+                                            <td><%= product.sizes[4].basePrice%></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -147,9 +151,34 @@
 
             </tbody>
         </table>
+        <!-- PAGINATION -->
+        <div class="pagination">
+
+            <!-- LEFT ARROW: show ONLY if NOT first page -->
+            <% if (currentPage> 1) { %>
+                <a href="/admin/users?page=<%= currentPage - 1 %>" class="arrow-btn">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <% } %>
+
+                    <!-- CURRENT PAGE NUMBER -->
+                    <span class="current-page-display">
+                        <%= currentPage %>
+                    </span>
+
+                    <!-- RIGHT ARROW: show ONLY if NOT last page -->
+                    <% if (currentPage < totalPages) { %>
+                        <a href="/admin/users?page=<%= currentPage + 1 %>" class="arrow-btn">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        <% } %>
+
+        </div>
 
     </div>
 </div>
+
+
 
 
 
@@ -175,7 +204,7 @@
                 <label>Category <span class="star-icon">*</span></label>
 
                 <div class="categoryDrop">
-                    <div class="dropdown-cat-selected" value="null">Select Category</div>
+                    <div class="dropdown-cat-selected" value="">Select Category</div>
                     <ul class="dropdown-cat-options">
                         <% categoriesName.forEach(cat=>{ %>
                             <li data-value="<%= cat.name %>">
@@ -198,17 +227,15 @@
         </div>
 
         <!-- PRODUCT IMAGES -->
+        <!-- Image Upload -->
         <label>Product Images <span class="star-icon">*</span></label>
-
         <div class="images-container">
             <div class="img-box">
-
                 <label for="fileInput" class="custom-file-upload">Upload Images</label>
-                <input id="fileInput" type="file" multiple accept="image/*">
+                <input id="fileInput" type="file" accept="image/*" multiple>
 
-                <!-- PREVIEW AFTER CROPPING ONLY -->
+                <!-- PREVIEW (populated by JS) -->
                 <div id="previewContainer" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;"></div>
-
             </div>
         </div>
 
@@ -262,58 +289,15 @@
 </div>
 
 
-<!-- GLOBAL CROP MODAL -->
-<div id="cropModal" style="
-        display:none;
-        position:fixed;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        background:rgba(0,0,0,0.7);
-        z-index:999999;
-        justify-content:center;
-        align-items:center;
-     ">
-
-    <div id="cropBox" style="
-            background:white;
-            padding:20px;
-            border-radius:12px;
-            width:auto;
-            max-width:95vw;
-            max-height:95vh;
-            overflow:auto;        /* 🔥 FIX: Allows cropper to show fully */
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-         ">
-
-        <!-- IMAGE TO CROP -->
-        <img id="cropImage" style="
-                max-width:100%;
-                max-height:80vh;
-                object-fit:contain;   /* 🔥 FIX: Ensures full image stays visible */
-                display:block;
-                margin:auto;
-             " />
-
-        <!-- BUTTONS -->
-        <div style="
-                display:flex;
-                justify-content:flex-end;
-                width:100%;
-                margin-top:12px;
-                gap:10px;
-            ">
-            <button id="cancelCropBtn" class="btn cancel-btn" style="padding:10px 18px;">
-                Cancel
-            </button>
-
-            <button id="cropNextBtn" class="btn add-btn-confirm" style="padding:10px 18px;">
-                Crop
-            </button>
+<!-- GLOBAL CROP MODAL (outside modal or at bottom of page) -->
+<div id="cropModal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999999; justify-content:center; align-items:center;">
+    <div id="cropBox"
+        style="background:white; padding:20px; border-radius:10px; max-width:95vw; max-height:95vh; overflow:auto; display:flex; flex-direction:column; align-items:center;">
+        <img id="cropImage" style="max-width:100%; max-height:80vh; object-fit:contain; display:block; margin:auto;" />
+        <div style="display:flex; gap:8px; justify-content:flex-end; width:100%; margin-top:12px;">
+            <button id="cancelCropBtn" class="btn cancel-btn" type="button">Cancel</button>
+            <button id="cropNextBtn" class="btn add-btn-confirm" type="button">Crop</button>
         </div>
-
     </div>
 </div>

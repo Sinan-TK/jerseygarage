@@ -90,6 +90,8 @@ const options = document.querySelectorAll(".dropdown-cat-options li");
 const selected = document.querySelector(".dropdown-cat-selected");
 const category = document.getElementById("seleted-category");
 
+category.value = "";
+
 selected.addEventListener("click", () => {
   catDrop.classList.toggle("active");
 });
@@ -109,15 +111,18 @@ document.addEventListener("click", (e) => {
   }
 });
 
-/* -------------------------
-   CROP SYSTEM VARIABLES
-------------------------- */
-let cropper = null;
-let currentIndex = 0;
+// Frontend: product-images.js
 
-let selectedFiles = []; // original files chosen
-let croppedImages = []; // final cropped blobs
 
+const OUTPUT_FORMAT = "image/webp"; 
+const OUTPUT_QUALITY = 0.9;
+
+// State arrays (stable indexing)
+let selectedFiles = [];   // original File objects selected in current selection cycle (temporary while cropping)
+let croppedBlobs = [];    // final cropped blobs aligned by index (sparse: null = empty slot)
+let nextSlotIndex = 0;    // index to place next cropped image
+
+// DOM
 const fileInput = document.getElementById("fileInput");
 const cropModal = document.getElementById("cropModal");
 const cropImage = document.getElementById("cropImage");
@@ -125,35 +130,95 @@ const cropNextBtn = document.getElementById("cropNextBtn");
 const cancelCropBtn = document.getElementById("cancelCropBtn");
 const previewContainer = document.getElementById("previewContainer");
 
-/* -------------------------
-   IMAGE SELECTED → OPEN FIRST CROP
-------------------------- */
+let cropper = null;
+
+/* ---------------------------
+  Helpers
+----------------------------*/
+
+// find first free slot in croppedBlobs or push to end
+function getNextFreeIndex() {
+  const idx = croppedBlobs.findIndex(b => b === undefined || b === null);
+  return idx === -1 ? croppedBlobs.length : idx;
+}
+
+// render previews from croppedBlobs (stable order)
+function renderPreviews() {
+  previewContainer.innerHTML = "";
+  croppedBlobs.forEach((blob, index) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+
+    const card = document.createElement("div");
+    card.className = "preview-card";
+    card.dataset.index = index;
+    card.style = "display:flex; flex-direction:column; align-items:center; gap:6px;";
+
+    const img = document.createElement("img");
+    img.src = url;
+    img.style = "width:100px; height:100px; object-fit:cover; border-radius:6px;";
+
+    const controls = document.createElement("div");
+    controls.style = "display:flex; gap:6px;";
+
+    // Re-crop
+    const recropBtn = document.createElement("button");
+    recropBtn.type = "button";
+    recropBtn.className = "btn";
+    recropBtn.textContent = "Re-Crop";
+    recropBtn.onclick = () => {
+      // open cropper for existing blob (re-crop)
+      openCropperFor(new File([blob], `recrop_${index}.webp`, { type: OUTPUT_FORMAT }), index);
+    };
+
+    // Remove
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "btn cancel-btn";
+    removeBtn.textContent = "Remove";
+    removeBtn.onclick = () => {
+      // remove and re-render
+      croppedBlobs[index] = null;
+      renderPreviews();
+    };
+
+    controls.appendChild(recropBtn);
+    controls.appendChild(removeBtn);
+
+    card.appendChild(img);
+    card.appendChild(controls);
+
+    previewContainer.appendChild(card);
+  });
+}
+
+/* ---------------------------
+  Cropper flow
+----------------------------*/
+
 fileInput.addEventListener("change", (e) => {
-  const maxImages = 5;
+  const incoming = Array.from(e.target.files || []);
+  if (incoming.length === 0) return;
 
-  const existingCount = croppedImages.filter(Boolean).length;
-  const selectedCount = e.target.files.length;
+  const existingCount = croppedBlobs.filter(Boolean).length;
 
-  if (existingCount + selectedCount > maxImages) {
-    toastr.error(`You can only upload ${maxImages} images total.`, "Failed");
-    fileInput.value = "";
-    return;
-  }
-
-  selectedFiles = Array.from(e.target.files);
-  currentIndex = 0;
-  openCropperFor(selectedFiles[currentIndex]);
+  // We'll crop them sequentially
+  selectedFiles = incoming;
+  // start placing at next free slot(s)
+  nextSlotIndex = getNextFreeIndex();
+  // open cropper for first selected file
+  openCropperFor(selectedFiles[0], nextSlotIndex);
 });
 
-/* -------------------------
-   OPEN CROPPER FOR FILE
-------------------------- */
-function openCropperFor(file) {
+function openCropperFor(file, targetIndex = null) {
+  // targetIndex: where this cropped blob should be stored
   const url = URL.createObjectURL(file);
   cropImage.src = url;
 
+  // show modal
   cropModal.style.display = "flex";
 
+  // cleanup any existing cropper
   if (cropper) {
     cropper.destroy();
     cropper = null;
@@ -164,136 +229,77 @@ function openCropperFor(file) {
       aspectRatio: 1,
       viewMode: 1,
       autoCropArea: 0.9,
+      responsive: true,
     });
+
+    // store target index for use after cropping
+    cropModal.dataset.targetIndex = (typeof targetIndex === "number") ? String(targetIndex) : "";
   };
 }
 
-/* -------------------------
-   AFTER CROPPING → SAVE + PREVIEW
-------------------------- */
 cropNextBtn.addEventListener("click", () => {
   if (!cropper) return;
 
-  const canvas = cropper.getCroppedCanvas({
-    maxWidth: 1600,
-    maxHeight: 1600,
-  });
+  const canvas = cropper.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 });
 
   canvas.toBlob((blob) => {
-    croppedImages[currentIndex] = blob;
-    addPreview(blob, currentIndex);
+    // store blob into the designated index
+    const targetIndex = cropModal.dataset.targetIndex ? parseInt(cropModal.dataset.targetIndex, 10) : getNextFreeIndex();
+    croppedBlobs[targetIndex] = blob;
 
+    // cleanup and close
     cropper.destroy();
     cropper = null;
     cropModal.style.display = "none";
+    URL.revokeObjectURL(cropImage.src);
 
-    currentIndex++;
-
-    if (currentIndex < selectedFiles.length) {
-      openCropperFor(selectedFiles[currentIndex]);
+   
+    const alreadyCropped = Object.values(croppedBlobs).filter(Boolean).length;
+   
+    if (selectedFiles.length > 0) {
+      // remove the first (just processed) file from selectedFiles
+      selectedFiles.shift();
     }
 
-    // Allow selecting more images later
+    if (selectedFiles.length > 0) {
+      // next free targetIndex
+      const nextIndex = getNextFreeIndex();
+      openCropperFor(selectedFiles[0], nextIndex);
+    } else {
+      // finished batch
+      selectedFiles = [];
+      cropModal.dataset.targetIndex = "";
+    }
+
+    renderPreviews();
+
+    // reset file input so user can select same files again if needed
     fileInput.value = "";
-  });
+  }, OUTPUT_FORMAT, OUTPUT_QUALITY);
 });
 
-/* -------------------------
-   CANCEL CROP
-------------------------- */
 cancelCropBtn.addEventListener("click", () => {
   if (cropper) {
     cropper.destroy();
     cropper = null;
   }
-
   cropModal.style.display = "none";
+  selectedFiles = []; // discard current selection batch
+  fileInput.value = "";
 });
 
-/* -------------------------
-   ADD PREVIEW WITH BUTTONS
-------------------------- */
-function addPreview(blob, index) {
-  const url = URL.createObjectURL(blob);
-
-  const wrapper = document.createElement("div");
-  wrapper.style = `
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:6px;
-  `;
-  wrapper.dataset.index = index;
-
-  const img = document.createElement("img");
-  img.src = url;
-  img.style = `
-    width:100px;
-    height:100px;
-    object-fit:cover;
-    border-radius:6px;
-  `;
-
-  /* ----- RE-CROP BUTTON ----- */
-  const recropBtn = document.createElement("button");
-  recropBtn.textContent = "Re-Crop";
-  recropBtn.className = "btn";
-  recropBtn.style =
-    "padding:4px 8px; font-size:12px;border: 1px solid black;color: black;background:white; border-radius:3px";
-
-  recropBtn.addEventListener("mouseover", () => {
-    recropBtn.style.backgroundColor = "black";
-    recropBtn.style.color = "white";
-  });
-
-  recropBtn.addEventListener("mouseout", () => {
-    recropBtn.style.backgroundColor = "white";
-    recropBtn.style.color = "black";
-  });
-
-  recropBtn.addEventListener("click", () => {
-    currentIndex = index;
-    openCropperFor(new File([blob], "recrop.jpg")); // open current cropped blob again
-  });
-
-  /* ----- REMOVE BUTTON ----- */
-  const removeBtn = document.createElement("button");
-  removeBtn.textContent = "Remove";
-  removeBtn.className = "btn cancel-btn";
-  removeBtn.style =
-    "padding:4px 8px; font-size:12px;border: 1px solid black;color: black;background:white; border-radius:3px";
-
-  removeBtn.addEventListener("mouseover", () => {
-    removeBtn.style.backgroundColor = "black";
-    removeBtn.style.color = "white";
-  });
-
-  removeBtn.addEventListener("mouseout", () => {
-    removeBtn.style.backgroundColor = "white";
-    removeBtn.style.color = "black";
-  });
-
-  removeBtn.addEventListener("click", () => {
-    wrapper.remove();
-    croppedImages[index] = null; // mark deleted
-  });
-
-  wrapper.appendChild(img);
-  wrapper.appendChild(recropBtn);
-  wrapper.appendChild(removeBtn);
-
-  previewContainer.appendChild(wrapper);
-}
-
-//----------------------------------------------------------//
-//add product axious//
-//---------------------------------------------------------//
-
+/* ---------------------------
+  Submit product (example)
+----------------------------*/
 async function submitProduct() {
+  // validate min images
+  const validCount = croppedBlobs.filter(Boolean).length;
+  
   const productName = document.getElementById("productName").value.trim();
   const teamName = document.getElementById("teamName").value.trim();
   const description = document.getElementById("description").value;
-  const categoryName = category.value;
+  const categoryName = document.getElementById("seleted-category").value;
+  
   const sizes = ["S", "M", "L", "XL", "XXL"];
 
   const stock = {};
@@ -317,34 +323,38 @@ async function submitProduct() {
   formData.append("teamName", teamName);
   formData.append("description", description);
   formData.append("category", categoryName);
-  formData.append("stock",stock);
-  formData.append("normalPrice",normalPrice);
-  formData.append("basePrice",basePrice);
+  formData.append("stock",JSON.stringify(stock));
+  formData.append("normalPrice",JSON.stringify(normalPrice));
+  formData.append("basePrice",JSON.stringify(basePrice));
 
-  // add stock + price fields here if needed
-  // formData.append("stock_S", stock["S"])
-
-  // Append ONLY existing blobs
-  croppedImages.forEach((blob, index) => {
-    if (blob) {
-      const file = new File([blob], `image_${index}.jpg`, {
-        type: "image/jpeg",
-      });
-      formData.append("images", file);
-    }
+  // Append cropped blobs in stable order
+  croppedBlobs.forEach((blob, idx) => {
+    if (!blob) return;
+    // name files sequentially to preserve order
+    const filename = `image_${idx}.webp`;
+    const file = new File([blob], filename, { type: OUTPUT_FORMAT });
+    formData.append("images", file); // backend expects field name "images"
   });
+
   try {
-    const res = await axios.post(`/admin/products/add`, formData, {
+    const res = await axios.post("/admin/products/add", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    if(res.data.success){
-      toastr.success(res.data.message,"Success");
-    }else{
-      toastr.error(res.data.message,"Failed");
+    if (res.data.success) {
+      toastr.success(res.data.message,"Product added!");
+      // reset UI
+      croppedBlobs = [];
+      renderPreviews();
+      // optionally close modal...
+      setTimeout(()=>{
+        window.location.reload();
+      },5000);
+    } else {
+      toastr.error(res.data.message,"Failed:");
     }
   } catch (err) {
-
-    console.log(err,"something went wrong!!");
+    console.error("UPLOAD ERROR", err);
+    toastr.error(err.response.data.message,"Error");
   }
 }

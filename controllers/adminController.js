@@ -2,9 +2,13 @@ import bcrypt from "bcrypt";
 import Admin from "../models/adminModel.js";
 import User from "../models/userModel.js";
 import Category from "../models/categoryModel.js";
+import Product from "../models/productModel.js";
 import { ObjectId } from "mongodb";
 import cloudinary from "../config/cloudinary.js";
-// import Product from "../models/productModel.js";
+import upload from "../middlewares/multer.js";
+
+const uploadImages = upload.array("images", 5);
+
 // import { message } from "statuses";
 
 // ======================================================================
@@ -354,68 +358,29 @@ export const logOut = (req, res) => {
 // ======================================================================
 
 export const productsPageRender = async (req, res) => {
+  let page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const totalProducts = await Product.countDocuments();
+  const totalPages = Math.ceil(totalProducts / limit);
+
+  if (page > totalPages) {
+    page = totalPages;
+  }
+
+  if (page < 1) {
+    page = 1;
+  }
+
+  const skip = (page - 1) * limit;
+
+  const products = await Product.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  req.session.page = page;
 
   const categoriesName = await Category.find().select("name");
-
-  // categoriesName.forEach( cat => {
-  //   console.log(cat._id);    
-  // });
-
-  // categoriesName.forEach( cat => {
-  //   console.log(cat.name);    
-  // });
-
-  const products = [
-    {
-      _id: "679a12f9c1a41b00123a1111",
-      name: "Nike Air Max 270",
-      image: "/uploads/products/airmax270.jpg",
-      category: { name: "Footwear" },
-      is_active: true,
-    },
-    {
-      _id: "679a12f9c1a41b00123a2222",
-      name: "Adidas Ultraboost 23",
-      image: "/uploads/products/ultraboost.jpg",
-      category: { name: "Footwear" },
-      is_active: false,
-    },
-    {
-      _id: "679a12f9c1a41b00123a3333",
-      name: "Apple iPhone 15 Pro",
-      image: "/uploads/products/iphone15pro.jpg",
-      category: { name: "Mobiles" },
-      is_active: true,
-    },
-    {
-      _id: "679a12f9c1a41b00123a4444",
-      name: "Samsung Galaxy S24",
-      image: "/uploads/products/s24.jpg",
-      category: { name: "Mobiles" },
-      is_active: true,
-    },
-    {
-      _id: "679a12f9c1a41b00123a5555",
-      name: "Sony WH-1000XM5",
-      image: "/uploads/products/xm5.jpg",
-      category: { name: "Headphones" },
-      is_active: false,
-    },
-    {
-      _id: "679a12f9c1a41b00123a6666",
-      name: "Red Hoodie Oversized",
-      image: "/uploads/products/redhoodie.jpg",
-      category: { name: "Clothing" },
-      is_active: true,
-    },
-    {
-      _id: "679a12f9c1a41b00123a7777",
-      name: "Cotton T-Shirt",
-      image: "/img/default-product.png",
-      category: null,
-      is_active: true,
-    },
-  ];
 
   res.render("admin/pages/products", {
     title: "Products",
@@ -424,10 +389,10 @@ export const productsPageRender = async (req, res) => {
     errorMessage: "",
     pageJS: "products.js",
     products,
-    currentPage: 1,
-    totalPages: 1,
-    searchContent :"",
-    status :"",
+    currentPage: page,
+    totalPages,
+    searchContent: "",
+    // status: "",
     categoriesName,
   });
 };
@@ -568,44 +533,150 @@ export const searchCategory = async (req, res) => {
 // 15.SEARCH CATEGORY
 // ======================================================================
 
-export const addProduct = async (req,res) => {
-  try {
-    const {
-      productName,
-      teamName,
-      description,
-      category,
-      stock,
-      normalPrice,
-      basePrice,
-    } = req.body;
-
-    console.log(productName,
-      teamName,
-      description,
-      category,
-      stock,
-      normalPrice,
-      basePrice)
-
-    if (!req.files || req.files.length === 0) {
-      return res.json({
-        success:false,
-        message:"No image uploaded!"
-      })
+export const addProduct = async (req, res) => {
+  uploadImages(req, res, async (err) => {
+    // Multer limit handler
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum 5 images allowed!",
+      });
     }
 
-    console.log(req.files.length)
+    try {
+      const { productName, teamName, description, category } = req.body;
 
-    if(req.files.length < 3){
+      const stock = JSON.parse(req.body.stock);
+      const normalPrice = JSON.parse(req.body.normalPrice);
+      const basePrice = JSON.parse(req.body.basePrice);
+
+      if (!productName) {
+        return res.json({
+          success: false,
+          message: "Product name required!",
+        });
+      }
+
+      if (!category) {
+        return res.json({
+          success: false,
+          message: "Select Category!",
+        });
+      }
+
+      if (!teamName) {
+        return res.json({
+          success: false,
+          message: "Team name required!",
+        });
+      }
+
+      // Images Validation (min/max)
+      if (!req.files || req.files.length === 0) {
+        return res.json({
+          success: false,
+          message: "No image uploaded!",
+        });
+      }
+
+      if (req.files.length < 3) {
+        return res.json({
+          success: false,
+          message: "Minimum 3 images required!",
+        });
+      }
+      // Price validation
+      for (let i in stock) {
+        if (!normalPrice[i] || !basePrice[i] || !stock[i]) {
+          return res.json({
+            success: false,
+            message: "Stock, Normal price and Base price are required!",
+          });
+        }
+
+        if (Number(normalPrice[i]) < Number(basePrice[i])) {
+          return res.json({
+            success: false,
+            message: "Normal price should always be greater than base price!",
+          });
+        }
+      }
+
+      // -------------------------
+      // UPLOAD TO CLOUDINARY NOW
+      // -------------------------
+
+      const uploadedImages = [];
+
+      for (let file of req.files) {
+        const uploadResult = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "products" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+
+          stream.end(file.buffer);
+        });
+
+        uploadedImages.push(uploadResult.secure_url);
+      }
+
+      console.log("CLOUDINARY URLs:", uploadedImages);
+
+      // After uploadedImages[] is created
+
+      const categoryId = await Category.findOne({ name: category });
+
+      console.log(categoryId);
+
+      const sizesList = ["S", "M", "L", "XL", "XXL"];
+
+      const sizeArray = sizesList.map((size) => ({
+        size,
+        stock: Number(stock[size]),
+        basePrice: Number(basePrice[size]),
+        normalPrice: Number(normalPrice[size]),
+      }));
+
+      const product = await Product.create({
+        name: productName,
+        teamName,
+        description,
+        category: categoryId,
+        images: uploadedImages,
+        sizes: sizeArray,
+      });
+
+      console.log(product);
+
+      // -------------------------
+      // SAVE PRODUCT INTO DB
+      // -------------------------
+      // await Product.create({
+      //   name: productName,
+      //   teamName,
+      //   description,
+      //   category,
+      //   stock,
+      //   basePrice,
+      //   normalPrice,
+      //   images: uploadedImages,
+      // });
+
+      // If all validation passes
       return res.json({
-        success:false,
-        message:"Minimum 3 images required",
-      })
-
+        success: true,
+        message: "Product added successfully!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong!",
+      });
     }
-
-  }catch(err){
-    console.log("something went wrong!");
-  }
-}
+  });
+};

@@ -512,9 +512,9 @@ textarea {
   font-family:sans-serif;
 }
 
-.stockTable tr td input[type="number"] {
-  -moz-appearance: textfield;  /* Firefox */
-}
+/* .stockTable tr td input[type="number"] { */
+  /* -moz-appearance: textfield;  Firefox */
+/* } */
 
 .stockTable tr td input[type="number"]::-webkit-inner-spin-button,
 .stockTable tr td input[type="number"]::-webkit-outer-spin-button {

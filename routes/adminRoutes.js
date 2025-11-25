@@ -35,7 +35,7 @@ router.patch("/categories/edit/:id", adminController.editCategory);
 
 router.get("/products",adminMiddleware.isLoggedIn,adminController.productsPageRender);
 
-router.post("/products/add",upload.array("images",5),adminController.addProduct);
+router.post("/products/add",adminController.addProduct);
 
 router.get("/categories",adminMiddleware.isLoggedIn,adminController.featureNotAvailable);
 
