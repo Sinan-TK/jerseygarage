@@ -1,6 +1,7 @@
 import express from "express";
 import * as adminController from "../controllers/adminController.js";
 import * as adminMiddleware from "../middlewares/adminMiddleware.js";
+import upload from "../middlewares/multer.js";
 
 const router = express.Router();
 
@@ -33,6 +34,8 @@ router.patch("/categories/block/:id",adminMiddleware.isLoggedIn, adminController
 router.patch("/categories/edit/:id", adminController.editCategory);
 
 router.get("/products",adminMiddleware.isLoggedIn,adminController.productsPageRender);
+
+router.post("/products/add",upload.array("images",5),adminController.addProduct);
 
 router.get("/categories",adminMiddleware.isLoggedIn,adminController.featureNotAvailable);
 

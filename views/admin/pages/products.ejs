@@ -161,46 +161,59 @@
         <!-- HEADER -->
         <div class="modal-header">
             <h2>Add New Product</h2>
-            <span class="close-btn" onclick="closeAddProductModal()">✕</span>
+            <span class="close-btn">✕</span>
         </div>
 
         <!-- PRODUCT NAME + CATEGORY -->
         <div class="form-row">
             <div class="input-group">
-                <label>Product Name *</label>
-                <input type="text" name="productName" placeholder="e.g., Warriors #30 Curry Jersey">
+                <label>Product Name <span class="star-icon">*</span></label>
+                <input id="productName" type="text" name="productName" placeholder="Product Name">
             </div>
+
             <div class="input-group">
-                <label>Category *</label>
-                <input type="text" name="category" placeholder="Select Category">
+                <label>Category <span class="star-icon">*</span></label>
+
+                <div class="categoryDrop">
+                    <div class="dropdown-cat-selected" value="null">Select Category</div>
+                    <ul class="dropdown-cat-options">
+                        <% categoriesName.forEach(cat=>{ %>
+                            <li data-value="<%= cat.name %>">
+                                <%= cat.name %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+
+                <input id="seleted-category" type="hidden" name="category" value="null">
             </div>
         </div>
 
-        <!-- SKU + TEAM NAME -->
+        <!-- TEAM NAME -->
         <div class="form-row">
-            <!-- <div class="input-group">
-                <label>SKU *</label>
-                <input type="text" name="sku" placeholder="e.g., WSJ-30-2024">
-            </div> -->
             <div class="input-group">
-                <label>Team/Club Name <span>*</span></label>
-                <input type="text" name="teamName" placeholder="e.g., Golden State Warriors">
+                <label>Team/Club Name <span class="star-icon">*</span></label>
+                <input type="text" id="teamName" name="teamName" placeholder="Team/Club Name">
             </div>
         </div>
 
         <!-- PRODUCT IMAGES -->
-        <label>Product Images <span>*</span></label>
+        <label>Product Images <span class="star-icon">*</span></label>
+
         <div class="images-container">
-      <div class="img-box">
-        <label for="fileInput"  class="custom-file-upload">Upload Images</label>
-        <input id="fileInput" type="file" name="images" accept="image/*" multiple>
-      </div>
-    </div>
+            <div class="img-box">
 
+                <label for="fileInput" class="custom-file-upload">Upload Images</label>
+                <input id="fileInput" type="file" multiple accept="image/*">
 
+                <!-- PREVIEW AFTER CROPPING ONLY -->
+                <div id="previewContainer" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;"></div>
 
-        <!-- STOCK AND PRICING TABLE -->
-        <label>Stock and Pricing by Size *</label>
+            </div>
+        </div>
+
+        <!-- STOCK TABLE -->
+        <label>Stock and Pricing by Size <span class="star-icon">*</span></label>
         <table class="stockTable">
             <tr>
                 <th></th>
@@ -235,14 +248,71 @@
 
         <!-- DESCRIPTION -->
         <div class="input-group">
-            <label>Description *</label>
-            <textarea name="description"  placeholder="Enter product description..."></textarea>
+            <label>Description <span class="star-icon">*</span></label>
+            <textarea id="description" name="description" placeholder="Enter product description..."></textarea>
         </div>
 
         <!-- FOOTER -->
         <div class="modal-footer">
-            <button class="btn cancel-btn" onclick="closeAddProductModal()">Cancel</button>
+            <button class="btn cancel-btn">Cancel</button>
             <button class="btn add-btn-confirm" onclick="submitProduct()">Add Product</button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- GLOBAL CROP MODAL -->
+<div id="cropModal" style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.7);
+        z-index:999999;
+        justify-content:center;
+        align-items:center;
+     ">
+
+    <div id="cropBox" style="
+            background:white;
+            padding:20px;
+            border-radius:12px;
+            width:auto;
+            max-width:95vw;
+            max-height:95vh;
+            overflow:auto;        /* 🔥 FIX: Allows cropper to show fully */
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+         ">
+
+        <!-- IMAGE TO CROP -->
+        <img id="cropImage" style="
+                max-width:100%;
+                max-height:80vh;
+                object-fit:contain;   /* 🔥 FIX: Ensures full image stays visible */
+                display:block;
+                margin:auto;
+             " />
+
+        <!-- BUTTONS -->
+        <div style="
+                display:flex;
+                justify-content:flex-end;
+                width:100%;
+                margin-top:12px;
+                gap:10px;
+            ">
+            <button id="cancelCropBtn" class="btn cancel-btn" style="padding:10px 18px;">
+                Cancel
+            </button>
+
+            <button id="cropNextBtn" class="btn add-btn-confirm" style="padding:10px 18px;">
+                Crop
+            </button>
         </div>
 
     </div>

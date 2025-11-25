@@ -3,6 +3,8 @@ import Admin from "../models/adminModel.js";
 import User from "../models/userModel.js";
 import Category from "../models/categoryModel.js";
 import { ObjectId } from "mongodb";
+import cloudinary from "../config/cloudinary.js";
+// import Product from "../models/productModel.js";
 // import { message } from "statuses";
 
 // ======================================================================
@@ -351,7 +353,18 @@ export const logOut = (req, res) => {
 // 12.PRODUCT PAGE RENDER
 // ======================================================================
 
-export const productsPageRender = (req, res) => {
+export const productsPageRender = async (req, res) => {
+
+  const categoriesName = await Category.find().select("name");
+
+  // categoriesName.forEach( cat => {
+  //   console.log(cat._id);    
+  // });
+
+  // categoriesName.forEach( cat => {
+  //   console.log(cat.name);    
+  // });
+
   const products = [
     {
       _id: "679a12f9c1a41b00123a1111",
@@ -415,6 +428,7 @@ export const productsPageRender = (req, res) => {
     totalPages: 1,
     searchContent :"",
     status :"",
+    categoriesName,
   });
 };
 
@@ -551,22 +565,47 @@ export const searchCategory = async (req, res) => {
 };
 
 // ======================================================================
-// EXPORTS
+// 15.SEARCH CATEGORY
 // ======================================================================
-// module.exports = {
-//   renderLoginPage,
-//   loginAdmin,
-//   getUsers,
-//   blockUser,
-//   unblockUser,
-//   getCategories,
-//   addCategory,
-//   blockCategory,
-//   unblockCategory,
-//   editCategory,
-//   logOut,
-//   featureNotAvailable,
-//   searchUser,
-//   searchCategory,
-//   productsPageRender,
-// };
+
+export const addProduct = async (req,res) => {
+  try {
+    const {
+      productName,
+      teamName,
+      description,
+      category,
+      stock,
+      normalPrice,
+      basePrice,
+    } = req.body;
+
+    console.log(productName,
+      teamName,
+      description,
+      category,
+      stock,
+      normalPrice,
+      basePrice)
+
+    if (!req.files || req.files.length === 0) {
+      return res.json({
+        success:false,
+        message:"No image uploaded!"
+      })
+    }
+
+    console.log(req.files.length)
+
+    if(req.files.length < 3){
+      return res.json({
+        success:false,
+        message:"Minimum 3 images required",
+      })
+
+    }
+
+  }catch(err){
+    console.log("something went wrong!");
+  }
+}

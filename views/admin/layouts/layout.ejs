@@ -18,18 +18,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+
   <% if (showLayout !==false) { %>
     <link rel="stylesheet" href="/css/admin/layout.css">
     <% } %>
+
+
 
       <!-- Optional Page-Specific CSS -->
       <% if (cssFile) { %>
         <link rel="stylesheet" href="<%= cssFile %>">
         <% } %>
 
-          <style>
-
-          </style>
+          <!-- CropperJS CSS -->
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.css" />
 </head>
 
 <body>
@@ -109,6 +111,10 @@
         <% } %>
 
           <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+          <!-- CropperJS script -->
+          <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.js"></script>
+
 
           <script>
             toastr.options = {
