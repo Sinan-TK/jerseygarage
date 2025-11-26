@@ -81,9 +81,9 @@
 
                         <!-- EDIT -->
                         <td>
-                            <a href="/admin/products/edit/<%= product._id %>" class="edit-btn">
+                            <span data-product="<%= JSON.stringify(product) %>" class="edit-btn" onclick="editModal()">
                                 <i class="fa-solid fa-pen-to-square"></i> Edit
-                            </a>
+                            </span>
                         </td>
 
                         <!-- ACTION -->
@@ -285,6 +285,113 @@
 
     </div>
 </div>
+
+<!-- Edit modal -->
+
+<div id="editModal" class="modal-overlay">
+    <div class="modal">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h2>Edit Product</h2>
+            <span class="close-btn">✕</span>
+        </div>
+
+        <!-- PRODUCT NAME + CATEGORY -->
+        <div class="form-row">
+            <div class="input-group">
+                <label>Product Name <span class="star-icon">*</span></label>
+                <input id="editProductName" type="text" name="productName" placeholder="Product Name">
+            </div>
+
+            <div class="input-group">
+                <label>Category <span class="star-icon">*</span></label>
+
+                <div class="categoryDrop">
+                    <div id="edit-selected" class="dropdown-cat-selected" value="">Select Category</div>
+                    <ul class="dropdown-cat-options">
+                        <% categoriesName.forEach(cat=>{ %>
+                            <li data-value="<%= cat.name %>">
+                                <%= cat.name %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+
+                <input id="seleted-category" type="hidden" name="category" value="">
+            </div>
+        </div>
+
+        <!-- TEAM NAME -->
+        <div class="form-row">
+            <div class="input-group">
+                <label>Team/Club Name <span class="star-icon">*</span></label>
+                <input type="text" id="teamName" name="teamName" placeholder="Team/Club Name">
+            </div>
+        </div>
+
+        <!-- PRODUCT IMAGES -->
+        <label>Product Images <span class="star-icon">*</span></label>
+        <div class="images-container">
+            <div class="img-box">
+                <label for="fileInput" class="custom-file-upload">Upload Images</label>
+                <input id="fileInput" type="file" accept="image/*" multiple>
+
+                <!-- PREVIEW (populated by JS) -->
+                <div id="previewContainer" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;"></div>
+            </div>
+        </div>
+
+        <!-- STOCK TABLE -->
+        <label>Stock and Pricing by Size <span class="star-icon">*</span></label>
+        <table class="stockTable">
+            <tr>
+                <th></th>
+                <th>S</th>
+                <th>M</th>
+                <th>L</th>
+                <th>XL</th>
+                <th>XXL</th>
+            </tr>
+
+            <tr>
+                <td>Stock</td>
+                <% ['S','M','L','XL','XXL'].forEach(size=> { %>
+                    <td><input class="stockInput" type="number" name="stock_<%= size %>"></td>
+                    <% }) %>
+            </tr>
+
+            <tr>
+                <td>Normal Price</td>
+                <% ['S','M','L','XL','XXL'].forEach(size=> { %>
+                    <td><input class="stockInput" type="number" name="normalPrice_<%= size %>"></td>
+                    <% }) %>
+            </tr>
+
+            <tr>
+                <td>Base Price</td>
+                <% ['S','M','L','XL','XXL'].forEach(size=> { %>
+                    <td><input class="stockInput" type="number" name="basePrice_<%= size %>"></td>
+                    <% }) %>
+            </tr>
+        </table>
+
+        <!-- DESCRIPTION -->
+        <div class="input-group">
+            <label>Description <span class="star-icon">*</span></label>
+            <textarea id="description" name="description" placeholder="Enter product description..."></textarea>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button class="btn cancel-btn">Cancel</button>
+            <button class="btn add-btn-confirm" onclick="submitProduct()">Add Product</button>
+        </div>
+
+    </div>
+</div>
+
+
 
 
 <!-- GLOBAL CROP MODAL (outside modal or at bottom of page) -->

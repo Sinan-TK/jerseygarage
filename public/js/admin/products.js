@@ -409,3 +409,22 @@ actionBtn.addEventListener("click", async () => {
     toastr.error(err, "Error");
   }
 });
+
+async function editModal() {
+
+  const product = JSON.parse(document.querySelector(".edit-btn").dataset.product);
+  const editModal = document.getElementById("editModal");
+  editModal.style.display = "flex";
+
+  document.getElementById("editProductName").value = product.name;
+  document.getElementById("seleted-category").value = product.category;
+  document.getElementById("edit-selected").value = product.category;
+  document.getElementById("edit-selected").innerText = product.category;
+
+
+
+  console.log(product);
+
+
+  
+}
