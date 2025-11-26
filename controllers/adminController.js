@@ -651,22 +651,8 @@ export const addProduct = async (req, res) => {
       });
 
       console.log(product);
+      
 
-      // -------------------------
-      // SAVE PRODUCT INTO DB
-      // -------------------------
-      // await Product.create({
-      //   name: productName,
-      //   teamName,
-      //   description,
-      //   category,
-      //   stock,
-      //   basePrice,
-      //   normalPrice,
-      //   images: uploadedImages,
-      // });
-
-      // If all validation passes
       return res.json({
         success: true,
         message: "Product added successfully!",
@@ -680,3 +666,39 @@ export const addProduct = async (req, res) => {
     }
   });
 };
+
+// ======================================================================
+// 16.BLOCK PRODUCT
+// ======================================================================
+
+export const blockProduct = async (req,res) => {
+  const id = req.params.id;
+
+  const data = await Product.findByIdAndUpdate(id,{is_active:false},{new:true});
+
+  console.log(data);
+  console.log(id);
+
+  res.json({
+    success:true,
+    message:"Product Unlisted!",
+  })
+}
+
+// ======================================================================
+// 16.UNBLOCK PRODUCT
+// ======================================================================
+
+export const unblockProduct = async (req,res) => {
+  const id = req.params.id;
+
+  const data = await Product.findByIdAndUpdate(id,{is_active:true},{new:true});
+
+  console.log(data);
+  console.log(id);
+
+  res.json({
+    success:true,
+    message:"Product Listed!",
+  })
+}

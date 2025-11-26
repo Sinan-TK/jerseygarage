@@ -37,6 +37,11 @@ router.get("/products",adminMiddleware.isLoggedIn,adminController.productsPageRe
 
 router.post("/products/add",adminController.addProduct);
 
+router.patch("/products/block/:id",adminController.blockProduct)
+
+router.patch("/products/unblock/:id",adminController.unblockProduct)
+
+
 router.get("/categories",adminMiddleware.isLoggedIn,adminController.featureNotAvailable);
 
 router.get("/offers",adminMiddleware.isLoggedIn,adminController.featureNotAvailable);

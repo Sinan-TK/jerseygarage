@@ -113,14 +113,13 @@ document.addEventListener("click", (e) => {
 
 // Frontend: product-images.js
 
-
-const OUTPUT_FORMAT = "image/webp"; 
+const OUTPUT_FORMAT = "image/webp";
 const OUTPUT_QUALITY = 0.9;
 
 // State arrays (stable indexing)
-let selectedFiles = [];   // original File objects selected in current selection cycle (temporary while cropping)
-let croppedBlobs = [];    // final cropped blobs aligned by index (sparse: null = empty slot)
-let nextSlotIndex = 0;    // index to place next cropped image
+let selectedFiles = []; // original File objects selected in current selection cycle (temporary while cropping)
+let croppedBlobs = []; // final cropped blobs aligned by index (sparse: null = empty slot)
+let nextSlotIndex = 0; // index to place next cropped image
 
 // DOM
 const fileInput = document.getElementById("fileInput");
@@ -138,7 +137,7 @@ let cropper = null;
 
 // find first free slot in croppedBlobs or push to end
 function getNextFreeIndex() {
-  const idx = croppedBlobs.findIndex(b => b === undefined || b === null);
+  const idx = croppedBlobs.findIndex((b) => b === undefined || b === null);
   return idx === -1 ? croppedBlobs.length : idx;
 }
 
@@ -152,11 +151,13 @@ function renderPreviews() {
     const card = document.createElement("div");
     card.className = "preview-card";
     card.dataset.index = index;
-    card.style = "display:flex; flex-direction:column; align-items:center; gap:6px;";
+    card.style =
+      "display:flex; flex-direction:column; align-items:center; gap:6px;";
 
     const img = document.createElement("img");
     img.src = url;
-    img.style = "width:100px; height:100px; object-fit:cover; border-radius:6px;";
+    img.style =
+      "width:100px; height:100px; object-fit:cover; border-radius:6px;";
 
     const controls = document.createElement("div");
     controls.style = "display:flex; gap:6px;";
@@ -168,7 +169,10 @@ function renderPreviews() {
     recropBtn.textContent = "Re-Crop";
     recropBtn.onclick = () => {
       // open cropper for existing blob (re-crop)
-      openCropperFor(new File([blob], `recrop_${index}.webp`, { type: OUTPUT_FORMAT }), index);
+      openCropperFor(
+        new File([blob], `recrop_${index}.webp`, { type: OUTPUT_FORMAT }),
+        index
+      );
     };
 
     // Remove
@@ -233,7 +237,8 @@ function openCropperFor(file, targetIndex = null) {
     });
 
     // store target index for use after cropping
-    cropModal.dataset.targetIndex = (typeof targetIndex === "number") ? String(targetIndex) : "";
+    cropModal.dataset.targetIndex =
+      typeof targetIndex === "number" ? String(targetIndex) : "";
   };
 }
 
@@ -242,40 +247,45 @@ cropNextBtn.addEventListener("click", () => {
 
   const canvas = cropper.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 });
 
-  canvas.toBlob((blob) => {
-    // store blob into the designated index
-    const targetIndex = cropModal.dataset.targetIndex ? parseInt(cropModal.dataset.targetIndex, 10) : getNextFreeIndex();
-    croppedBlobs[targetIndex] = blob;
+  canvas.toBlob(
+    (blob) => {
+      // store blob into the designated index
+      const targetIndex = cropModal.dataset.targetIndex
+        ? parseInt(cropModal.dataset.targetIndex, 10)
+        : getNextFreeIndex();
+      croppedBlobs[targetIndex] = blob;
 
-    // cleanup and close
-    cropper.destroy();
-    cropper = null;
-    cropModal.style.display = "none";
-    URL.revokeObjectURL(cropImage.src);
+      // cleanup and close
+      cropper.destroy();
+      cropper = null;
+      cropModal.style.display = "none";
+      URL.revokeObjectURL(cropImage.src);
 
-   
-    const alreadyCropped = Object.values(croppedBlobs).filter(Boolean).length;
-   
-    if (selectedFiles.length > 0) {
-      // remove the first (just processed) file from selectedFiles
-      selectedFiles.shift();
-    }
+      const alreadyCropped = Object.values(croppedBlobs).filter(Boolean).length;
 
-    if (selectedFiles.length > 0) {
-      // next free targetIndex
-      const nextIndex = getNextFreeIndex();
-      openCropperFor(selectedFiles[0], nextIndex);
-    } else {
-      // finished batch
-      selectedFiles = [];
-      cropModal.dataset.targetIndex = "";
-    }
+      if (selectedFiles.length > 0) {
+        // remove the first (just processed) file from selectedFiles
+        selectedFiles.shift();
+      }
 
-    renderPreviews();
+      if (selectedFiles.length > 0) {
+        // next free targetIndex
+        const nextIndex = getNextFreeIndex();
+        openCropperFor(selectedFiles[0], nextIndex);
+      } else {
+        // finished batch
+        selectedFiles = [];
+        cropModal.dataset.targetIndex = "";
+      }
 
-    // reset file input so user can select same files again if needed
-    fileInput.value = "";
-  }, OUTPUT_FORMAT, OUTPUT_QUALITY);
+      renderPreviews();
+
+      // reset file input so user can select same files again if needed
+      fileInput.value = "";
+    },
+    OUTPUT_FORMAT,
+    OUTPUT_QUALITY
+  );
 });
 
 cancelCropBtn.addEventListener("click", () => {
@@ -294,12 +304,12 @@ cancelCropBtn.addEventListener("click", () => {
 async function submitProduct() {
   // validate min images
   const validCount = croppedBlobs.filter(Boolean).length;
-  
+
   const productName = document.getElementById("productName").value.trim();
   const teamName = document.getElementById("teamName").value.trim();
   const description = document.getElementById("description").value;
   const categoryName = document.getElementById("seleted-category").value;
-  
+
   const sizes = ["S", "M", "L", "XL", "XXL"];
 
   const stock = {};
@@ -323,9 +333,9 @@ async function submitProduct() {
   formData.append("teamName", teamName);
   formData.append("description", description);
   formData.append("category", categoryName);
-  formData.append("stock",JSON.stringify(stock));
-  formData.append("normalPrice",JSON.stringify(normalPrice));
-  formData.append("basePrice",JSON.stringify(basePrice));
+  formData.append("stock", JSON.stringify(stock));
+  formData.append("normalPrice", JSON.stringify(normalPrice));
+  formData.append("basePrice", JSON.stringify(basePrice));
 
   // Append cropped blobs in stable order
   croppedBlobs.forEach((blob, idx) => {
@@ -342,19 +352,60 @@ async function submitProduct() {
     });
 
     if (res.data.success) {
-      toastr.success(res.data.message,"Product added!");
+      toastr.success(res.data.message, "Product added!");
       // reset UI
       croppedBlobs = [];
       renderPreviews();
       // optionally close modal...
-      setTimeout(()=>{
+      setTimeout(() => {
         window.location.reload();
-      },5000);
+      }, 5000);
     } else {
-      toastr.error(res.data.message,"Failed:");
+      toastr.error(res.data.message, "Failed:");
     }
   } catch (err) {
     console.error("UPLOAD ERROR", err);
-    toastr.error(err.response.data.message,"Error");
+    toastr.error(err.response.data.message, "Error");
   }
 }
+
+// block and unblock the product
+const actionBtn = document.querySelector(".action-btn");
+
+actionBtn.addEventListener("click", async () => {
+  const productStatus = document.querySelector(".status-badge");
+  const productId = document.querySelector(".product-row").dataset.id;
+  const status = productStatus.innerText === "List" ? "block" : "unblock";
+  console.log(status);
+  console.log(productStatus.innerText);
+  console.log(productId);
+
+  try {
+    const res = await axios.patch(`/admin/products/${status}/${productId}`);
+
+    if (res.data.success) {
+      if (status === "block") {
+        productStatus.innerText = "Unlist";
+        productStatus.classList.replace("active","inactive");
+        actionBtn.classList.replace("block","list");
+        productStatus.classList.replace("active","inactive");
+        actionBtn.innerHTML = `<i class="fa-solid fa-unlock"></i> List`;
+
+
+        toastr.error(res.data.message,"Status:");
+      }else{
+        productStatus.innerText = "List";
+        productStatus.classList.replace("inactive","active");
+        actionBtn.classList.replace("list","block");
+        productStatus.classList.replace("inactive","active");
+        actionBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block`;
+
+        toastr.success(res.data.message,"Status:");
+      }
+
+    } else {
+    }
+  } catch (err) {
+    toastr.error(err, "Error");
+  }
+});

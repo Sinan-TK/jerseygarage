@@ -97,13 +97,13 @@
 }
 
 .product-table thead tr th {
-    padding-left: 20px;
+  padding-left: 20px;
 }
 
 .product-table tbody tr {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 /* TABLE CELLS */
@@ -114,8 +114,9 @@
 
 .product-table th,
 .product-table td {
-    text-align: left !important;
+  text-align: left !important;
 }
+
 
 
 /* ARROW ICON */
@@ -144,7 +145,7 @@
 
 .image-cell,
 .image-cell img {
-    text-align: left !important;
+  text-align: left !important;
 }
 
 /* STATUS */
@@ -169,20 +170,24 @@
 .edit-btn,
 .block-icon,
 .unblock-icon {
-    text-align: left !important;
-    justify-content: flex-start !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
 }
 
-.edit-btn{
-    text-decoration: none;
+.edit-btn {
+  text-decoration: none;
 }
 
-.list{
-    color: #00bb54;
+.list {
+  display: inline;
+  color: #00bb54;
+  cursor: pointer;
 }
 
-.block{
-    color:#d14545;
+.block {
+  display: inline;
+  color: #d14545;
+  cursor: pointer;
 }
 
 /* DROPDOWN ROW */
@@ -198,17 +203,17 @@
 }
 
 .add-btn {
-    margin-block: 15px;
-    background: #0f172a;
-    color: #fff;
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  margin-block: 15px;
+  background: #0f172a;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* SIZE PREVIEW TABLE */
@@ -243,8 +248,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.4);
-  display: none; 
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 9999;
@@ -267,8 +272,15 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===========================
@@ -362,14 +374,14 @@ textarea {
   border-radius: 8px;
   list-style: none;
   padding: 6px 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   opacity: 0;
   pointer-events: none;
   transform: translateY(5px);
   transition: all 0.2s ease;
   z-index: 50;
   max-height: 30vh;
-  overflow-y:scroll;
+  overflow-y: scroll;
 }
 
 /* When dropdown is open */
@@ -418,8 +430,10 @@ textarea {
    IMAGE UPLOAD BOXES
 =========================== */
 .images-container {
-  display: grid; /* Changed from flex */
-  grid-template-columns: 1fr; /* Creates 2 equal columns */
+  display: grid;
+  /* Changed from flex */
+  grid-template-columns: 1fr;
+  /* Creates 2 equal columns */
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -434,9 +448,9 @@ textarea {
   color: #777;
   background: #fafafa;
   cursor: pointer;
-  
+
   /* Optional: Ensures boxes are equal height even if content varies */
-  height: 100%; 
+  height: 100%;
 }
 
 .img-box:hover {
@@ -446,7 +460,7 @@ textarea {
 /* ===========================
    TABLE FOR SIZES
 =========================== */
- .stockTable{
+.stockTable {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 22px;
@@ -507,18 +521,19 @@ textarea {
   color: #fff;
 }
 
-.input-group textarea{
+.input-group textarea {
   resize: none;
-  font-family:sans-serif;
+  font-family: sans-serif;
 }
 
 /* .stockTable tr td input[type="number"] { */
-  /* -moz-appearance: textfield;  Firefox */
+/* -moz-appearance: textfield;  Firefox */
 /* } */
 
 .stockTable tr td input[type="number"]::-webkit-inner-spin-button,
 .stockTable tr td input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;  /* Chrome, Safari, Edge */
+  -webkit-appearance: none;
+  /* Chrome, Safari, Edge */
   margin: 0;
 }
 
@@ -540,12 +555,12 @@ textarea {
 }
 
 .custom-file-upload:hover {
-    background: #000000;  
+  background: #000000;
   color: #ffffff;
   border: 1px solid black;
 }
 
-.star-icon{
+.star-icon {
   color: rgb(255, 71, 71);
   font-size: large;
 }
