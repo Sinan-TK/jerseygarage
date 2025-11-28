@@ -229,7 +229,7 @@ async function editConfirm() {
       errorText.innerText = res.data.message;
     }
   } catch (err) {
-    console.log("Something went wrong!!");
+    console.log("Something went wrong!!",err);
   }
 }
 
@@ -349,12 +349,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
+//ADD CATEGORY SECTION
+
 async function addCategory() {
   const name = document.getElementById("addCategoryName").value;
   const description = document.getElementById("addCategoryDescription").value;
   const color = document.getElementById("selectedColor").value;
-  const errorBox = document.getElementById("editError");
-  const errorText = document.getElementById("editErrorText");
+  const errorBox = document.getElementById("addError");
+  const errorText = document.getElementById("addErrorText");
 
   console.log(name, description, color);
 

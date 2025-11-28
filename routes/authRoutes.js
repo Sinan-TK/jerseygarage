@@ -5,26 +5,30 @@ import passport from "passport";
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-  res.locals.layout = "user/layouts/layout";
-  next();
-});
+router.use(authMiddleware.userLayout);
 
-router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
+// router.use((req, res, next) => {
+//   res.locals.layout = "user/layouts/layout";
+//   next();
+// });
 
-router.get("/google/callback",passport.authenticate("google", { failureRedirect: "/login" }),authController.googleCallback);
+// CHECK THE SESSION.USER
 
-// router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
+router.use(authMiddleware.profileIcon);
+
+router.get("/google",authMiddleware.isLoggedIn,passport.authenticate("google", { scope: ["profile", "email"] }));
+
+router.get("/google/callback",authMiddleware.isLoggedIn,passport.authenticate("google", { failureRedirect: "/login" }),authController.googleCallback);
 
 router.get('/login' ,authMiddleware.isLoggedIn , authController.loginPage);
 
 router.post('/login',authController.userVerification);
 
-router.get('/signup',authMiddleware.isLoggedIn ,authController.signUpPage);
+router.get('/signup',authMiddleware.isLoggedIn,authMiddleware.isMailFound,authController.signUpPage);
 
 router.post('/signup', authController.getEmail);
 
-router.get('/verify-otp',authMiddleware.isMailFound ,authController.renderOtpPage);
+router.get('/verify-otp', authMiddleware.noMailFound ,authController.renderOtpPage);
 
 router.post('/verify-otp', authController.otpVerification);
 
@@ -34,8 +38,6 @@ router.get('/register',authMiddleware.isMailFound, authController.renderSignupDe
 
 router.post('/register',authController.saveSignupDetails);
 
-router.get('/', authController.renderHomePage);
-
 router.get('/forgotpassword',authMiddleware.isLoggedIn ,authController.renderForgetPasswordPage);
 
 router.post('/forgotpassword',authController.emailVerification);
@@ -43,6 +45,8 @@ router.post('/forgotpassword',authController.emailVerification);
 router.get('/newpassword',authMiddleware.isMailFound ,authController.renderNewPassPage);
 
 router.post('/newpassword',authController.newPassValidation);
+
+router.get('/', authController.renderHomePage);
 
 router.get('/shop',authController.renderShopPage);
 

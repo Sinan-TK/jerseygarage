@@ -300,6 +300,7 @@ export const editCategory = async (req, res) => {
     console.log(id);
 
     if (!name || !description || !color) {
+      console.log(`working`)
       return res.json({
         success: false,
         message: "All fields are required. Please fill out every input!",

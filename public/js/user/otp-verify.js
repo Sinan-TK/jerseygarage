@@ -55,13 +55,19 @@ async function verifyOtp() {
     const res = await axios.post("/verify-otp", { otpValue });
 
     if (res.data.success) {
-      toastr.success("Login successful!", "Welcome");
+      toastr.success("Otp verification successfull!", "Status:");
 
-      if (res.data.purpose === "signup") {
-        setTimeout(() => (window.location.href = "/register"), 1000);
-      } else {
-        setTimeout(() => (window.location.href = "/newpassword"), 1000);
-      }
+      console.log(res.data.purpose)
+
+      setTimeout(()=>{
+        window.location.href = res.data.redirect;
+      },1000);
+
+      // if (res.data.purpose === "signup") {
+      //   setTimeout(() => (window.location.href = "/register"), 1000);
+      // } else {
+      //   setTimeout(() => (window.location.href = "/newpassword"), 1000);
+      // }
     } else {
       if (res.data.toast) {
         toastr.error(res.data.message, "Failed");

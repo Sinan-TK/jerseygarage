@@ -8,15 +8,15 @@
     </nav>
   </div>
 
-  <a href="#" class="logo">JerseyGarage</a>
+  <a href="/" class="logo">JerseyGarage</a>
 
   <div class="header-right">
     <a href="#" class="search">
       <img src="/images/user/header/search-logo.png" alt="search" style="width: 20px; height: 20px;">
       <span class="search-text">Search</span>
     </a>
-    <a href="#" class="account"><img src="/images/user/header/profile-logo.png" alt="profile" style="width: 22px; height: 21px;"></a>
-    <a href="#" class="cart">
+    <a href="<%= user ? '/user/profile' : '/login' %>" class="account"><img src="/images/user/header/profile-logo.png" alt="profile" style="width: 22px; height: 21px;"></a>
+    <a href="<%= user ? '/user/profile' : '/login' %>" class="cart">
       <img src="/images/user/header/cart-logo.png" alt="cart" style="width: 25px; height: 25px;">
       <span class="cart-count">0</span>
     </a>
@@ -51,8 +51,8 @@
     </div>
 
     <div class="sidebar-footer">
-      <a href="#" class="sidebar-footer-btn account-btn"> Account</a>
-      <a href="#" class="sidebar-footer-btn cart-btn"> Cart</a>
+      <a href="<%= user ? '/user/profile' : '/login' %>" class="sidebar-footer-btn account-btn"> Account</a>
+      <a href="<%= user ? '/user/profile' : '/login' %>" class="sidebar-footer-btn cart-btn"> Cart</a>
     </div>
   </div>
 </header>

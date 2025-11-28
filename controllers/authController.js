@@ -24,6 +24,7 @@ export const loginPage = (req, res) => {
 // ======================================================================
 
 export const googleCallback = (req, res) => {
+  req.session.user = true;
   // User logged in successfully
   res.redirect("/");
 };
@@ -62,7 +63,7 @@ export const userVerification = async (req, res) => {
     }
 
     // Store session
-    req.session.userId = user._id;
+    req.session.user = true;
 
     return res.json({
       success: true,
@@ -220,11 +221,19 @@ export const otpVerification = async (req, res) => {
     otpDoc.is_used = true;
     await otpDoc.save();
 
-    return res.json({
-      success: true,
-      message: "OTP verified successfully!",
-      purpose,
-    });
+    if (purpose === "signup") {
+      return res.json({
+        success: true,
+        message: "OTP verified successfully!",
+        redirect:"/register",
+      });
+    } else {
+      return res.json({
+        success: true,
+        message: "OTP verified successfully!",
+        redirect:"/newpassword",
+      });
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send("Server Error");
@@ -536,26 +545,3 @@ export const renderShopPage = (req, res) => {
     pageJS: "",
   });
 };
-
-// ======================================================================
-// EXPORT ALL
-// ======================================================================
-
-// module.exports = {
-//   loginPage,
-//   googleCallback,
-//   userVerification,
-//   signUpPage,
-//   getEmail,
-//   renderOtpPage,
-//   otpVerification,
-//   resendOtp,
-//   renderSignupDetails,
-//   saveSignupDetails,
-//   renderHomePage,
-//   renderForgetPasswordPage,
-//   emailVerification,
-//   renderNewPassPage,
-//   newPassValidation,
-//   renderShopPage,
-// };

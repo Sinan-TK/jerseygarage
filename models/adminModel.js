@@ -21,10 +21,6 @@ const adminSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    otp_code: {
-      type: String,
-      default: null, // nullable
-    },
   },
   {
     timestamps: true,

@@ -13,8 +13,3 @@ export const adminExists = (req,res,next) => {
     // }
     next();
 }
-
-// module.exports = {
-//   isLoggedIn,
-//   adminExists,
-// };
