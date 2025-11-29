@@ -66,8 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       if (res.data.success) {
-        console.log(res.data.updatedData.is_blocked);
-        if (res.data.updatedData.is_blocked) {
+        console.log(res.data)
+        console.log(res.data.data.is_blocked);
+        if (res.data.data.is_blocked) {
           const statusEl = document.querySelector(
             `[data-id="${selectedUserId}"]`
           );

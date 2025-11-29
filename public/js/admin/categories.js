@@ -196,7 +196,7 @@ async function editConfirm() {
       editModal.style.display = "none";
       toastr.success(res.data.message, "success");
 
-      const updated = res.data.updatedData;
+      const updated = res.data.data;
 
       // FIND THE CARD USING data-id
       const card = document.querySelector(
@@ -224,12 +224,25 @@ async function editConfirm() {
         editBtn.dataset.description = updated.description;
         editBtn.dataset.color = updated.color;
       }
-    } else {
-      errorBox.style.display = "flex";
-      errorText.innerText = res.data.message;
     }
   } catch (err) {
-    console.log("Something went wrong!!",err);
+    const error = err.response?.data;
+
+    console.log(error);
+
+    errorBox.style.display = "flex";
+    errorText.innerText = error?.message || "Something went wrong.";
+
+    setTimeout(() => {
+      errorBox.style.display = "none";
+      errorText.innerHTML = "";
+    }, 3000);
+    
+
+    // errorBox.style.display = "flex";
+    // errorText.innerText = res.data.message;
+
+    // console.log("Something went wrong!!", err);
   }
 }
 
@@ -249,16 +262,16 @@ async function blockConfirm() {
 
     if (res.data.success) {
       // toastr.success(res.data.message,"success");
-      console.log(res.data.updatedData.is_active);
-      if (res.data.updatedData.is_active) {
+      console.log(res.data.data.is_active);
+      if (res.data.data.is_active) {
         const status = document.querySelector(
-          `.status[data-id="${res.data.updatedData._id}"]`
+          `.status[data-id="${res.data.data._id}"]`
         );
         status.textContent = "Active";
         status.classList.replace("inactive", "active");
 
         const blockButton = document.querySelector(
-          `.cat-action[data-id="${res.data.updatedData._id}"]`
+          `.cat-action[data-id="${res.data.data._id}"]`
         );
         blockButton.textContent = "Block";
         blockButton.classList.replace("unblock-category", "block-category");
@@ -268,13 +281,13 @@ async function blockConfirm() {
         confirmModal.style.display = "none";
       } else {
         const status = document.querySelector(
-          `.status[data-id="${res.data.updatedData._id}"]`
+          `.status[data-id="${res.data.data._id}"]`
         );
         status.textContent = "Blocked";
         status.classList.replace("active", "inactive");
 
         const blockButton = document.querySelector(
-          `.cat-action[data-id="${res.data.updatedData._id}"]`
+          `.cat-action[data-id="${res.data.data._id}"]`
         );
         blockButton.textContent = "Unblock";
         blockButton.classList.replace("block-category", "unblock-category");
@@ -349,7 +362,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
 //ADD CATEGORY SECTION
 
 async function addCategory() {
@@ -368,16 +380,23 @@ async function addCategory() {
       color,
     });
 
-    if(res.data.success){
-      toastr.success("Category added","Success");
-      setTimeout(()=>{
+    if (res.data.success) {
+      toastr.success("Category added", "Success");
+      setTimeout(() => {
         window.location.reload();
-      },5000);
-    }else{
-      errorBox.style.display = "flex";
-      errorText.innerText = res.data.message;
+      }, 3000);
     }
   } catch (err) {
-    console.log("Something went wrong!");
+    const error = err.response?.data;
+
+    console.log(error);
+
+    errorBox.style.display = "flex";
+    errorText.innerText = error?.message || "Something went wrong.";
+
+    setTimeout(() => {
+      errorBox.style.display = "none";
+      errorText.innerHTML = "";
+    }, 3000);
   }
 }

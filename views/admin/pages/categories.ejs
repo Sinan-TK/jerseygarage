@@ -94,20 +94,20 @@
 <div class="pagination">
 
     <!-- LEFT ARROW: show ONLY if NOT first page -->
-    <% if (currentPage> 1) { %>
-        <a href="/admin/categories?page=<%= currentPage - 1 %>" class="arrow-btn">
+    <% if (pagination.page> 1) { %>
+        <a href="/admin/categories?page=<%= pagination.page - 1 %>" class="arrow-btn">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
         <% } %>
 
             <!-- CURRENT PAGE NUMBER -->
             <span class="current-page-display">
-                <%= currentPage %>
+                <%= pagination.page %>
             </span>
 
             <!-- RIGHT ARROW: show ONLY if NOT last page -->
-            <% if (currentPage < totalPages) { %>
-                <a href="/admin/categories?page=<%= currentPage + 1 %>" class="arrow-btn">
+            <% if (pagination.page < pagination.totalPages) { %>
+                <a href="/admin/categories?page=<%= pagination.page + 1 %>" class="arrow-btn">
                     <i class="fa-solid fa-chevron-right"></i>
                 </a>
                 <% } %>

@@ -39,13 +39,6 @@ const userSchema = new mongoose.Schema(
         return !this.googleId;     // Require password only for normal signup
       },
     },
-
-    default_address: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
-      default: null,
-    },
-
     referral_code: {
       type: String,
     },
@@ -57,16 +50,6 @@ const userSchema = new mongoose.Schema(
     },
 
     referral_count: {
-      type: Number,
-      default: 0,
-    },
-
-    orderCount: {
-      type: Number,
-      default: 0,
-    },
-
-    totalSpent: {
       type: Number,
       default: 0,
     },

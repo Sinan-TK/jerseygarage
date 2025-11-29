@@ -21,9 +21,12 @@ googlePassportConfig();   // <-- REQUIRED
 
 
 // Routes imports
-import adminRoutes from "./routes/adminRoutes.js";
+import adminRoutes from "./routes/adminRoutes/adminRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+
+//Globel Middleware
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 app.use(nocache());
@@ -34,9 +37,7 @@ connectDB();
 // 🧩 Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.static(path.join(__dirname, "public"), { maxAge: 0 }));
-
 app.use(expressLayouts);
 
 app.use(
@@ -58,10 +59,15 @@ app.use(toastHandler);
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+
 // 🧩 Routes
 app.use("/admin", adminRoutes);
 app.use("/user", userRoutes);
 app.use("/", authRoutes);
+
+//Error handler middleware 
+app.use(errorHandler);
 
 // 🧩 Server
 const PORT = process.env.PORT || 3000;

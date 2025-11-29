@@ -4,30 +4,31 @@ async function loginVerification() {
   const errorBox = document.getElementById("loginError");
   const errorText = document.getElementById("loginErrorText");
 
-  console.log(email, password);
-
   try {
     const res = await axios.post("/admin/login", { email, password });
 
+    // SUCCESS
     if (res.data.success) {
       toastr.success(res.data.message, "Welcome");
 
       setTimeout(() => {
-        window.location.href = "/admin/dashboard";
-      }, 1000);
-    } else {
-      errorBox.style.display = "flex";
-      errorText.innerText = res.data.message;
-
-      setTimeout(() => {
-        errorBox.style.display = "none";
-        errorText.innerHTML = "";
-      }, 3000);
-
+        if (res.data.redirect) {
+          window.location.href = res.data.redirect;
+        }
+      }, 2000);
     }
   } catch (err) {
-    console.log(err);
+    // Axios always puts failed validation inside err.response
+    const error = err.response?.data;
+
+    console.log("AXIOS ERROR:", error);
+
     errorBox.style.display = "flex";
-    errorText.innerText = "Something went wrong.";
+    errorText.innerText = error?.message || "Something went wrong.";
+
+    setTimeout(() => {
+      errorBox.style.display = "none";
+      errorText.innerHTML = "";
+    }, 3000);
   }
 }
