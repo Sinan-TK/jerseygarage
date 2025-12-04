@@ -53,7 +53,10 @@ export const loginAdmin = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.adminLogin.INVALID_PASSWORD);
   }
 
-  req.session.Admin = true;
+  req.session.Admin = {
+    id: admin._id,
+    email: admin.email,
+  };
 
   return sendResponse(res, Responses.adminLogin.LOGIN_SUCCESS);
 });
@@ -132,7 +135,7 @@ export const searchUser = wrapAsync(async (req, res) => {
   if (status === "blocked") filter.is_blocked = true;
   if (status === "active") filter.is_blocked = false;
 
-  const result = await paginate(User,page,5,filter);
+  const result = await paginate(User, page, 5, filter);
 
   res.render("admin/pages/user", {
     title: "Users",
@@ -213,9 +216,6 @@ export const featureNotAvailable = (req, res) => {
     pageJS: "",
   });
 };
-
-
-
 
 // ======================================================================
 // 15.SEARCH CATEGORY

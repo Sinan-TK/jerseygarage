@@ -39,12 +39,14 @@ if (inputs && inputs.length) {
 // VERIFY OTP
 // ------------------------------
 async function verifyOtp() {
-  const otpInputs = document.querySelectorAll('.otp-inputs input[type="number"]');
+  const otpInputs = document.querySelectorAll(
+    '.otp-inputs input[type="number"]'
+  );
   const errorBox = document.getElementById("otpError");
   const errorMessage = document.getElementById("otpErrorText");
 
-  if (errorBox) errorBox.style.display = "none";
-  if (errorMessage) errorMessage.innerText = "";
+  errorBox.style.display = "none";
+  errorMessage.innerText = "";
 
   let otpValue = "";
   otpInputs.forEach((input) => {
@@ -54,34 +56,26 @@ async function verifyOtp() {
   try {
     const res = await axios.post("/verify-otp", { otpValue });
 
+    console.log(res);
+
     if (res.data.success) {
       toastr.success("Otp verification successfull!", "Status:");
 
-      console.log(res.data.purpose)
-
-      setTimeout(()=>{
+      setTimeout(() => {
         window.location.href = res.data.redirect;
-      },1000);
-
-      // if (res.data.purpose === "signup") {
-      //   setTimeout(() => (window.location.href = "/register"), 1000);
-      // } else {
-      //   setTimeout(() => (window.location.href = "/newpassword"), 1000);
-      // }
-    } else {
-      if (res.data.toast) {
-        toastr.error(res.data.message, "Failed");
-      } else {
-        if (errorBox) errorBox.style.display = "flex";
-        if (errorMessage) errorMessage.innerText = res.data.message;
-
-        setTimeout(() => {
-          if (errorBox) errorBox.style.display = "none";
-        }, 3000);
-      }
+      }, 1000);
     }
   } catch (err) {
-    console.error("verifyOtp error:", err);
+    const error = err.response?.data;
+
+    console.log(error);
+
+    errorBox.style.display = "flex";
+    errorMessage.innerText = error?.message || "Something went wrong!";
+
+    setTimeout(() => {
+      errorBox.style.display = "none";
+    }, 3000);
   }
 }
 
@@ -116,7 +110,8 @@ function startOtpExpireTimer(endTime) {
       expireDisplay.style.display = "none";
       otpExpire.style.display = "none";
 
-      messageBox.textContent = "Your OTP has expired. Please request a new one.";
+      messageBox.textContent =
+        "Your OTP has expired. Please request a new one.";
       messageBox.style.display = "block";
       return;
     }

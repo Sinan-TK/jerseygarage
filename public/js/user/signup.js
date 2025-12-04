@@ -13,14 +13,22 @@ async function getMail() {
       toastr.success("Success", res.data.message);
 
       setTimeout(() => {
-        window.location.href = "/verify-otp";
-      }, 1000);
-    } else {
-      errorBox.style.display = "flex";
-      errorMessage.innerText = res.data.message;
+        if (res.data.redirect) {
+          window.location.href = res.data.redirect;
+        }
+      }, 3000);
     }
   } catch (err) {
+    const error = err.response?.data;
+
+    console.log(error);
+
     errorBox.style.display = "flex";
-    errorMessage.innerText = "Something went wrong.";
+    errorMessage.innerText = error?.message || "Something went wrong.";
+
+    setTimeout(() => {
+      errorBox.style.display = "none";
+      errorMessage.innerText = "";
+    }, 3000);
   }
 }

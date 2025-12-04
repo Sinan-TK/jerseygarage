@@ -11,14 +11,22 @@ async function loginUser() {
       toastr.success("Login successful!", "Welcome");
 
       setTimeout(() => {
-        window.location.href = "/";
-      }, 800);
-    } else {
-      errorBox.style.display = "flex";
-      errorText.innerText = res.data.message;
+        if (res.data.redirect) {
+          window.location.href = res.data.redirect;
+        }
+      }, 2000);
     }
   } catch (err) {
+    const error = err.response?.data;
+
+    console.log(error);
+
     errorBox.style.display = "flex";
-    errorText.innerText = "Something went wrong.";
+    errorText.innerText = error?.message || "Something went wrong.";
+
+    setTimeout(() => {
+      errorBox.style.display = "none";
+      errorText.innerHTML = "";
+    }, 3000);
   }
 }

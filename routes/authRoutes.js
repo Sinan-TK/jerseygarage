@@ -1,16 +1,11 @@
 import express from "express";
-import * as authController from "../controllers/authController.js";
+import * as authController from "../controllers/user/authController.js";
 import * as authMiddleware from "../middlewares/authMiddleware.js";
 import passport from "passport";
 
 const router = express.Router();
 
 router.use(authMiddleware.userLayout);
-
-// router.use((req, res, next) => {
-//   res.locals.layout = "user/layouts/layout";
-//   next();
-// });
 
 // CHECK THE SESSION.USER
 

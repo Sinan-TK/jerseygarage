@@ -1,169 +1,125 @@
 import bcrypt from "bcrypt";
-import User from "../models/userModel.js";
-import Otp from "../models/otpModel.js";
-import otpGenerator from "otp-generator";
-import sendOTP from "../utils/sendOtp.js";
+import User from "../../models/userModel.js";
+import Otp from "../../models/otpModel.js";
+import otpGenerator from "otp-generator"; //remove
+import sendOTP from "../../utils/sendOtp.js";
+import { generateOtp } from "../../utils/GenerateOtp.js";
+import * as Responses from "../../utils/responses/user/auth.responses.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { wrapAsync } from "../../utils/wrapAsync.js";
+import * as userValidators from "../../validators/userValidators.js";
+import { paginate } from "../../utils/pagination.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
 // ======================================================================
 
-export const loginPage = (req, res) => {
+export const loginPage = wrapAsync((req, res) => {
   res.render("user/pages/login", {
     title: "Login",
-    error: "",
     pageCSS: "login",
     showHeader: true,
     showFooter: true,
     pageJS: "login.js",
   });
-};
+});
 
 // ======================================================================
 // 2. GOOGLE AUTHENTICATION TRUE
 // ======================================================================
 
-export const googleCallback = (req, res) => {
+export const googleCallback = wrapAsync((req, res) => {
   req.session.user = true;
   // User logged in successfully
   res.redirect("/");
-};
+});
 
 // ======================================================================
 // 3. USER LOGIN VERIFICATION
 // ======================================================================
 
-export const userVerification = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+export const userVerification = wrapAsync(async (req, res) => {
+  const { error } = userValidators.userSchema.validate(req.body);
 
-    if (!email || !password) {
-      return res.json({
-        success: false,
-        message: "Please enter both email and password.",
-      });
-    }
-
-    const user = await User.findOne({ email });
-    console.log(user);
-
-    if (!user) {
-      return res.json({
-        success: false,
-        message: "Invalid email or password.",
-      });
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.json({
-        success: false,
-        message: "Invalid email or password.",
-      });
-    }
-
-    // Store session
-    req.session.user = true;
-
-    return res.json({
-      success: true,
-      message: "Login successful!",
-    });
-  } catch (err) {
-    console.log(err);
-    return res.json({
-      success: false,
-      message: "Server error. Please try again later.",
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
     });
   }
-};
+
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return sendResponse(res, Responses.loginUser.USER_NOT_FOUND);
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    return sendResponse(res, Responses.loginUser.PASSWORD_NOT_MATCH);
+  }
+
+  // Store session
+  req.session.user = {
+    id: user._id,
+    email: user.email,
+  };
+
+  return sendResponse(res, Responses.loginUser.LOGIN);
+});
 
 // ======================================================================
 // 4. SIGNUP PAGE (EMAIL PAGE)
 // ======================================================================
 
-export const signUpPage = (req, res) => {
+export const signUpPage = wrapAsync((req, res) => {
   res.render("user/pages/signup", {
     title: "Email SignUp",
     pageCSS: "signup",
     showHeader: true,
     showFooter: true,
-    error: "",
     pageJS: "signup.js",
   });
-};
+});
 
 // ======================================================================
 // 5. USER SUBMITS EMAIL (SIGNUP) → GENERATE OTP
 // ======================================================================
 
-export const getEmail = async (req, res) => {
-  try {
-    const { email } = req.body;
+export const getEmail = wrapAsync(async (req, res) => {
+  const { error } = userValidators.userMailSchema.validate(req.body);
 
-    console.log(email);
-
-    if (!email) {
-      return res.json({
-        success: false,
-        message: "Email is required!",
-      });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.json({
-        success: false,
-        message: "Enter a valid email address!",
-      });
-    }
-
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res.json({
-        success: false,
-        message: "Email already registered!",
-      });
-    }
-
-    const otp = otpGenerator.generate(6, {
-      digits: true,
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
     });
-
-    console.log("Generated OTP:", otp);
-
-    await Otp.deleteMany({ email, purpose: "signup" });
-
-    await Otp.create({
-      email,
-      otp_code: otp,
-      purpose: "signup",
-    });
-
-    req.session.tempEmail = email;
-    req.session.otpPurpose = "signup";
-
-    await sendOTP(email, otp, "SignUp OTP");
-
-    return res.json({
-      success: true,
-      message: "OTP sended successfully!",
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
   }
-};
+
+  const { email } = req.body;
+
+  console.log(email);
+
+  const existingUser = await User.findOne({ email });
+
+  if (existingUser) {
+    return sendResponse(res, Responses.signupUserEmail.USER_FOUND);
+  }
+
+  await generateOtp(email, "signup");
+
+  req.session.tempEmail = email;
+  req.session.otpPurpose = "signup";
+
+  return sendResponse(res, Responses.signupUserEmail.EMAIL_OK);
+});
 
 // ======================================================================
 // 6. RENDER OTP PAGE
 // ======================================================================
 
-export const renderOtpPage = (req, res) => {
+export const renderOtpPage = wrapAsync((req, res) => {
   res.render("user/pages/otp-verify", {
     title: "OTP Verification",
     errorMessage: "",
@@ -172,73 +128,74 @@ export const renderOtpPage = (req, res) => {
     showFooter: true,
     pageJS: "otp-verify.js",
   });
-};
+});
 
 // ======================================================================
 // 7. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
 // ======================================================================
 
-export const otpVerification = async (req, res) => {
-  try {
-    const { otpValue } = req.body;
-    const email = req.session.tempEmail;
-    const purpose = req.session.otpPurpose;
-    console.log(otpValue);
+export const otpVerification = wrapAsync(async (req, res) => {
+  const email = req.session.tempEmail;
+  const purpose = req.session.otpPurpose;
 
-    if (!otpValue) {
-      return res.json({
-        success: false,
-        message: "Please enter the OTP!",
-      });
-    }
-
-    if (!email || !purpose) {
-      return res.json({
-        success: false,
-        message: "Session expired. Please try again!",
-        toast: true,
-      });
-    }
-
-    const otpDoc = await Otp.findOne({ email, purpose, is_used: false });
-
-    if (!otpDoc) {
-      return res.json({
-        success: false,
-        message: "OTP expired. Please resend OTP!",
-        toast: false,
-      });
-    }
-
-    if (otpDoc.otp_code !== otpValue) {
-      return res.json({
-        success: false,
-        message: "Incorrect OTP. Please try again!",
-        toast: false,
-      });
-    }
-
-    otpDoc.is_used = true;
-    await otpDoc.save();
-
-    if (purpose === "signup") {
-      return res.json({
-        success: true,
-        message: "OTP verified successfully!",
-        redirect:"/register",
-      });
-    } else {
-      return res.json({
-        success: true,
-        message: "OTP verified successfully!",
-        redirect:"/newpassword",
-      });
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
+  if (!email || !purpose) {
+    return sendResponse(res, Responses.otpVerify.DATA_NOT_FOUND);
   }
-};
+
+  const { error } = userValidators.otpSchema.validate(req.body);
+
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
+  }
+
+  const { otpValue } = req.body;
+  console.log(otpValue);
+
+  if (!otpValue) {
+    return res.json({
+      success: false,
+      message: "Please enter the OTP!",
+    });
+  }
+
+  const otpDoc = await Otp.findOne({ email, purpose, is_used: false });
+
+  if (!otpDoc) {
+    return res.json({
+      success: false,
+      message: "OTP expired. Please resend OTP!",
+      toast: false,
+    });
+  }
+
+  if (otpDoc.otp_code !== otpValue) {
+    return res.json({
+      success: false,
+      message: "Incorrect OTP. Please try again!",
+      toast: false,
+    });
+  }
+
+  otpDoc.is_used = true;
+  await otpDoc.save();
+
+  if (purpose === "signup") {
+    return res.json({
+      success: true,
+      message: "OTP verified successfully!",
+      redirect: "/register",
+    });
+  } else {
+    return res.json({
+      success: true,
+      message: "OTP verified successfully!",
+      redirect: "/newpassword",
+    });
+  }
+});
 
 // ======================================================================
 // 8. RESEND OTP
