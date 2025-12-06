@@ -3,7 +3,7 @@ import sendOTP from "../utils/sendOtp.js";
 import Otp from "../models/otpModel.js";
 
 
-export const generateOtp = async (email,purpose) => {
+export const generateOtp = async (email,purpose,message) => {
   const otp = otpGenerator.generate(6, {
     digits: true,
     upperCaseAlphabets: false,
@@ -20,7 +20,7 @@ export const generateOtp = async (email,purpose) => {
     otp_code: otp,
     purpose,
   });
-  await sendOTP(email, otp, "SignUp OTP ");
+  await sendOTP(email, otp, message);
 };
 
 

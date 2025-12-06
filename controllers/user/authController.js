@@ -107,7 +107,7 @@ export const getEmail = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.signupUserEmail.USER_FOUND);
   }
 
-  await generateOtp(email, "signup");
+  await generateOtp(email, "signup", "SignUp OTP. ");
 
   req.session.tempEmail = email;
   req.session.otpPurpose = "signup";
@@ -154,46 +154,23 @@ export const otpVerification = wrapAsync(async (req, res) => {
   const { otpValue } = req.body;
   console.log(otpValue);
 
-  if (!otpValue) {
-    return res.json({
-      success: false,
-      message: "Please enter the OTP!",
-    });
-  }
-
   const otpDoc = await Otp.findOne({ email, purpose, is_used: false });
 
   if (!otpDoc) {
-    return res.json({
-      success: false,
-      message: "OTP expired. Please resend OTP!",
-      toast: false,
-    });
+    return sendResponse(res, Responses.otpVerify.OTP_EXPIRED);
   }
 
   if (otpDoc.otp_code !== otpValue) {
-    return res.json({
-      success: false,
-      message: "Incorrect OTP. Please try again!",
-      toast: false,
-    });
+    return sendResponse(res, Responses.otpVerify.INCORRECT_OTP);
   }
 
   otpDoc.is_used = true;
   await otpDoc.save();
 
   if (purpose === "signup") {
-    return res.json({
-      success: true,
-      message: "OTP verified successfully!",
-      redirect: "/register",
-    });
+    return sendResponse(res, Responses.otpVerify.REGISTER);
   } else {
-    return res.json({
-      success: true,
-      message: "OTP verified successfully!",
-      redirect: "/newpassword",
-    });
+    return sendResponse(res, Responses.otpVerify.NEWPASSWORD);
   }
 });
 
@@ -201,196 +178,108 @@ export const otpVerification = wrapAsync(async (req, res) => {
 // 8. RESEND OTP
 // ======================================================================
 
-export const resendOtp = async (req, res) => {
-  try {
-    const email = req.session.tempEmail;
-    const purpose = req.session.otpPurpose;
+export const resendOtp = wrapAsync(async (req, res) => {
+  const email = req.session.tempEmail;
+  const purpose = req.session.otpPurpose;
 
-    if (!email || !purpose) {
-      return res.json({
-        success: false,
-        message: "Session expired. Please try again!",
-        toast: true,
-      });
-    }
-
-    const otp = otpGenerator.generate(6, {
-      digits: true,
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
-    });
-
-    console.log("Resent OTP:", otp);
-
-    await Otp.deleteMany({ email, purpose });
-    await Otp.create({ email, otp_code: otp, purpose });
-
-    await sendOTP(email, otp, "Resend OTP");
-
-    return res.json({
-      success: true,
-      message: "OTP resended successfully!",
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
+  if (!email || !purpose) {
+    return sendResponse(res, Responses.resendOtp.DATA_NOT_FOUND);
   }
-};
+
+  await generateOtp(email, purpose, "Resend OTP. ");
+
+  return sendResponse(res, Responses.resendOtp.RESEND_OTP);
+});
 
 // ======================================================================
 // 9. SHOW REGISTER PAGE
 // ======================================================================
 
-export const renderSignupDetails = (req, res) => {
+export const renderSignupDetails = wrapAsync((req, res) => {
   res.render("user/pages/register", {
     title: "Register",
     pageCSS: "register",
     showHeader: true,
     showFooter: true,
-    error: "",
     pageJS: "register.js",
   });
-};
+});
 
 // ======================================================================
 // 10. SAVE NEW USER (FINAL REGISTER PAGE)
 // ======================================================================
 
-export const saveSignupDetails = async (req, res) => {
-  try {
-    const { fullName, password, confirmPassword } = req.body;
-    console.log(
-      `fullname:${fullName},password:${password},conform password:${confirmPassword}`
-    );
-    const email = req.session.tempEmail;
+export const saveSignupDetails = wrapAsync(async (req, res) => {
+  const email = req.session.tempEmail;
 
-    if (!email) {
-      return res.json({
-        success: false,
-        message: "Session expired. Please try again!",
-        toast: true,
-      });
-    }
+  if (!email) return sendResponse(res, Responses.registerLogic.DATA_NOT_FOUND);
 
-    if (!fullName || !password || !confirmPassword) {
-      return res.json({
-        success: false,
-        message: "All fields are required!",
-      });
-    }
+  const { error } = userValidators.registerSchema.validate(req.body);
 
-    if (password !== confirmPassword) {
-      return res.json({
-        success: false,
-        message: "Passwords do not match!",
-      });
-    }
-
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-      return res.json({
-        success: false,
-        message:
-          "Password must be at least 8 characters and include uppercase, lowercase, number & special character.",
-      });
-    }
-
-    const newUser = new User({
-      full_name: fullName,
-      email,
-      password_hash: password, // raw → pre-save hook will hash
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
     });
-
-    await newUser.save();
-
-    delete req.session.tempEmail;
-    delete req.session.otpPurpose;
-
-    return res.json({
-      success: true,
-      message: "Account Created Successfully!",
-    });
-    return res.redirect("/login");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
   }
-};
+
+  const { fullName, password, confirmPassword } = req.body;
+
+  const newUser = new User({
+    full_name: fullName,
+    email,
+    password_hash: password,
+  });
+
+  await newUser.save();
+
+  delete req.session.tempEmail;
+  delete req.session.otpPurpose;
+
+  return sendResponse(res, Responses.registerLogic.ACCOUNT_CREATED);
+});
 
 // ======================================================================
 // 11. FORGET PASSWORD PAGE
 // ======================================================================
 
-export const renderForgetPasswordPage = (req, res) => {
+export const renderForgetPasswordPage = wrapAsync((req, res) => {
   res.render("user/pages/signup", {
     title: "Forget Password",
     pageCSS: "signup",
     showHeader: true,
     showFooter: true,
-    error: "",
     pageJS: "forgotpassword.js",
   });
-};
+});
 
 // ======================================================================
 // 12. EMAIL SUBMIT (FORGOT PASSWORD)
 // ======================================================================
 
-export const emailVerification = async (req, res) => {
-  try {
-    const { email } = req.body;
+export const emailVerification = wrapAsync(async (req, res) => {
+  const { error } = userValidators.emailCheck.validate(req.body);
 
-    console.log(email);
-
-    if (!email) {
-      return res.json({
-        success: false,
-        message: "Email is required!",
-      });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.json({
-        success: false,
-        message: "No account found with this email!",
-      });
-    }
-
-    const otp = otpGenerator.generate(6, {
-      digits: true,
-      upperCaseAlphabets: false,
-      lowerCaseAlphabets: false,
-      specialChars: false,
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
     });
-
-    console.log("Generated OTP:", otp);
-
-    await Otp.deleteMany({ email, purpose: "forget_password" });
-
-    await Otp.create({
-      email,
-      otp_code: otp,
-      purpose: "forget_password",
-    });
-
-    req.session.tempEmail = email;
-    req.session.otpPurpose = "forget_password";
-
-    await sendOTP(email, otp, "Forgot Password OTP");
-
-    return res.json({
-      success: true,
-      message: "OTP generated!",
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
   }
-};
+
+  const { email } = req.body;
+  console.log(email);
+
+  const user = await User.findOne({ email });
+  if (!user) return sendResponse(res, Responses.forgetPass.NOT_FOUND);
+
+  await generateOtp(email, "forget_password", "Forget password OTP. ");
+
+  req.session.tempEmail = email;
+  req.session.otpPurpose = "forget_password";
+
+  return sendResponse(res, Responses.forgetPass.OTP_GENERATED);
+});
 
 // ======================================================================
 // 13. NEW PASSWORD PAGE
@@ -402,7 +291,7 @@ export const renderNewPassPage = (req, res) => {
     pageCSS: "newpassword",
     showHeader: true,
     showFooter: true,
-    error: "",
+    pageJS: "newpassword.js",
   });
 };
 
@@ -410,76 +299,38 @@ export const renderNewPassPage = (req, res) => {
 // 14. UPDATE PASSWORD
 // ======================================================================
 
-export const newPassValidation = async (req, res) => {
-  try {
-    const email = req.session.tempEmail;
-    if (!email) return res.redirect("/forgotpassword");
+export const newPassValidation = wrapAsync(async (req, res) => {
+  const email = req.session.tempEmail;
+  if (!email) return sendResponse(res, Responses.registerLogic.DATA_NOT_FOUND);
 
-    const { password, confirmPassword } = req.body;
+  const { error } = userValidators.newPassSchema.validate(req.body);
 
-    if (!password || !confirmPassword) {
-      return res.render("user/pages/newpassword", {
-        title: "New Password",
-        pageCSS: "newpassword",
-        showHeader: true,
-        showFooter: true,
-        error: "All fields are required",
-      });
-    }
-
-    if (password !== confirmPassword) {
-      return res.render("user/pages/newpassword", {
-        title: "New Password",
-        pageCSS: "newpassword",
-        showHeader: true,
-        showFooter: true,
-        error: "Passwords do not match",
-      });
-    }
-
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-      return res.render("user/pages/newpassword", {
-        title: "New Password",
-        pageCSS: "newpassword",
-        showHeader: true,
-        showFooter: true,
-        error:
-          "Password must be at least 8 characters and include uppercase, lowercase, number & special character.",
-      });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.render("user/pages/newpassword", {
-        title: "New Password",
-        pageCSS: "newpassword",
-        showHeader: true,
-        showFooter: true,
-        error: "User not found",
-      });
-    }
-
-    user.password_hash = password; // raw → pre-save will hash
-    await user.save();
-
-    delete req.session.tempEmail;
-    delete req.session.otpPurpose;
-
-    return res.redirect("/login");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
   }
-};
+
+  const { password, confirmPassword } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) return sendResponse(res, Responses.forgetPass.NOT_FOUND);
+
+  user.password_hash = password;
+  await user.save();
+
+  delete req.session.tempEmail;
+  delete req.session.otpPurpose;
+
+  return sendResponse(res, Responses.forgetPass.PASS_CHANGE);
+});
 
 // ======================================================================
 // 15.HOME PAGE
 // ======================================================================
 
-export const renderHomePage = (req, res) => {
+export const renderHomePage = wrapAsync((req, res) => {
   res.render("user/pages/home", {
     title: "Home",
     pageCSS: "home",
@@ -487,13 +338,13 @@ export const renderHomePage = (req, res) => {
     showFooter: true,
     pageJS: "",
   });
-};
+});
 
 // ======================================================================
 // 16.SHOP PAGE
 // ======================================================================
 
-export const renderShopPage = (req, res) => {
+export const renderShopPage = wrapAsync((req, res) => {
   res.render("user/pages/shop", {
     title: "Shop",
     pageCSS: "shop",
@@ -501,4 +352,4 @@ export const renderShopPage = (req, res) => {
     showHeader: true,
     pageJS: "",
   });
-};
+});

@@ -5,7 +5,7 @@ export const globalResponses = Object.freeze({
   },
   BAD_REQUEST: {
     code: 400,
-    message: "Invalid request!",
+    message: "Invalid request!",//
   },
   UNAUTHORIZED: {
     code: 401,
@@ -17,6 +17,6 @@ export const globalResponses = Object.freeze({
   },
   NOT_FOUND: {
     code: 404,
-    message: "Resource not found!",
+    message: "Resource not found!",//
   }
 });

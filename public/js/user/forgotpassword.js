@@ -10,16 +10,19 @@ async function getMail() {
     const res = await axios.post("/forgotpassword", { email });
 
     if (res.data.success) {
-      setTimeout(() => {
-        window.location.href = "/verify-otp";
-      }, 800);
+      toastr.success(res.data.message, "Success");
 
-    } else {
-      errorBox.style.display = "flex";
-      errorMessage.innerText = res.data.message;
+      setTimeout(() => {
+        window.location.href = res.data.redirect;
+      }, 800);
     }
   } catch (err) {
+
+    const error = err.response?.data;
+
+    console.log(error);
+
     errorBox.style.display = "flex";
-    errorMessage.innerText = "Something went wrong.";
+    errorMessage.innerText = error.message || "Something went wrong.";
   }
 }

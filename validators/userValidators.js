@@ -25,3 +25,47 @@ export const otpSchema = Joi.object({
     "string.min": "Please enter the OTP fully!",
   }),
 });
+
+export const registerSchema = Joi.object({
+  fullName: Joi.string().required().messages({
+    "string.empty": "Please enter the full name!",
+  }),
+  password: Joi.string()
+    .min(8)
+    .max(30)
+    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$"))
+    .required()
+    .messages({
+      "string.empty": "Please enter the password!",
+      "string.min": "Password must be at least 8 characters",
+      "string.pattern.base":
+        "Password must contain uppercase, lowercase, and a number",
+    }),
+  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
+    "any.only": "Passwords do not match",
+  }),
+});
+
+export const newPassSchema = Joi.object({
+  password: Joi.string()
+    .min(8)
+    .max(30)
+    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$"))
+    .required()
+    .messages({
+      "string.empty": "Please enter the password!",
+      "string.min": "Password must be at least 8 characters",
+      "string.pattern.base":
+        "Password must contain uppercase, lowercase, and a number",
+    }),
+  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
+    "any.only": "Passwords do not match",
+  }),
+});
+
+export const emailCheck = Joi.object({
+  email: Joi.string().email().required().messages({
+    "string.empty": "Please enter the email!",
+    "string.email": "Enter a valid email!",
+  }),
+});

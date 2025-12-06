@@ -2,14 +2,18 @@
 
     <div class="top-header">
         <div>
-            <h2>Categories</h2>
-            <p>Organize your product categories</p>
+            <div>
+                <div>
+                    <h2>Categories</h2>
+                    <p>Organize your product categories</p>
+                </div>
 
-            <!-- <form action="/categories/add" method="POST"> -->
-            <button type="button" class="add-btn" onclick="openCategoryModal()">
-                <span>+</span> Add Category
-            </button>
-            <!-- </form> -->
+                <div>
+                    <button type="button" class="add-btn" onclick="openCategoryModal()">
+                        <span>+</span> Add Category
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="category-card">
 
@@ -19,7 +23,8 @@
                 <div class="filter-bar">
 
                     <input id="filterInput" class="search-category" name="searchContent"
-                        value="<%= typeof searchContent !== 'undefined' ? searchContent : '' %>" placeholder="Search categories...">
+                        value="<%= typeof searchContent !== 'undefined' ? searchContent : '' %>"
+                        placeholder="Search categories...">
 
                     <div class="custom-dropdown">
                         <div class="dropdown-selected">All Categories</div>
@@ -220,7 +225,8 @@
             <input type="text" name="name" id="addCategoryName" class="input-field" placeholder="Category Name">
 
             <label>Description</label>
-            <textarea name="description" id="addCategoryDescription" class="input-field" rows="3" placeholder="Write description..."></textarea>
+            <textarea name="description" id="addCategoryDescription" class="input-field" rows="3"
+                placeholder="Write description..."></textarea>
 
             <label>Color Theme</label>
 
@@ -233,7 +239,7 @@
                 <div class="color-box" data-color="#f7f7f7" style="background:#f7f7f7"></div>
             </div>
 
-            <input type="hidden"  name="color" id="selectedColor">
+            <input type="hidden" name="color" id="selectedColor">
 
             <!-- Buttons -->
             <div class="modal-actions">

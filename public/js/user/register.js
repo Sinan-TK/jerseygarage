@@ -7,8 +7,7 @@ async function registerData() {
   const errorBox = document.getElementById("registerError");
   const errorText = document.getElementById("registerErrorText");
 
-  console.log(fullName,password,confirmPassword);
-  
+  console.log(fullName, password, confirmPassword);
 
   try {
     const res = await axios.post("/register", {
@@ -18,26 +17,18 @@ async function registerData() {
     });
 
     if (res.data.success) {
-        toastr.success(res.data.message, "Success");
+      toastr.success(res.data.message, "Success");
 
-        setTimeout(() => {
-          window.location.href = "/login"
-        }, 3000);
-
-    } else {
-      if (res.data.toast) {
-        toastr.error(res.data.message, "Failed");
-      } else {
-        if (errorBox) errorBox.style.display = "flex";
-        if (errorText) errorText.innerText = res.data.message;
-
-        setTimeout(() => {
-          if (errorBox) errorBox.style.display = "none";
-        }, 3000);
-      }
+      setTimeout(() => {
+        window.location.href = res.data.redirect;
+      }, 3000);
     }
   } catch (err) {
+    const error = err.response?.data;
+
+    console.log(error);
+
     errorBox.style.display = "flex";
-    errorText.innerText = "Something went wrong!";
+    errorText.innerText = error.message || "Something went wrong!";
   }
 }

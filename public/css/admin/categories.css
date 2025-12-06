@@ -1,5 +1,6 @@
 .categories-page {
     padding: 30px;
+    padding-bottom: 0%;
     font-family: "Inter", sans-serif;
 }
 
@@ -15,24 +16,24 @@
 }
 
 .add-btn {
-    margin-top: 15px;
+    /* margin-top: 15px; */
     background: #0f172a;
     color: #fff;
-    padding: 10px 16px;
+    padding: 18px 20px;
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
 
 .categories-grid {
-    margin-top: 30px;
+    margin-top: 20px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
+    gap: 20px;
 }
 
 .cat-card {
@@ -457,6 +458,7 @@ textarea.input-field {
   padding: 10px 18px;
   border-radius: 6px;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .red-title { color: #dc2626; }    /* red-600 */
@@ -464,14 +466,24 @@ textarea.input-field {
 
 .top-header{
   display: flex;
-  gap: 40px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.top-header div div{
+  display: flex;
+  justify-content: space-between;
+}
+
+.top-header div div div{
+  display: block;
 }
 
 
 .category-card {
   background: #fff;
   border-radius: 14px;
-  padding: 22px;
+  padding: 20px;
   width: 100%;
   border: 1px solid #eee;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
@@ -483,7 +495,6 @@ textarea.input-field {
 .filter-bar {
   display: flex;
   gap: 12px;
-  margin-bottom: 18px;
   flex-wrap: wrap;
 }
 

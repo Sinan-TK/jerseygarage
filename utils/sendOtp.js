@@ -18,7 +18,7 @@ async function sendOTP(email, otp, message) {
     from: "jerseygarageofficial@gmail.com",
     to: email,
     subject: "Your OTP Code",
-    text: `${message}.Your OTP is: ${otp}`,
+    text: `${message}Your OTP is: ${otp}`,
   };
 
   await transporter.sendMail(mailOptions);
