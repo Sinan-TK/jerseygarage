@@ -3,6 +3,12 @@
   padding: 32px 40px;
 }
 
+.page-header{
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+}
+
 .product-container {
   background: white;
   padding: 24px;
@@ -204,10 +210,10 @@
 }
 
 .add-btn {
-  margin-block: 15px;
+  /* margin-block: 15px; */
   background: #0f172a;
   color: #fff;
-  padding: 10px 16px;
+  padding: 18px 20px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
@@ -538,7 +544,7 @@ textarea {
   margin: 0;
 }
 
-#fileInput {
+#fileInput,#fileInputEdit {
   display: none;
 }
 

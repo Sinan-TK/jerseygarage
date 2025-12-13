@@ -1,10 +1,13 @@
 <div class="product-page">
 
     <div class="page-header">
-        <h2>Products</h2>
-        <p class="page-subtext">View product inventory and prices.</p>
-
-        <button class="add-btn"><span>+</span>Add Product</button>
+        <div>
+            <h2>Products</h2>
+            <p class="page-subtext">View product inventory and prices.</p>
+        </div>
+        <div>
+            <button class="add-btn"><span>+</span>Add Product</button>
+        </div>
     </div>
 
     <div class="product-container">
@@ -64,36 +67,43 @@
                             <%= product.name %>
                         </td>
 
-                        <!-- CATEGORY -->
-                        <td>
-                            <%categoriesName.forEach(category=>{if(category._id.toString() == product.category.toString()){%>
-                                <%=category.name%>
-                                    <%}})%>
+                        <% let catName="" ; categoriesName.forEach(category=> {
+                            if (category._id.toString() === product.category.toString()) {
+                            catName = category.name;
+                            }
+                            });
+                            %>
 
-                        </td>
+                            <!-- CATEGORY -->
+                            <td id="categoryTd">
+                                <%= catName %>
+                            </td>
 
-                        <!-- STATUS -->
-                        <td>
-                            <span class="status-badge <%= product.is_active ? 'active' : 'inactive' %>">
-                                <%= product.is_active ? 'List' : 'Unlist' %>
-                            </span>
-                        </td>
+                            <!-- STATUS -->
+                            <td>
+                                <span class="status-badge <%= product.is_active ? 'active' : 'inactive' %>">
+                                    <%= product.is_active ? 'List' : 'Unlist' %>
+                                </span>
+                            </td>
 
-                        <!-- EDIT -->
-                        <td>
-                            <span data-product="<%= JSON.stringify(product) %>" class="edit-btn" onclick="editModal()">
-                                <i class="fa-solid fa-pen-to-square"></i> Edit
-                            </span>
-                        </td>
+                            <!-- EDIT -->
+                            <td>
+                                <span data-product="<%= JSON.stringify(product) %>" data-category="<%= catName %>"
+                                    class="edit-btn" onclick="editModal()">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </span>
+                            </td>
 
-                        <!-- ACTION -->
-                        <td>
-                            <% if (product.is_active) { %>
-                                <span class="action-btn block"><i class="fa-solid fa-ban block-icon"></i> Block</span>
-                                <% } else { %>
-                                    <span class="action-btn list"><i class="fa-solid fa-unlock unblock-icon"></i> List</span>
-                                    <% } %>
-                        </td>
+                            <!-- ACTION -->
+                            <td>
+                                <% if (product.is_active) { %>
+                                    <span class="action-btn block"><i class="fa-solid fa-ban block-icon"></i>
+                                        Block</span>
+                                    <% } else { %>
+                                        <span class="action-btn list"><i class="fa-solid fa-unlock unblock-icon"></i>
+                                            List</span>
+                                        <% } %>
+                            </td>
                     </tr>
 
                     <!-- DROPDOWN ROW -->
@@ -103,7 +113,7 @@
                                 <table class="size-preview-table">
                                     <thead>
                                         <tr>
-                                            
+
                                             <th></th>
                                             <th>S</th>
                                             <th>M</th>
@@ -116,29 +126,59 @@
                                     <tbody>
                                         <tr>
                                             <td>Stock</td>
-                                            <td><%= product.sizes[0].stock%></td>
-                                            <td><%= product.sizes[1].stock%></td>
-                                            <td><%= product.sizes[2].stock%></td>
-                                            <td><%= product.sizes[3].stock%></td>
-                                            <td><%= product.sizes[4].stock%></td>
+                                            <td>
+                                                <%= product.sizes[0].stock%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[1].stock%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[2].stock%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[3].stock%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[4].stock%>
+                                            </td>
                                         </tr>
 
                                         <tr>
                                             <td>Normal Price</td>
-                                            <td><%= product.sizes[0].normalPrice%></td>
-                                            <td><%= product.sizes[1].normalPrice%></td>
-                                            <td><%= product.sizes[2].normalPrice%></td>
-                                            <td><%= product.sizes[3].normalPrice%></td>
-                                            <td><%= product.sizes[4].normalPrice%></td>
+                                            <td>
+                                                <%= product.sizes[0].normalPrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[1].normalPrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[2].normalPrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[3].normalPrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[4].normalPrice%>
+                                            </td>
                                         </tr>
 
                                         <tr>
                                             <td>Base Price</td>
-                                            <td><%= product.sizes[0].basePrice%></td>
-                                            <td><%= product.sizes[1].basePrice%></td>
-                                            <td><%= product.sizes[2].basePrice%></td>
-                                            <td><%= product.sizes[3].basePrice%></td>
-                                            <td><%= product.sizes[4].basePrice%></td>
+                                            <td>
+                                                <%= product.sizes[0].basePrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[1].basePrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[2].basePrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[3].basePrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.sizes[4].basePrice%>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -154,20 +194,20 @@
         <div class="pagination">
 
             <!-- LEFT ARROW: show ONLY if NOT first page -->
-            <% if (currentPage> 1) { %>
-                <a href="/admin/users?page=<%= currentPage - 1 %>" class="arrow-btn">
+            <% if (pagination.page> 1) { %>
+                <a href="/admin/products?page=<%= pagination.page - 1 %>" class="arrow-btn">
                     <i class="fa-solid fa-chevron-left"></i>
                 </a>
                 <% } %>
 
                     <!-- CURRENT PAGE NUMBER -->
                     <span class="current-page-display">
-                        <%= currentPage %>
+                        <%= pagination.page %>
                     </span>
 
                     <!-- RIGHT ARROW: show ONLY if NOT last page -->
-                    <% if (currentPage < totalPages) { %>
-                        <a href="/admin/users?page=<%= currentPage + 1 %>" class="arrow-btn">
+                    <% if (pagination.page < pagination.totalPages) { %>
+                        <a href="/admin/products?page=<%= pagination.page + 1 %>" class="arrow-btn">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                         <% } %>
@@ -212,7 +252,7 @@
                     </ul>
                 </div>
 
-                <input id="seleted-category" type="hidden" name="category" value="null">
+                <input id="seleted-category" type="hidden" name="category" value="">
             </div>
         </div>
 
@@ -280,7 +320,9 @@
         <!-- FOOTER -->
         <div class="modal-footer">
             <button class="btn cancel-btn">Cancel</button>
-            <button class="btn add-btn-confirm" onclick="submitProduct()">Add Product</button>
+            <button type="button" onclick="submitProduct()" id="addBtn" class="btn add-btn-confirm">
+                Add Product
+            </button>
         </div>
 
     </div>
@@ -308,7 +350,7 @@
                 <label>Category <span class="star-icon">*</span></label>
 
                 <div class="categoryDrop">
-                    <div id="edit-selected" class="dropdown-cat-selected" value="">Select Category</div>
+                    <div id="edit-category" class="dropdown-cat-selected" value="">z</div>
                     <ul class="dropdown-cat-options">
                         <% categoriesName.forEach(cat=>{ %>
                             <li data-value="<%= cat.name %>">
@@ -318,7 +360,7 @@
                     </ul>
                 </div>
 
-                <input id="seleted-category" type="hidden" name="category" value="">
+                <input id="edited-seleted-category" type="hidden" name="category" value="">
             </div>
         </div>
 
@@ -326,7 +368,7 @@
         <div class="form-row">
             <div class="input-group">
                 <label>Team/Club Name <span class="star-icon">*</span></label>
-                <input type="text" id="teamName" name="teamName" placeholder="Team/Club Name">
+                <input type="text" id="teamNameEdit" name="teamName" placeholder="Team/Club Name">
             </div>
         </div>
 
@@ -334,11 +376,11 @@
         <label>Product Images <span class="star-icon">*</span></label>
         <div class="images-container">
             <div class="img-box">
-                <label for="fileInput" class="custom-file-upload">Upload Images</label>
-                <input id="fileInput" type="file" accept="image/*" multiple>
+                <label for="fileInputEdit" class="custom-file-upload">Upload Images</label>
+                <input id="fileInputEdit" type="file" accept="image/*" multiple>
 
                 <!-- PREVIEW (populated by JS) -->
-                <div id="previewContainer" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;"></div>
+                <div id="previewContainerEdit" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;"></div>
             </div>
         </div>
 
@@ -357,21 +399,21 @@
             <tr>
                 <td>Stock</td>
                 <% ['S','M','L','XL','XXL'].forEach(size=> { %>
-                    <td><input class="stockInput" type="number" name="stock_<%= size %>"></td>
+                    <td><input class="stockInput" type="number" name="edit_stock_<%= size %>"></td>
                     <% }) %>
             </tr>
 
             <tr>
                 <td>Normal Price</td>
                 <% ['S','M','L','XL','XXL'].forEach(size=> { %>
-                    <td><input class="stockInput" type="number" name="normalPrice_<%= size %>"></td>
+                    <td><input class="stockInput" type="number" name="edit_normalPrice_<%= size %>"></td>
                     <% }) %>
             </tr>
 
             <tr>
                 <td>Base Price</td>
                 <% ['S','M','L','XL','XXL'].forEach(size=> { %>
-                    <td><input class="stockInput" type="number" name="basePrice_<%= size %>"></td>
+                    <td><input class="stockInput" type="number" name="edit_basePrice_<%= size %>"></td>
                     <% }) %>
             </tr>
         </table>
@@ -379,13 +421,13 @@
         <!-- DESCRIPTION -->
         <div class="input-group">
             <label>Description <span class="star-icon">*</span></label>
-            <textarea id="description" name="description" placeholder="Enter product description..."></textarea>
+            <textarea id="descriptionEdit" name="description" placeholder="Enter product description..."></textarea>
         </div>
 
         <!-- FOOTER -->
         <div class="modal-footer">
             <button class="btn cancel-btn">Cancel</button>
-            <button class="btn add-btn-confirm" onclick="submitProduct()">Add Product</button>
+            <button type="button" class="btn add-btn-confirm" onclick="submitEdit()">Edit Submit</button>
         </div>
 
     </div>

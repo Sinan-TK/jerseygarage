@@ -1,26 +1,31 @@
-/* ROW DROPDOWN */
+/* ===============================
+   ROW DROPDOWN
+================================ */
 document.querySelectorAll(".row-arrow").forEach((arrow) => {
   arrow.addEventListener("click", () => {
     const id = arrow.dataset.id;
     const panel = document.getElementById(`drop-${id}`);
 
-    // Close others
+    // Close other dropdown rows
     document.querySelectorAll(".dropdown-row").forEach((p) => {
       if (p !== panel) p.style.display = "none";
     });
 
+    // Reset other arrows
     document.querySelectorAll(".row-arrow").forEach((a) => {
       if (a !== arrow) a.classList.remove("open");
     });
 
-    // Toggle
+    // Toggle current
     const open = panel.style.display === "table-row";
     panel.style.display = open ? "none" : "table-row";
     arrow.classList.toggle("open", !open);
   });
 });
 
-/* STATUS DROPDOWN */
+/* ===============================
+   STATUS DROPDOWN (FILTER BAR)
+================================ */
 const dd = document.getElementById("statusDropdown");
 
 dd.addEventListener("click", () => {
@@ -60,69 +65,84 @@ document.getElementById("clearFilter").addEventListener("click", () => {
   });
 });
 
-// Add product modal open
-
-const addModal = document.querySelector(".modal-overlay");
-const cancelBtn = document.querySelectorAll(".close-btn, .cancel-btn");
+/* ===============================
+   MODALS (ADD + EDIT)
+================================ */
+const addModal = document.getElementById("addProductModal");
+const editModal = document.getElementById("editModal");
+const body = document.body;
 
 document.querySelector(".add-btn").addEventListener("click", () => {
-  console.log("active");
   addModal.style.display = "flex";
-  document.body.style.overflow = "hidden";
+  body.style.overflow = "hidden";
 });
 
-cancelBtn.forEach((btn) => {
+// Close buttons (X and Cancel) for both modals
+document.querySelectorAll(".close-btn, .cancel-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    addModal.style.display = "none";
+    const modal = btn.closest(".modal-overlay");
+    if (modal) {
+      modal.style.display = "none";
+      body.style.overflow = "";
+    }
   });
 });
 
-addModal.addEventListener("click", (e) => {
-  if (e.target === addModal) {
-    addModal.style.display = "none";
-  }
-});
-
-//Category drop
-
-const catDrop = document.querySelector(".categoryDrop");
-const options = document.querySelectorAll(".dropdown-cat-options li");
-const selected = document.querySelector(".dropdown-cat-selected");
-const category = document.getElementById("seleted-category");
-
-category.value = "";
-
-selected.addEventListener("click", () => {
-  catDrop.classList.toggle("active");
-});
-
-options.forEach((opt) => {
-  opt.addEventListener("click", () => {
-    selected.textContent = opt.textContent;
-    catDrop.classList.remove("active");
-    category.value = opt.dataset.value;
+// Click outside to close (for both modals)
+[addModal, editModal].forEach((modal) => {
+  modal.addEventListener("mousedown", (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+      body.style.overflow = "";
+    }
   });
 });
 
-// close when clicking outside
-document.addEventListener("click", (e) => {
-  if (!catDrop.contains(e.target)) {
-    catDrop.classList.remove("active");
-  }
+/* ===============================
+   CATEGORY DROPDOWNS (ADD + EDIT)
+================================ */
+document.querySelectorAll(".categoryDrop").forEach((drop) => {
+  const selected = drop.querySelector(".dropdown-cat-selected");
+  const optionsBox = drop.querySelector(".dropdown-cat-options");
+  const options = drop.querySelectorAll(".dropdown-cat-options li");
+  const hiddenInput = drop.parentElement.querySelector('input[type="hidden"]');
+
+  // Toggle dropdown
+  selected.addEventListener("click", (e) => {
+    e.stopPropagation();
+    drop.classList.toggle("active");
+  });
+
+  // Select option
+  options.forEach((opt) => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selected.textContent = opt.textContent;
+      hiddenInput.value = opt.dataset.value;
+      drop.classList.remove("active");
+    });
+  });
 });
 
-// Frontend: product-images.js
+// Close all category dropdowns on outside click
+document.addEventListener("click", () => {
+  document.querySelectorAll(".categoryDrop").forEach((drop) => {
+    drop.classList.remove("active");
+  });
+});
 
+/* ===============================
+   IMAGE CROPPER (ADD PRODUCT ONLY)
+================================ */
 const OUTPUT_FORMAT = "image/webp";
 const OUTPUT_QUALITY = 0.9;
 
-// State arrays (stable indexing)
-let selectedFiles = []; // original File objects selected in current selection cycle (temporary while cropping)
-let croppedBlobs = []; // final cropped blobs aligned by index (sparse: null = empty slot)
-let nextSlotIndex = 0; // index to place next cropped image
+// State arrays (for ADD product)
+let selectedFiles = []; // files currently being cropped
+let croppedBlobs = []; // final cropped blobs
 
-// DOM
-const fileInput = document.getElementById("fileInput");
+// DOM for cropping
+const fileInput = document.getElementById("fileInput"); // ADD modal only
 const cropModal = document.getElementById("cropModal");
 const cropImage = document.getElementById("cropImage");
 const cropNextBtn = document.getElementById("cropNextBtn");
@@ -130,10 +150,6 @@ const cancelCropBtn = document.getElementById("cancelCropBtn");
 const previewContainer = document.getElementById("previewContainer");
 
 let cropper = null;
-
-/* ---------------------------
-  Helpers
-----------------------------*/
 
 // find first free slot in croppedBlobs or push to end
 function getNextFreeIndex() {
@@ -143,6 +159,7 @@ function getNextFreeIndex() {
 
 // render previews from croppedBlobs (stable order)
 function renderPreviews() {
+  if (!previewContainer) return;
   previewContainer.innerHTML = "";
   croppedBlobs.forEach((blob, index) => {
     if (!blob) return;
@@ -168,7 +185,6 @@ function renderPreviews() {
     recropBtn.className = "btn";
     recropBtn.textContent = "Re-Crop";
     recropBtn.onclick = () => {
-      // open cropper for existing blob (re-crop)
       openCropperFor(
         new File([blob], `recrop_${index}.webp`, { type: OUTPUT_FORMAT }),
         index
@@ -181,7 +197,6 @@ function renderPreviews() {
     removeBtn.className = "btn cancel-btn";
     removeBtn.textContent = "Remove";
     removeBtn.onclick = () => {
-      // remove and re-render
       croppedBlobs[index] = null;
       renderPreviews();
     };
@@ -196,33 +211,24 @@ function renderPreviews() {
   });
 }
 
-/* ---------------------------
-  Cropper flow
-----------------------------*/
+// Handle file selection for ADD product
+if (fileInput) {
+  fileInput.addEventListener("change", (e) => {
+    const incoming = Array.from(e.target.files || []);
+    if (incoming.length === 0) return;
 
-fileInput.addEventListener("change", (e) => {
-  const incoming = Array.from(e.target.files || []);
-  if (incoming.length === 0) return;
-
-  const existingCount = croppedBlobs.filter(Boolean).length;
-
-  // We'll crop them sequentially
-  selectedFiles = incoming;
-  // start placing at next free slot(s)
-  nextSlotIndex = getNextFreeIndex();
-  // open cropper for first selected file
-  openCropperFor(selectedFiles[0], nextSlotIndex);
-});
+    selectedFiles = incoming;
+    const nextIndex = getNextFreeIndex();
+    openCropperFor(selectedFiles[0], nextIndex);
+  });
+}
 
 function openCropperFor(file, targetIndex = null) {
-  // targetIndex: where this cropped blob should be stored
   const url = URL.createObjectURL(file);
   cropImage.src = url;
 
-  // show modal
   cropModal.style.display = "flex";
 
-  // cleanup any existing cropper
   if (cropper) {
     cropper.destroy();
     cropper = null;
@@ -236,7 +242,6 @@ function openCropperFor(file, targetIndex = null) {
       responsive: true,
     });
 
-    // store target index for use after cropping
     cropModal.dataset.targetIndex =
       typeof targetIndex === "number" ? String(targetIndex) : "";
   };
@@ -249,39 +254,32 @@ cropNextBtn.addEventListener("click", () => {
 
   canvas.toBlob(
     (blob) => {
-      // store blob into the designated index
       const targetIndex = cropModal.dataset.targetIndex
         ? parseInt(cropModal.dataset.targetIndex, 10)
         : getNextFreeIndex();
+
       croppedBlobs[targetIndex] = blob;
 
-      // cleanup and close
       cropper.destroy();
       cropper = null;
       cropModal.style.display = "none";
       URL.revokeObjectURL(cropImage.src);
 
-      const alreadyCropped = Object.values(croppedBlobs).filter(Boolean).length;
-
       if (selectedFiles.length > 0) {
-        // remove the first (just processed) file from selectedFiles
         selectedFiles.shift();
       }
 
       if (selectedFiles.length > 0) {
-        // next free targetIndex
         const nextIndex = getNextFreeIndex();
         openCropperFor(selectedFiles[0], nextIndex);
       } else {
-        // finished batch
         selectedFiles = [];
         cropModal.dataset.targetIndex = "";
       }
 
       renderPreviews();
 
-      // reset file input so user can select same files again if needed
-      fileInput.value = "";
+      if (fileInput) fileInput.value = "";
     },
     OUTPUT_FORMAT,
     OUTPUT_QUALITY
@@ -294,16 +292,21 @@ cancelCropBtn.addEventListener("click", () => {
     cropper = null;
   }
   cropModal.style.display = "none";
-  selectedFiles = []; // discard current selection batch
-  fileInput.value = "";
+  selectedFiles = [];
+  if (fileInput) fileInput.value = "";
 });
 
-/* ---------------------------
-  Submit product (example)
-----------------------------*/
+/* ===============================
+   SUBMIT ADD PRODUCT
+================================ */
 async function submitProduct() {
-  // validate min images
-  const validCount = croppedBlobs.filter(Boolean).length;
+  document.getElementById("fileInput").value = "";
+
+  const addBtn = document.getElementById("addBtn");
+
+  // ✅ Proper lock
+  addBtn.disabled = true;
+  addBtn.innerHTML = "Loading...";
 
   const productName = document.getElementById("productName").value.trim();
   const teamName = document.getElementById("teamName").value.trim();
@@ -311,7 +314,6 @@ async function submitProduct() {
   const categoryName = document.getElementById("seleted-category").value;
 
   const sizes = ["S", "M", "L", "XL", "XXL"];
-
   const stock = {};
   const normalPrice = {};
   const basePrice = {};
@@ -326,7 +328,223 @@ async function submitProduct() {
     ).value;
   });
 
-  // Prepare formData
+  const formData = new FormData();
+  formData.append("productName", productName);
+  formData.append("teamName", teamName);
+  formData.append("description", description);
+  formData.append("category", categoryName);
+  formData.append("stock", JSON.stringify(stock));
+  formData.append("normalPrice", JSON.stringify(normalPrice));
+  formData.append("basePrice", JSON.stringify(basePrice));
+
+  croppedBlobs.forEach((blob, idx) => {
+    if (!blob) return;
+    const file = new File([blob], `image_${idx}.webp`, {
+      type: OUTPUT_FORMAT,
+    });
+    formData.append("images", file);
+  });
+
+  try {
+    const res = await axios.post("/admin/products/add", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    console.log(res);
+
+    if (res.data.success) {
+      toastr.success(res.data.message, "Product added!");
+      croppedBlobs = [];
+      renderPreviews();
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+  } catch (err) {
+    const error = err.response?.data;
+
+    toastr.error(error?.message || "Something went wrong", "Error");
+
+    // ✅ Proper unlock on error
+    addBtn.disabled = false;
+    addBtn.innerHTML = "Add Product";
+  }
+}
+
+/* ===============================
+   BLOCK / UNBLOCK PRODUCT
+================================ */
+document.querySelectorAll(".action-btn").forEach((actionBtn) => {
+  actionBtn.addEventListener("click", async () => {
+    const row = actionBtn.closest(".product-row");
+    const productId = row.dataset.id;
+    const productStatus = row.querySelector(".status-badge");
+
+    const status =
+      productStatus.innerText.trim() === "List" ? "block" : "unblock";
+
+    try {
+      const res = await axios.patch(`/admin/products/${status}/${productId}`);
+
+      if (res.data.success) {
+        if (status === "block") {
+          productStatus.innerText = "Unlist";
+          productStatus.classList.replace("active", "inactive");
+          actionBtn.classList.replace("block", "list");
+          actionBtn.innerHTML = `<i class="fa-solid fa-unlock"></i> List`;
+          toastr.error(res.data.message, "Status:");
+        } else {
+          productStatus.innerText = "List";
+          productStatus.classList.replace("inactive", "active");
+          actionBtn.classList.replace("list", "block");
+          actionBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block`;
+          toastr.success(res.data.message, "Status:");
+        }
+      }
+    } catch (err) {
+      toastr.error("Action failed", "Error");
+    }
+  });
+});
+
+/* ===============================
+   EDIT PRODUCT FLOW
+================================ */
+
+// Existing images array for edit
+let editImages = [];
+
+function editModalOpen() {
+  const btn = event.currentTarget;
+  const product = JSON.parse(btn.dataset.product);
+
+  const modal = document.getElementById("editModal");
+  modal.style.display = "flex";
+  body.style.overflow = "hidden";
+
+  // Fill text fields
+  document.getElementById("editProductName").value = product.name;
+  document.getElementById("teamNameEdit").value = product.teamName;
+  document.getElementById("descriptionEdit").value = product.description;
+
+  // Set category
+  document.getElementById("edit-category").innerText = btn.dataset.category;
+  document.getElementById("edited-seleted-category").value =
+    btn.dataset.category;
+
+  // Fill stock values
+  const sizes = ["S", "M", "L", "XL", "XXL"];
+  sizes.forEach((size, index) => {
+    document.querySelector(
+      `#editModal input[name="edit_stock_${size}"]`
+    ).value = product.sizes[index].stock;
+
+    document.querySelector(
+      `#editModal input[name="edit_normalPrice_${size}"]`
+    ).value = product.sizes[index].normalPrice;
+
+    document.querySelector(
+      `#editModal input[name="edit_basePrice_${size}"]`
+    ).value = product.sizes[index].basePrice;
+  });
+
+  // Store product ID
+  modal.dataset.id = product._id;
+
+  // Load existing images
+  loadEditImages(product.images);
+}
+
+// hook all edit buttons to editModalOpen
+document.querySelectorAll(".edit-btn").forEach((btn) => {
+  btn.addEventListener("click", editModalOpen);
+});
+
+function loadEditImages(images) {
+  const previewContainer = document.getElementById("previewContainerEdit");
+  previewContainer.innerHTML = "";
+
+  editImages = [...images];
+
+  images.forEach((imgUrl, index) => {
+    const card = document.createElement("div");
+    card.style =
+      "display:flex; flex-direction:column; align-items:center; gap:6px;";
+
+    const image = document.createElement("img");
+    image.src = imgUrl;
+    image.style =
+      "width:100px; height:100px; object-fit:cover; border-radius:6px;";
+
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "btn cancel-btn";
+    removeBtn.innerText = "Remove";
+
+    removeBtn.onclick = async () => {
+      const productId = document.getElementById("editModal").dataset.id;
+
+      try {
+        const res = await axios.patch("/admin/products/remove-image", {
+          productId,
+          imageUrl: imgUrl,
+        });
+
+        if (res.data.success) {
+          editImages.splice(index, 1);
+
+          const editBtn = document.querySelector(
+            `.product-row[data-id="${productId}"] .edit-btn`
+          );
+
+          const productData = JSON.parse(editBtn.dataset.product);
+          productData.images = productData.images.filter(
+            (img) => img !== imgUrl
+          );
+          editBtn.dataset.product = JSON.stringify(productData);
+
+          loadEditImages(editImages);
+
+          toastr.success("Image removed");
+        } else {
+          toastr.error("Failed to remove image");
+        }
+      } catch (err) {
+        toastr.error("Image delete error");
+      }
+    };
+
+    card.appendChild(image);
+    card.appendChild(removeBtn);
+    previewContainer.appendChild(card);
+  });
+}
+
+/* SUBMIT EDIT PRODUCT */
+async function submitEdit() {
+  const productName = document.getElementById("editProductName").value.trim();
+  const teamName = document.getElementById("teamNameEdit").value.trim();
+  const description = document.getElementById("descriptionEdit").value;
+  const categoryName = document.getElementById("edited-seleted-category").value;
+  const productId = document.getElementById("editModal").dataset.id;
+
+  const sizes = ["S", "M", "L", "XL", "XXL"];
+  const stock = {};
+  const normalPrice = {};
+  const basePrice = {};
+
+  sizes.forEach((size) => {
+    stock[size] = document.querySelector(
+      `input[name="edit_stock_${size}"]`
+    ).value;
+    normalPrice[size] = document.querySelector(
+      `input[name="edit_normalPrice_${size}"]`
+    ).value;
+    basePrice[size] = document.querySelector(
+      `input[name="edit_basePrice_${size}"]`
+    ).value;
+  });
+
   const formData = new FormData();
 
   formData.append("productName", productName);
@@ -337,94 +555,34 @@ async function submitProduct() {
   formData.append("normalPrice", JSON.stringify(normalPrice));
   formData.append("basePrice", JSON.stringify(basePrice));
 
-  // Append cropped blobs in stable order
-  croppedBlobs.forEach((blob, idx) => {
-    if (!blob) return;
-    // name files sequentially to preserve order
-    const filename = `image_${idx}.webp`;
-    const file = new File([blob], filename, { type: OUTPUT_FORMAT });
-    formData.append("images", file); // backend expects field name "images"
-  });
+  // NOTE: Currently not cropping new images in edit.
+  // If you later add "new upload" logic for edit, append them here.
 
   try {
-    const res = await axios.post("/admin/products/add", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const res = await axios.patch(
+      `/admin/products/edit/${productId}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
 
     if (res.data.success) {
-      toastr.success(res.data.message, "Product added!");
-      // reset UI
-      croppedBlobs = [];
-      renderPreviews();
-      // optionally close modal...
+      toastr.success(res.data.message, "Product updated!");
       setTimeout(() => {
         window.location.reload();
-      }, 5000);
+      }, 500);
     } else {
       toastr.error(res.data.message, "Failed:");
     }
   } catch (err) {
     console.error("UPLOAD ERROR", err);
-    toastr.error(err.response.data.message, "Error");
+    toastr.error(err.response?.data?.message || "Error", "Error");
   }
 }
 
-// block and unblock the product
-const actionBtn = document.querySelector(".action-btn");
-
-actionBtn.addEventListener("click", async () => {
-  const productStatus = document.querySelector(".status-badge");
-  const productId = document.querySelector(".product-row").dataset.id;
-  const status = productStatus.innerText === "List" ? "block" : "unblock";
-  console.log(status);
-  console.log(productStatus.innerText);
-  console.log(productId);
-
-  try {
-    const res = await axios.patch(`/admin/products/${status}/${productId}`);
-
-    if (res.data.success) {
-      if (status === "block") {
-        productStatus.innerText = "Unlist";
-        productStatus.classList.replace("active","inactive");
-        actionBtn.classList.replace("block","list");
-        productStatus.classList.replace("active","inactive");
-        actionBtn.innerHTML = `<i class="fa-solid fa-unlock"></i> List`;
-
-
-        toastr.error(res.data.message,"Status:");
-      }else{
-        productStatus.innerText = "List";
-        productStatus.classList.replace("inactive","active");
-        actionBtn.classList.replace("list","block");
-        productStatus.classList.replace("inactive","active");
-        actionBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block`;
-
-        toastr.success(res.data.message,"Status:");
-      }
-
-    } else {
-    }
-  } catch (err) {
-    toastr.error(err, "Error");
-  }
-});
-
-async function editModal() {
-
-  const product = JSON.parse(document.querySelector(".edit-btn").dataset.product);
-  const editModal = document.getElementById("editModal");
-  editModal.style.display = "flex";
-
-  document.getElementById("editProductName").value = product.name;
-  document.getElementById("seleted-category").value = product.category;
-  document.getElementById("edit-selected").value = product.category;
-  document.getElementById("edit-selected").innerText = product.category;
-
-
-
-  console.log(product);
-
-
-  
-}
+// const addBtn = document.getElementById("addBtn");
+// addBtn.addEventListener("click", (e) => {
+//   e.stopPropagation(); // prevents bubbling to modal overlay
+//   submitProduct();
+// });

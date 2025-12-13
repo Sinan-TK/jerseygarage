@@ -3,15 +3,15 @@ import Admin from "../../models/adminModel.js";
 import User from "../../models/userModel.js";
 import Category from "../../models/categoryModel.js";
 import Product from "../../models/productModel.js";
-import cloudinary from "../../config/cloudinary.js";
-import upload from "../../middlewares/multer.js";
+// import cloudinary from "../../config/cloudinary.js";
+// import upload from "../../middlewares/multer.js";
 import * as Responses from "../../utils/responses/admin/admin.response.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { wrapAsync } from "../../utils/wrapAsync.js";
 import { adminSchema } from "../../validators/adminValidators.js";
 import { paginate } from "../../utils/pagination.js";
 
-const uploadImages = upload.array("images", 5);
+// const uploadImages = upload.array("images", 5);
 
 // ======================================================================
 // 1. RENDER LOGIN PAGE
@@ -53,7 +53,7 @@ export const loginAdmin = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.adminLogin.INVALID_PASSWORD);
   }
 
-  req.session.Admin = {
+  req.session.admin = {
     id: admin._id,
     email: admin.email,
   };
@@ -153,61 +153,23 @@ export const searchUser = wrapAsync(async (req, res) => {
 // 11.LOGOUT
 // ======================================================================
 
-export const logOut = (req, res) => {
-  console.log("hell");
-  delete req.session.Admin;
-  return res.redirect("/admin/login");
-};
+export const logOut = wrapAsync((req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log("Admin logout error:", err);
+    }
 
-// ======================================================================
-// 12.PRODUCT PAGE RENDER
-// ======================================================================
+    res.clearCookie("admin.sid");
 
-export const productsPageRender = async (req, res) => {
-  let page = parseInt(req.query.page) || 1;
-  const limit = 10;
-  const totalProducts = await Product.countDocuments();
-  const totalPages = Math.ceil(totalProducts / limit);
-
-  if (page > totalPages) {
-    page = totalPages;
-  }
-
-  if (page < 1) {
-    page = 1;
-  }
-
-  const skip = (page - 1) * limit;
-
-  const products = await Product.find()
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  req.session.page = page;
-
-  const categoriesName = await Category.find().select("name");
-
-  res.render("admin/pages/products", {
-    title: "Products",
-    showLayout: true,
-    cssFile: "/css/admin/products.css",
-    errorMessage: "",
-    pageJS: "products.js",
-    products,
-    currentPage: page,
-    totalPages,
-    searchContent: "",
-    // status: "",
-    categoriesName,
+    return res.redirect("/admin/login");
   });
-};
+});
 
 // ======================================================================
 // 13.FEATURE NOT AVAILABLE
 // ======================================================================
 
-export const featureNotAvailable = (req, res) => {
+export const featureNotAvailable = wrapAsync((req, res) => {
   res.render("admin/pages/featurenotavailable", {
     title: "featurenotavailable",
     showLayout: true,
@@ -215,185 +177,5 @@ export const featureNotAvailable = (req, res) => {
     errorMessage: "",
     pageJS: "",
   });
-};
+});
 
-// ======================================================================
-// 15.SEARCH CATEGORY
-// ======================================================================
-
-export const addProduct = async (req, res) => {
-  uploadImages(req, res, async (err) => {
-    // Multer limit handler
-    if (err) {
-      return res.status(400).json({
-        success: false,
-        message: "Maximum 5 images allowed!",
-      });
-    }
-
-    try {
-      const { productName, teamName, description, category } = req.body;
-
-      const stock = JSON.parse(req.body.stock);
-      const normalPrice = JSON.parse(req.body.normalPrice);
-      const basePrice = JSON.parse(req.body.basePrice);
-
-      if (!productName) {
-        return res.json({
-          success: false,
-          message: "Product name required!",
-        });
-      }
-
-      if (!category) {
-        return res.json({
-          success: false,
-          message: "Select Category!",
-        });
-      }
-
-      if (!teamName) {
-        return res.json({
-          success: false,
-          message: "Team name required!",
-        });
-      }
-
-      // Images Validation (min/max)
-      if (!req.files || req.files.length === 0) {
-        return res.json({
-          success: false,
-          message: "No image uploaded!",
-        });
-      }
-
-      if (req.files.length < 3) {
-        return res.json({
-          success: false,
-          message: "Minimum 3 images required!",
-        });
-      }
-      // Price validation
-      for (let i in stock) {
-        if (!normalPrice[i] || !basePrice[i] || !stock[i]) {
-          return res.json({
-            success: false,
-            message: "Stock, Normal price and Base price are required!",
-          });
-        }
-
-        if (Number(normalPrice[i]) < Number(basePrice[i])) {
-          return res.json({
-            success: false,
-            message: "Normal price should always be greater than base price!",
-          });
-        }
-      }
-
-      // -------------------------
-      // UPLOAD TO CLOUDINARY NOW
-      // -------------------------
-
-      const uploadedImages = [];
-
-      for (let file of req.files) {
-        const uploadResult = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: "products" },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve(result);
-            }
-          );
-
-          stream.end(file.buffer);
-        });
-
-        uploadedImages.push(uploadResult.secure_url);
-      }
-
-      console.log("CLOUDINARY URLs:", uploadedImages);
-
-      // After uploadedImages[] is created
-
-      const categoryId = await Category.findOne({ name: category });
-
-      console.log(categoryId);
-
-      const sizesList = ["S", "M", "L", "XL", "XXL"];
-
-      const sizeArray = sizesList.map((size) => ({
-        size,
-        stock: Number(stock[size]),
-        basePrice: Number(basePrice[size]),
-        normalPrice: Number(normalPrice[size]),
-      }));
-
-      const product = await Product.create({
-        name: productName,
-        teamName,
-        description,
-        category: categoryId,
-        images: uploadedImages,
-        sizes: sizeArray,
-      });
-
-      console.log(product);
-
-      return res.json({
-        success: true,
-        message: "Product added successfully!",
-      });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({
-        success: false,
-        message: "Something went wrong!",
-      });
-    }
-  });
-};
-
-// ======================================================================
-// 16.BLOCK PRODUCT
-// ======================================================================
-
-export const blockProduct = async (req, res) => {
-  const id = req.params.id;
-
-  const data = await Product.findByIdAndUpdate(
-    id,
-    { is_active: false },
-    { new: true }
-  );
-
-  console.log(data);
-  console.log(id);
-
-  res.json({
-    success: true,
-    message: "Product Unlisted!",
-  });
-};
-
-// ======================================================================
-// 16.UNBLOCK PRODUCT
-// ======================================================================
-
-export const unblockProduct = async (req, res) => {
-  const id = req.params.id;
-
-  const data = await Product.findByIdAndUpdate(
-    id,
-    { is_active: true },
-    { new: true }
-  );
-
-  console.log(data);
-  console.log(id);
-
-  res.json({
-    success: true,
-    message: "Product Listed!",
-  });
-};
