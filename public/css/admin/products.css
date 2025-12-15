@@ -183,6 +183,7 @@
 .edit-btn {
   text-decoration: none;
   color: blue;
+  cursor: pointer;
 }
 
 .list {

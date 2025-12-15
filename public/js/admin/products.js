@@ -299,12 +299,12 @@ cancelCropBtn.addEventListener("click", () => {
 /* ===============================
    SUBMIT ADD PRODUCT
 ================================ */
-async function submitProduct() {
+document.getElementById("addBtn").addEventListener("click", async () => {
   document.getElementById("fileInput").value = "";
 
   const addBtn = document.getElementById("addBtn");
 
-  // ✅ Proper lock
+  //  Proper lock
   addBtn.disabled = true;
   addBtn.innerHTML = "Loading...";
 
@@ -364,13 +364,15 @@ async function submitProduct() {
   } catch (err) {
     const error = err.response?.data;
 
-    toastr.error(error?.message || "Something went wrong", "Error");
+    console.log(error?.message)
 
-    // ✅ Proper unlock on error
+    toastr.error(error?.message || "Something went wrong", "Failed");
+
+    //  Proper unlock on error
     addBtn.disabled = false;
     addBtn.innerHTML = "Add Product";
   }
-}
+});
 
 /* ===============================
    BLOCK / UNBLOCK PRODUCT
@@ -415,8 +417,9 @@ document.querySelectorAll(".action-btn").forEach((actionBtn) => {
 // Existing images array for edit
 let editImages = [];
 
-function editModalOpen() {
-  const btn = event.currentTarget;
+function editModalOpen(e) {
+  const btn = e.currentTarget;
+
   const product = JSON.parse(btn.dataset.product);
 
   const modal = document.getElementById("editModal");

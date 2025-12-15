@@ -6,7 +6,7 @@
             <p class="page-subtext">View product inventory and prices.</p>
         </div>
         <div>
-            <button class="add-btn"><span>+</span>Add Product</button>
+            <button type="button" class="add-btn"><span>+</span>Add Product</button>
         </div>
     </div>
 
@@ -26,8 +26,8 @@
                 </ul>
             </div>
 
-            <button id="applyFilter" class="btn-apply">Apply</button>
-            <button id="clearFilter" class="btn-clear">Clear</button>
+            <button type="button" id="applyFilter" class="btn-apply">Apply</button>
+            <button type="button" id="clearFilter" class="btn-clear">Clear</button>
         </div>
 
         <!-- PRODUCT TABLE -->
@@ -89,7 +89,7 @@
                             <!-- EDIT -->
                             <td>
                                 <span data-product="<%= JSON.stringify(product) %>" data-category="<%= catName %>"
-                                    class="edit-btn" onclick="editModal()">
+                                    class="edit-btn">
                                     <i class="fa-solid fa-pen-to-square"></i> Edit
                                 </span>
                             </td>
@@ -126,59 +126,38 @@
                                     <tbody>
                                         <tr>
                                             <td>Stock</td>
-                                            <td>
-                                                <%= product.sizes[0].stock%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[1].stock%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[2].stock%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[3].stock%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[4].stock%>
-                                            </td>
+                                            <% ["S","M","L","XL","XXL"].forEach(size=> {
+                                                const variant = product.variants.find(v => v.size === size);
+                                                %>
+                                                <td>
+                                                    <%= variant ? variant.stock : "-" %>
+                                                </td>
+                                                <% }) %>
+
+
                                         </tr>
+
 
                                         <tr>
                                             <td>Normal Price</td>
-                                            <td>
-                                                <%= product.sizes[0].normalPrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[1].normalPrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[2].normalPrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[3].normalPrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[4].normalPrice%>
-                                            </td>
+                                            <% ["S","M","L","XL","XXL"].forEach(size=> {
+                                                const variant = product.variants.find(v => v.size === size);
+                                                %>
+                                                <td>
+                                                    <%= variant ? variant.normal_price : "-" %>
+                                                </td>
+                                                <% }) %>
                                         </tr>
 
                                         <tr>
                                             <td>Base Price</td>
-                                            <td>
-                                                <%= product.sizes[0].basePrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[1].basePrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[2].basePrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[3].basePrice%>
-                                            </td>
-                                            <td>
-                                                <%= product.sizes[4].basePrice%>
-                                            </td>
+                                            <% ["S","M","L","XL","XXL"].forEach(size=> {
+                                                const variant = product.variants.find(v => v.size === size);
+                                                %>
+                                                <td>
+                                                    <%= variant ? variant.base_price : "-" %>
+                                                </td>
+                                                <% }) %>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -319,8 +298,8 @@
 
         <!-- FOOTER -->
         <div class="modal-footer">
-            <button class="btn cancel-btn">Cancel</button>
-            <button type="button" onclick="submitProduct()" id="addBtn" class="btn add-btn-confirm">
+            <button type="button" class="btn cancel-btn">Cancel</button>
+            <button type="button" id="addBtn" class="btn add-btn-confirm">
                 Add Product
             </button>
         </div>
@@ -426,7 +405,7 @@
 
         <!-- FOOTER -->
         <div class="modal-footer">
-            <button class="btn cancel-btn">Cancel</button>
+            <button type="button" class="btn cancel-btn">Cancel</button>
             <button type="button" class="btn add-btn-confirm" onclick="submitEdit()">Edit Submit</button>
         </div>
 
