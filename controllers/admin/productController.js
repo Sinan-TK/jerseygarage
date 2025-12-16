@@ -30,7 +30,7 @@ export const productsPageRender = wrapAsync(async (req, res) => {
   const variants = await Variant.find({
     product_id: { $in: productIds },
   }).lean();
-  
+
   const productsWithVariants = result.data.map((product) => {
     return {
       ...product.toObject(),
@@ -256,7 +256,7 @@ export const removeImage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const editProduct = wrapAsync(async (req, res) => {
-  uploadImages(req, res, (err) => {
+  uploadImages(req, res, async (err) => {
     if (err) {
       return sendResponse(res, {
         code: 400,
@@ -264,73 +264,66 @@ export const editProduct = wrapAsync(async (req, res) => {
       });
     }
 
-    (async () => {
+    try {
+      const { productName, teamName, description, category } = req.body;
+      const productId = req.params.id;
+
+      // ===== BASIC VALIDATION =====
+      if (!productName)
+        return sendResponse(res, Responses.addProduct.NO_PRODUCT);
+      if (!category) return sendResponse(res, Responses.addProduct.NO_CATEGORY);
+      if (!teamName) return sendResponse(res, Responses.addProduct.NO_TEAM);
+      if (!description) return sendResponse(res, Responses.addProduct.NO_DES);
+
+      // ===== PARSE PRICE DATA =====
+      let stock = {};
+      let normalPrice = {};
+      let basePrice = {};
+
       try {
-        const { productName, teamName, description, category } = req.body;
+        stock = JSON.parse(req.body.stock || "{}");
+        normalPrice = JSON.parse(req.body.normalPrice || "{}");
+        basePrice = JSON.parse(req.body.basePrice || "{}");
+      } catch {
+        return sendResponse(res, Responses.addProduct.INVALID_FORMAT);
+      }
 
-        if (!productName) {
-          sendResponse(res, Responses.addProduct.NO_PRODUCT);
-          return;
+      const sizes = ["S", "M", "L", "XL", "XXL"];
+
+      for (let size of sizes) {
+        if (!stock[size] || !normalPrice[size] || !basePrice[size]) {
+          return sendResponse(res, Responses.addProduct.SIZE_REQ);
         }
 
-        if (!category) {
-          sendResponse(res, Responses.addProduct.NO_CATEGORY);
-          return;
+        if (Number(normalPrice[size]) < Number(basePrice[size])) {
+          return sendResponse(res, Responses.addProduct.PRICE_LOGIC);
         }
+      }
 
-        if (!teamName) {
-          sendResponse(res, Responses.addProduct.NO_TEAM);
-          return;
-        }
+      // ===== FIND PRODUCT =====
+      const product = await Product.findById(productId);
+      if (!product) {
+        return sendResponse(res, Responses.addProduct.PRODUCT_NOT_FOUND);
+      }
 
-        if (!description) {
-          sendResponse(res, Responses.addProduct.NO_DES);
-          return;
-        }
+      // ===== UPDATE BASIC PRODUCT FIELDS =====
+      const categoryDoc = await Category.findOne({ name: category });
+      if (!categoryDoc) {
+        return sendResponse(res, Responses.addProduct.CATEGORY_NOT_EXIST);
+      }
 
-        let stock = {};
-        let normalPrice = {};
-        let basePrice = {};
+      product.name = productName;
+      product.teamName = teamName;
+      product.description = description;
+      product.category = categoryDoc._id;
 
-        try {
-          stock = JSON.parse(req.body.stock || "{}");
-          normalPrice = JSON.parse(req.body.normalPrice || "{}");
-          basePrice = JSON.parse(req.body.basePrice || "{}");
-        } catch {
-          sendResponse(res, Responses.addProduct.INVALID_FORMAT);
-          return;
-        }
+      // ===== HANDLE IMAGES (EDIT WITH MIN/MAX VALIDATION) =====
+      let uploadedImages = [];
 
-        if (!req.files || req.files.length === 0) {
-          sendResponse(res, Responses.addProduct.NO_IMAGE);
-          return;
-        }
-
-        if (req.files.length < 3) {
-          sendResponse(res, Responses.addProduct.MIN_IMAGE);
-          return;
-        }
-
+      if (req.files && req.files.length > 0) {
         if (req.files.length > 5) {
-          sendResponse(res, Responses.addProduct.MAX_IMAGE);
-          return;
+          return sendResponse(res, Responses.addProduct.MAX_IMAGE);
         }
-
-        const sizes = ["S", "M", "L", "XL", "XXL"];
-
-        for (let size of sizes) {
-          if (!stock[size] || !normalPrice[size] || !basePrice[size]) {
-            sendResponse(res, Responses.addProduct.SIZE_REQ);
-            return;
-          }
-
-          if (Number(normalPrice[size]) < Number(basePrice[size])) {
-            sendResponse(res, Responses.addProduct.PRICE_LOGIC);
-            return;
-          }
-        }
-
-        const uploadedImages = [];
 
         for (let file of req.files) {
           const result = await new Promise((resolve, reject) => {
@@ -344,35 +337,44 @@ export const editProduct = wrapAsync(async (req, res) => {
 
           uploadedImages.push(result.secure_url);
         }
-
-        const categoryDoc = await Category.findOne({ name: category });
-
-        if (!categoryDoc) {
-          sendResponse(res, Responses.addProduct.CATEGORY_NOT_EXIST);
-          return;
-        }
-
-        const sizesArray = sizes.map((size) => ({
-          size,
-          stock: Number(stock[size]),
-          basePrice: Number(basePrice[size]),
-          normalPrice: Number(normalPrice[size]),
-        }));
-
-        await Product.create({
-          name: productName,
-          teamName,
-          description,
-          category: categoryDoc._id,
-          images: uploadedImages,
-          sizes: sizesArray,
-        });
-
-        sendResponse(res, Responses.addProduct.PRODUCT_EDITED);
-      } catch (error) {
-        console.error("Add Product Error:", error);
-        sendResponse(res, Responses.addProduct.ERROR_500);
       }
-    })();
+
+      // 🔥 FINAL IMAGE COUNT VALIDATION
+      const finalImageCount = product.images.length + uploadedImages.length;
+
+      if (finalImageCount < 3) {
+        return sendResponse(res, Responses.addProduct.MIN_IMAGE);
+      }
+
+      if (finalImageCount > 5) {
+        return sendResponse(res, Responses.addProduct.MAX_IMAGE);
+      }
+
+      // append only AFTER validation
+      if (uploadedImages.length > 0) {
+        product.images.push(...uploadedImages);
+      }
+
+      await product.save();
+
+      // ===== UPDATE VARIANTS =====
+      for (let size of sizes) {
+        await Variant.findOneAndUpdate(
+          { product_id: product._id, size },
+          {
+            base_price: Number(basePrice[size]),
+            normal_price: Number(normalPrice[size]),
+            stock: Number(stock[size]),
+            is_available: Number(stock[size]) > 0,
+          },
+          { upsert: true }
+        );
+      }
+
+      return sendResponse(res, Responses.addProduct.PRODUCT_EDITED);
+    } catch (error) {
+      console.error("Edit Product Error:", error);
+      return sendResponse(res, Responses.addProduct.ERROR_500);
+    }
   });
 });

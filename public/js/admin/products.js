@@ -250,50 +250,69 @@ function openCropperFor(file, targetIndex = null) {
 cropNextBtn.addEventListener("click", () => {
   if (!cropper) return;
 
-  const canvas = cropper.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 });
+  const canvas = cropper.getCroppedCanvas({
+    maxWidth: 1600,
+    maxHeight: 1600,
+  });
 
   canvas.toBlob(
     (blob) => {
-      const targetIndex = cropModal.dataset.targetIndex
-        ? parseInt(cropModal.dataset.targetIndex, 10)
-        : getNextFreeIndex();
+      
+      const isEdit = editSelectedFiles.length > 0;
 
-      croppedBlobs[targetIndex] = blob;
+      if (isEdit) {
+        editNewBlobs.push(blob);
+        editSelectedFiles.shift();
 
-      cropper.destroy();
-      cropper = null;
-      cropModal.style.display = "none";
-      URL.revokeObjectURL(cropImage.src);
+        renderEditNewPreviews(); 
 
-      if (selectedFiles.length > 0) {
-        selectedFiles.shift();
-      }
-
-      if (selectedFiles.length > 0) {
-        const nextIndex = getNextFreeIndex();
-        openCropperFor(selectedFiles[0], nextIndex);
+        if (editSelectedFiles.length > 0) {
+          openEditCropperFor(editSelectedFiles[0]);
+        } else {
+          editSelectedFiles = [];
+          closeCropper();
+        }
       } else {
-        selectedFiles = [];
-        cropModal.dataset.targetIndex = "";
+        const idx = getNextFreeIndex();
+        croppedBlobs[idx] = blob;
+        selectedFiles.shift();
+
+        if (selectedFiles.length > 0) {
+          openCropperFor(selectedFiles[0], getNextFreeIndex());
+        } else {
+          selectedFiles = [];
+          closeCropper();
+        }
+
+        renderPreviews();
       }
-
-      renderPreviews();
-
-      if (fileInput) fileInput.value = "";
     },
     OUTPUT_FORMAT,
     OUTPUT_QUALITY
   );
 });
 
+function closeCropper() {
+  cropper.destroy();
+  cropper = null;
+  cropModal.style.display = "none";
+  URL.revokeObjectURL(cropImage.src);
+}
+
 cancelCropBtn.addEventListener("click", () => {
   if (cropper) {
     cropper.destroy();
     cropper = null;
   }
+
   cropModal.style.display = "none";
+  URL.revokeObjectURL(cropImage.src);
+
   selectedFiles = [];
+  editSelectedFiles = [];
+
   if (fileInput) fileInput.value = "";
+  if (editFileInput) editFileInput.value = "";
 });
 
 /* ===============================
@@ -364,7 +383,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
   } catch (err) {
     const error = err.response?.data;
 
-    console.log(error?.message)
+    console.log(error?.message);
 
     toastr.error(error?.message || "Something went wrong", "Failed");
 
@@ -414,54 +433,58 @@ document.querySelectorAll(".action-btn").forEach((actionBtn) => {
    EDIT PRODUCT FLOW
 ================================ */
 
-// Existing images array for edit
 let editImages = [];
 
 function editModalOpen(e) {
+  editNewBlobs = [];
   const btn = e.currentTarget;
 
   const product = JSON.parse(btn.dataset.product);
+  console.log(product);
 
   const modal = document.getElementById("editModal");
   modal.style.display = "flex";
   body.style.overflow = "hidden";
 
-  // Fill text fields
   document.getElementById("editProductName").value = product.name;
   document.getElementById("teamNameEdit").value = product.teamName;
   document.getElementById("descriptionEdit").value = product.description;
 
-  // Set category
   document.getElementById("edit-category").innerText = btn.dataset.category;
   document.getElementById("edited-seleted-category").value =
     btn.dataset.category;
 
-  // Fill stock values
   const sizes = ["S", "M", "L", "XL", "XXL"];
-  sizes.forEach((size, index) => {
+
+  const variantMap = {};
+  product.variants.forEach((v) => {
+    variantMap[v.size] = v;
+  });
+
+  sizes.forEach((size) => {
     document.querySelector(
       `#editModal input[name="edit_stock_${size}"]`
-    ).value = product.sizes[index].stock;
+    ).value = variantMap[size]?.stock ?? "";
 
     document.querySelector(
       `#editModal input[name="edit_normalPrice_${size}"]`
-    ).value = product.sizes[index].normalPrice;
+    ).value = variantMap[size]?.normal_price ?? "";
 
     document.querySelector(
       `#editModal input[name="edit_basePrice_${size}"]`
-    ).value = product.sizes[index].basePrice;
+    ).value = variantMap[size]?.base_price ?? "";
   });
 
-  // Store product ID
   modal.dataset.id = product._id;
 
-  // Load existing images
   loadEditImages(product.images);
 }
 
-// hook all edit buttons to editModalOpen
-document.querySelectorAll(".edit-btn").forEach((btn) => {
-  btn.addEventListener("click", editModalOpen);
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".edit-btn");
+  if (!btn) return;
+
+  editModalOpen({ currentTarget: btn });
 });
 
 function loadEditImages(images) {
@@ -523,6 +546,10 @@ function loadEditImages(images) {
   });
 }
 
+let editNewBlobs = [];
+
+const editFileInput = document.getElementById("fileInputEdit");
+
 /* SUBMIT EDIT PRODUCT */
 async function submitEdit() {
   const productName = document.getElementById("editProductName").value.trim();
@@ -558,23 +585,34 @@ async function submitEdit() {
   formData.append("normalPrice", JSON.stringify(normalPrice));
   formData.append("basePrice", JSON.stringify(basePrice));
 
-  // NOTE: Currently not cropping new images in edit.
-  // If you later add "new upload" logic for edit, append them here.
+  editNewBlobs.forEach((blob, index) => {
+    const file =
+      blob instanceof File
+        ? blob
+        : new File([blob], `edit_image_${index}.webp`, {
+            type: "image/webp",
+          });
+
+    formData.append("images", file);
+  });
+
+  for (const [key, value] of formData.entries()) {
+    console.log(key, value);
+  }
 
   try {
     const res = await axios.patch(
       `/admin/products/edit/${productId}`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
+      formData
     );
 
     if (res.data.success) {
       toastr.success(res.data.message, "Product updated!");
+      editNewBlobs = [];
+      editFileInput.value = "";
       setTimeout(() => {
         window.location.reload();
-      }, 500);
+      }, 5000);
     } else {
       toastr.error(res.data.message, "Failed:");
     }
@@ -584,8 +622,64 @@ async function submitEdit() {
   }
 }
 
-// const addBtn = document.getElementById("addBtn");
-// addBtn.addEventListener("click", (e) => {
-//   e.stopPropagation(); // prevents bubbling to modal overlay
-//   submitProduct();
-// });
+let editSelectedFiles = [];
+let editCropTargetIndex = null;
+
+if (editFileInput) {
+  editFileInput.addEventListener("change", (e) => {
+    const incoming = Array.from(e.target.files || []);
+    if (incoming.length === 0) return;
+
+    editSelectedFiles = incoming;
+    editCropTargetIndex = null; 
+    openEditCropperFor(editSelectedFiles[0]);
+  });
+}
+
+function openEditCropperFor(file) {
+  const url = URL.createObjectURL(file);
+  cropImage.src = url;
+  cropModal.style.display = "flex";
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  cropImage.onload = () => {
+    cropper = new Cropper(cropImage, {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 0.9,
+      responsive: true,
+    });
+  };
+}
+
+function renderEditNewPreviews() {
+  const container = document.getElementById("previewContainerEdit");
+
+  editNewBlobs.forEach((blob, index) => {
+    const card = document.createElement("div");
+    card.style =
+      "display:flex; flex-direction:column; align-items:center; gap:6px;";
+
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(blob);
+    img.style =
+      "width:100px; height:100px; object-fit:cover; border-radius:6px;";
+
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "btn cancel-btn";
+    removeBtn.innerText = "Remove";
+    removeBtn.onclick = () => {
+      editNewBlobs.splice(index, 1);
+      container.innerHTML = "";
+      renderEditNewPreviews();
+    };
+
+    card.appendChild(img);
+    card.appendChild(removeBtn);
+    container.appendChild(card);
+  });
+}
