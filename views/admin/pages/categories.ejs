@@ -82,7 +82,7 @@
                         <button class="edit" data-id="<%= category._id %>" data-name="<%= category.name %>"
                             data-description="<%= category.description %>" data-color="<%= category.color %>"
                             onclick="openEditModal()">Edit</button>
-                        <button class="view" onclick="openModalProductList()">View Products</button>
+                        <button class="view" id="view-products" data-products='<%- JSON.stringify(products) %>' data-category='<%- JSON.stringify(category) %>'  onclick="openModalProductList(this)">View Products</button>
                         <button
                             class="cat-action <%= category.is_active ? 'block block-category' : 'unblock unblock-category' %>"
                             data-name="<%= category.name %>" data-id="<%= category._id %>">
@@ -130,69 +130,14 @@
         <!-- Header -->
         <div class="modal-header">
             <div>
-                <h2>NBA Jerseys</h2>
-                <p>45 products in this category</p>
+                <h2 id="category-heading">name</h2>
+                <p id="category-description">description</p>
             </div>
             <button class="close-modal">&times;</button>
         </div>
 
         <!-- Product List -->
-        <div class="modal-products">
-
-            <!-- Product Item -->
-            <div class="product-item">
-                <img src="https://via.placeholder.com/90" alt="">
-                <div class="info">
-                    <h3>Bulls Classic Jersey</h3>
-                    <div class="meta">
-                        <span>₹99.99</span>
-                        <span>•</span>
-                        <span>12 in stock</span>
-                    </div>
-                    <a class="details" href="#">View Details →</a>
-                </div>
-            </div>
-
-            <div class="product-item">
-                <img src="https://via.placeholder.com/90" alt="">
-                <div class="info">
-                    <h3>Celtics Home Jersey</h3>
-                    <div class="meta">
-                        <span>₹89.99</span>
-                        <span>•</span>
-                        <span>31 in stock</span>
-                    </div>
-                    <a class="details" href="#">View Details →</a>
-                </div>
-            </div>
-
-            <div class="product-item">
-                <img src="https://via.placeholder.com/90" alt="">
-                <div class="info">
-                    <h3>Celtics Home Jersey</h3>
-                    <div class="meta">
-                        <span>₹89.99</span>
-                        <span>•</span>
-                        <span>31 in stock</span>
-                    </div>
-                    <a class="details" href="#">View Details →</a>
-                </div>
-            </div>
-
-            <div class="product-item">
-                <img src="https://via.placeholder.com/90" alt="">
-                <div class="info">
-                    <h3>Celtics Home Jersey</h3>
-                    <div class="meta">
-                        <span>₹89.99</span>
-                        <span>•</span>
-                        <span>31 in stock</span>
-                    </div>
-                    <a class="details" href="#">View Details →</a>
-                </div>
-            </div>
-
-        </div>
+        <div class="modal-products"></div>
 
         <!-- Footer -->
         <div class="modal-footer">

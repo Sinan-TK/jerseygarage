@@ -1,4 +1,5 @@
 import Category from "../../models/categoryModel.js";
+import Product from "../../models/productModel.js";
 import { wrapAsync } from "../../utils/wrapAsync.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { categorySchema } from "../../validators/categoryValidator.js";
@@ -14,6 +15,8 @@ export const getCategories = wrapAsync(async (req, res) => {
 
   const result = await paginate(Category, page, 8);
 
+  const products = await Product.find({});
+
   res.render("admin/pages/categories", {
     title: "Categories",
     showLayout: true,
@@ -21,6 +24,7 @@ export const getCategories = wrapAsync(async (req, res) => {
     categories: result.data,
     pagination: result.meta,
     pageJS: "categories.js",
+    products,
     categoryStatus: req.query.categoryStatus || "all",
     searchContent: req.query.searchContent,
   });
@@ -61,6 +65,8 @@ export const blockCategory = wrapAsync(async (req, res) => {
     { new: true }
   );
 
+  await Product.updateMany({category:id},{ $set: { is_active: false } });
+
   return sendResponse(res, {
     ...Responses.categoryStatus.CATEGORY_BLOCK,
     data: updatedData,
@@ -77,6 +83,8 @@ export const unblockCategory = wrapAsync(async (req, res) => {
     { is_active: true },
     { new: true }
   );
+
+  await Product.updateMany({category:id},{ $set: { is_active: true } });
 
   return sendResponse(res, {
     ...Responses.categoryStatus.CATEGORY_UNBLOCK,

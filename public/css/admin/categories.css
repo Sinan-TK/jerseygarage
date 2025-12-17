@@ -135,6 +135,16 @@
     text-decoration: none;
 }
 
+.listed{
+  color:#29984c;
+  font-weight: bold;
+}
+
+.blocked{
+  color:#d9534f;
+  font-weight: bold;
+}
+
 /* modal */
 
 /* Overlay */

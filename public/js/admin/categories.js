@@ -3,8 +3,42 @@
 ================================ */
 const viewProductsModal = document.getElementById("viewProductsModal");
 const viewCloseBtns = document.querySelectorAll(".close-modal, .close-footer");
+const btn = document.getElementById("view-products");
 
-function openModalProductList() {
+function openModalProductList(btn) {
+  const category = JSON.parse(btn.dataset.category);
+  document.getElementById("category-heading").innerHTML = category.name;
+  document.getElementById("category-description").innerHTML =
+    category.description;
+
+  const products = JSON.parse(btn.dataset.products);
+  console.log(products[0]);
+  const container = document.querySelector(".modal-products");
+  container.innerHTML = "";
+  products.forEach((product) => {
+    if (product.category === category._id) {
+      let status = "blocked";
+      if(product.is_active){
+        status = "listed";
+      }
+    container.innerHTML += `
+    <div class="product-item">
+      <img src="${product.images[0] || "/images/placeholder.png"}" alt="${
+        product.name
+      }">
+      <div class="info">
+        <h3>${product.name}</h3>
+        <div class="meta">
+        <span>•</span>
+        <span>Team: ${product.teamName}</span>
+          
+        </div>
+        <span class="${status}">${status}</span>
+      </div>
+    </div>
+  `;
+    }
+  });
   viewProductsModal.style.display = "flex";
 }
 
@@ -237,7 +271,6 @@ async function editConfirm() {
       errorBox.style.display = "none";
       errorText.innerHTML = "";
     }, 3000);
-    
 
     // errorBox.style.display = "flex";
     // errorText.innerText = res.data.message;
