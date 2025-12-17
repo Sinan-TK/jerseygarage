@@ -5,14 +5,18 @@
 
         <!-- LEFT IMAGES -->
         <div class="product-images">
-            <img class="main-img" src="/images/user/about/pele-quote.webp" />
+            <div class="img-zoom-container">
+                <img class="main-img" src="<%= product[0].images[0] %>" />
+            </div>
 
             <div class="thumbs">
-                <img src="/images/user/about/pele-quote.webp">
-                <img src="/images/user/about/football_legends-hero-image.webp">
-                <img src="/images/user/about/football_legends-hero-image.webp">
+                <% product[0].images.forEach((image, index)=> { %>
+                    <img src="<%= image %>" class="thumb <%= index === 0 ? 'active' : '' %>">
+                    <% }) %>
             </div>
         </div>
+
+
 
         <!-- RIGHT DETAILS -->
         <div class="product-info">
@@ -20,31 +24,62 @@
                 HOME / FEATURED / MANCHESTER UNITED 2001/2002 AWAY KIT BECKHAM POLO
             </p>
 
-            <h1>MANCHESTER UNITED 2001/2002 AWAY KIT BECKHAM POLO</h1>
+            <h1>
+                <%= product[0].name %>
+            </h1>
 
             <div class="price">
-                <span class="old">₹1099.00</span>
-                <span class="new">₹599.00</span>
+                <% let selectedVariant=null; const sizes=["S", "M" , "L" , "XL" , "XXL" ]; for (let size of sizes) {
+                    const match=product[0].variants.find( v=> v.size === size && v.is_available === true);
+
+                    if (match) {
+                    selectedVariant = match;
+                    break;
+                    }
+                    }
+                    %>
+
+                    <% if (selectedVariant) { %>
+                        <span class="old" id="normalPrice">₹<%= selectedVariant.normal_price %></span>
+                        <span class="new" id="basePrice">₹<%= selectedVariant.base_price %></span>
+                        <% } else { %>
+                            <span class="new">Out of stock</span>
+                            <% } %>
+
             </div>
 
             <ul class="features">
-                <li>Fit: Regular</li>
-                <li>New Season</li>
-                <li>Material: Dri-knit</li>
-                <li>Sublimation Quality</li>
-                <li>POLO</li>
-                <li>Orders delivered within 4-5 days in Kerala, 7-10 days outside</li>
+                <% const des=product[0].description.split(/\r?\n/); des.forEach((item)=>{ %>
+
+                    <li>
+                        <%= item %>
+                    </li>
+                    <%})%>
             </ul>
 
             <div class="sizes">
                 <p>Size :</p>
-                <div class="size-box">
-                    <button class="active"><strong>S</strong></button>
-                    <button><strong>M</strong></button>
-                    <button><strong>L</strong></button>
-                    <button><strong>XL</strong></button>
-                    <button><strong>XXL</strong></button>
-                </div>
+                <% console.log(product[0].variants) %>
+                    <!-- <div class="size-box">
+                        <button class="<%= selectedVariant.size === 'S' ? 'active' : '' %>"><strong>S</strong></button>
+                        <button class="<%= selectedVariant.size === 'M' ? 'active' : '' %>"><strong>M</strong></button>
+                        <button class="<%= selectedVariant.size === 'L' ? 'active' : '' %>"><strong>L</strong></button>
+                        <button class="<%= selectedVariant.size === 'XL' ? 'active' : '' %>"><strong>XL</strong></button>
+                        <button class="<%= selectedVariant.size === 'XXL' ? 'active' : '' %>"><strong>XXL</strong></button>
+                    </div> -->
+                    <div class="size-box">
+                        <button data-size="S"
+                            class="size-btn <%= selectedVariant?.size === 'S' ? 'active' : '' %>"><strong>S</strong></button>
+                        <button data-size="M" 
+                            class="size-btn <%= selectedVariant?.size === 'M' ? 'active' : '' %>"><strong>M</strong></button>
+                        <button data-size="L" 
+                            class="size-btn <%= selectedVariant?.size === 'L' ? 'active' : '' %>"><strong>L</strong></button>
+                        <button data-size="XL" 
+                            class="size-btn <%= selectedVariant?.size === 'XL' ? 'active' : '' %>"><strong>XL</strong></button>
+                        <button data-size="XXL" 
+                            class="size-btn <%= selectedVariant?.size === 'XXL' ? 'active' : '' %>"><strong>XXL</strong></button>
+                    </div>
+
             </div>
 
             <button class="cart-btn">
@@ -56,8 +91,12 @@
             </button>
 
             <div class="meta">
-                <p><strong>Category:</strong> Retro Jersey</p>
-                <p><strong>Team:</strong> MANCHESTER UNITED</p>
+                <p><strong>Category:</strong>
+                    <%= product[0].category_details[0].name %>
+                </p>
+                <p><strong>Team:</strong>
+                    <%= product[0].teamName %>
+                </p>
             </div>
         </div>
     </div>
@@ -101,42 +140,43 @@
         </tbody>
     </table>
 
-    <!-- RELATED PRODUCTS -->
-    <h2 class="related-title">Related Products</h2>
 
     <!-- Related -->
     <section class="related">
-      <h2>Related Products</h2>
-      <div class="related-grid">
-        <div class="product-card">
-          <img src="https://placehold.co/300x350/000000/FFF?text=Real+Madrid" alt="">
-          <div class="details">
-            <p class="name">Real Madrid Special Edition Black Polo</p>
-            <p class="price">₹599.00</p>
-          </div>
+        <h2>Related Products</h2>
+        <div class="related-grid">
+
+
+            <% relatedProducts.forEach((product)=> {%>
+                <a href="/product/<%= product._id %>">
+                    <div class="product-item">
+                        <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+                        <div class="product-details">
+                            <p class="product-name">
+                                <%=product.name%>
+                            </p>
+                            <div class="price-section">
+                                <p class="product-price-normal">
+                                    <% const sVariant=product.variants.find(v=> v.size === "L");
+                                        %>
+
+                                        <%=`₹${sVariant.normal_price}` %>
+                                </p>
+                                <p class="product-price-base">
+                                    <% const lVariant=product.variants.find(v=> v.size === "L");
+                                        %>
+
+                                        <%=`₹${lVariant.base_price}` %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <% }) %>
         </div>
-        <div class="product-card">
-          <img src="https://placehold.co/300x350/8B0000/FFF?text=Man+United" alt="">
-          <div class="details">
-            <p class="name">Man United 2002/03 Third Kit Beckham</p>
-            <p class="price">₹699.00</p>
-          </div>
-        </div>
-        <div class="product-card">
-          <img src="https://placehold.co/300x350/2233AA/FFF?text=Newcastle" alt="">
-          <div class="details">
-            <p class="name">Newcastle 23–25 Third Kit Polo</p>
-            <p class="price">₹649.00</p>
-          </div>
-        </div>
-        <div class="product-card">
-          <img src="https://placehold.co/300x350/007BFF/FFF?text=Man+City" alt="">
-          <div class="details">
-            <p class="name">Man City 24–25 Training Kit</p>
-            <p class="price">₹579.00</p>
-          </div>
-        </div>
-      </div>
     </section>
 
-</div>
+</div><script>
+  const variants = <%- JSON.stringify(product[0].variants) %>;
+</script>

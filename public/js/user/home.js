@@ -1,3 +1,6 @@
-document.querySelector('.about-button').addEventListener('click', () => {
-      alert('Navigating to About JerseyGarage...');
-    });
+document.querySelectorAll(".product-item").forEach(item => {
+  item.addEventListener("click", () => {
+    console.log(item.dataset.id);
+    
+  });
+});

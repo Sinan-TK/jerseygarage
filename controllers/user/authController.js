@@ -11,6 +11,8 @@ import { sendResponse } from "../../utils/sendResponse.js";
 import { wrapAsync } from "../../utils/wrapAsync.js";
 import * as userValidators from "../../validators/userValidators.js";
 import { paginate } from "../../utils/pagination.js";
+import { ObjectId } from "mongodb";
+import mongoose from "mongoose";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -362,7 +364,7 @@ export const renderHomePage = wrapAsync(async (req, res) => {
     pageCSS: "home",
     showHeader: true,
     showFooter: true,
-    pageJS: "",
+    pageJS: "home.js",
     products,
   });
 });
@@ -464,12 +466,87 @@ export const renderShopPage = wrapAsync(async (req, res) => {
 // 17.PRODUCT DETAIL PAGE RENDER
 // ======================================================================
 
-export const productDetailPage = wrapAsync((req, res) => {
+export const productDetailPage = wrapAsync(async (req, res) => {
+  const id = req.params.id;
+
+  const product = await Product.aggregate([
+    { $match: { _id: new ObjectId(id) } },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "_id",
+        foreignField: "product_id",
+        as: "variants",
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category_details",
+      },
+    },
+  ]);
+
+  // console.log(product[0].category);
+
+  const relatedProducts = await Product.aggregate([
+    {
+      $match: {
+        category: new ObjectId(product[0].category),
+        _id: { $ne: new ObjectId(id) },
+      },
+    },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "_id",
+        foreignField: "product_id",
+        as: "variants",
+      },
+    },
+  ]);
+
+  let finalRelatedProducts = [...relatedProducts];
+
+  if (finalRelatedProducts.length < 4) {
+    const remaining = 4 - finalRelatedProducts.length;
+
+    const extraProducts = await Product.aggregate([
+      {
+        $match: {
+          _id: {
+            $nin: [
+              new mongoose.Types.ObjectId(id),
+              ...finalRelatedProducts.map((p) => p._id),
+            ],
+          },
+        },
+      },
+      { $sample: { size: remaining } },
+      {
+        $lookup: {
+          from: "variants",
+          localField: "_id",
+          foreignField: "product_id",
+          as: "variants",
+        },
+      },
+    ]);
+
+    finalRelatedProducts = finalRelatedProducts.concat(extraProducts);
+  }
+
+  finalRelatedProducts.sort(() => 0.5 - Math.random());
+
   res.render("user/pages/productdetails", {
     title: "Product detail",
     pageCSS: "productdetails",
+    product,
+    relatedProducts: finalRelatedProducts,
     showFooter: true,
     showHeader: true,
-    pageJS: "",
+    pageJS: "productdetails.js",
   });
 });

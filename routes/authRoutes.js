@@ -45,6 +45,6 @@ router.get('/', authController.renderHomePage);
 
 router.get('/shop',authController.renderShopPage);
 
-router.get('/product/detail',authController.productDetailPage);
+router.get('/product/:id',authController.productDetailPage);
 
 export default router;
