@@ -193,10 +193,7 @@ export const blockProduct = wrapAsync(async (req, res) => {
     { new: true }
   );
 
-  res.json({
-    success: true,
-    message: "Product Unlisted!",
-  });
+  return sendResponse(res, Responses.productStatus.PRODUCT_BLOCK);
 });
 
 // ======================================================================
@@ -206,14 +203,15 @@ export const blockProduct = wrapAsync(async (req, res) => {
 export const unblockProduct = wrapAsync(async (req, res) => {
   const id = req.params.id;
 
-  const categoryId = await Product.findOne({_id:id}).select("category");
+  const categoryId = await Product.findOne({ _id: id }).select("category");
 
-  const catStatus = await Category.findOne({_id:categoryId.category}).select("is_active");
+  const catStatus = await Category.findOne({ _id: categoryId.category }).select(
+    "is_active"
+  );
 
-  if(!catStatus.is_active){
-    return sendResponse(res,Responses.productStatus.CATEGORY_BLOCKED);
+  if (!catStatus.is_active) {
+    return sendResponse(res, Responses.productStatus.CATEGORY_BLOCKED);
   }
-
 
   const data = await Product.findByIdAndUpdate(
     id,
@@ -221,7 +219,7 @@ export const unblockProduct = wrapAsync(async (req, res) => {
     { new: true }
   );
 
-  return sendResponse(res,Responses.productStatus.PRODUCT_UNBLOCK);
+  return sendResponse(res, Responses.productStatus.PRODUCT_UNBLOCK);
 });
 
 // ======================================================================
@@ -248,10 +246,7 @@ export const removeImage = wrapAsync(async (req, res) => {
     { new: true }
   );
 
-  return res.json({
-    success: true,
-    message: "Image removed successfully",
-  });
+  return sendResponse(res,Responses.removeImg.IMG_ROMOVED);
 });
 
 // ======================================================================

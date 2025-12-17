@@ -66,11 +66,18 @@ export const productStatus = Object.freeze({
   },
   PRODUCT_BLOCK: {
     code: 200,
-    message: "Product blocked successfully!",
+    message: "Product blocked!",
   },
   PRODUCT_UNBLOCK: {
     code: 200,
-    message: "Product unblocked successfully!",
+    message: "Product Unlisted!",
+  },
+});
+
+export const removeImg = Object.freeze({
+  IMG_ROMOVED: {
+    code: 200,
+    message: "Image removed successfully!",
   },
 });
 

@@ -426,10 +426,7 @@ document.querySelectorAll(".action-btn").forEach((actionBtn) => {
     } catch (err) {
       const error = err.response?.data;
 
-
-
       console.log(error);
-
 
       toastr.error(error.message||"Something went wrong", "Failed");
     }
@@ -539,8 +536,6 @@ function loadEditImages(images) {
           loadEditImages(editImages);
 
           toastr.success("Image removed");
-        } else {
-          toastr.error("Failed to remove image");
         }
       } catch (err) {
         toastr.error("Image delete error");
