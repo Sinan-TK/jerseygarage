@@ -14,6 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+document.querySelector(".btn-clear").addEventListener("click", () => {
+  const options = ["categories", "team", "size"];
+
+  options.forEach((name) => {
+    document.querySelectorAll(`input[name="${name}"]`).forEach((cb) => {
+      cb.checked = false;
+    });
+  });
+
+  document.getElementById("minRange").value = 0;
+  document.getElementById("maxRange").value = 2000;
+  updatePrice();
+});
+
 // double slider price logic
 const minRange = document.getElementById("minRange");
 const maxRange = document.getElementById("maxRange");
@@ -46,3 +60,57 @@ updatePrice();
 
 minRange.addEventListener("input", updatePrice);
 maxRange.addEventListener("input", updatePrice);
+
+const sortDropdown = document.getElementById("sortDropdown");
+const selected = sortDropdown.querySelector(".dropdown-selected");
+const options = sortDropdown.querySelectorAll(".dropdown-options li");
+
+// Toggle dropdown
+selected.addEventListener("click", (e) => {
+  e.stopPropagation();
+  sortDropdown.classList.toggle("active");
+});
+
+// Select option
+options.forEach((option) => {
+  option.addEventListener("click", () => {
+    selected.innerHTML = `${option.textContent} <i class="fa-solid fa-caret-down"></i>`;
+    selected.dataset.value = option.dataset.value;
+    sortDropdown.classList.remove("active");
+
+    console.log("Selected sort:", option.dataset.value);
+  });
+});
+
+// Close on outside click
+document.addEventListener("click", () => {
+  sortDropdown.classList.remove("active");
+});
+
+function getCheckedValue(name) {
+  const checked = document.querySelector(`input[name="${name}"]:checked`);
+  return checked ? checked.value : null;
+}
+
+//filter
+document.querySelector(".btn-apply").addEventListener("click", async () => {
+  const category = getCheckedValue("categories") || "";
+  const team = getCheckedValue("team") || "";
+  const size = getCheckedValue("size") || "";
+  const minRange = document.getElementById("minRange").value;
+  const maxRange = document.getElementById("maxRange").value;
+
+  try {
+    const res = await axios.get("/shop", {
+      params: {
+        category,
+        team,
+        size,
+        minRange,
+        maxRange,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});

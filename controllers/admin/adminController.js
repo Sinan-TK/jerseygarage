@@ -55,7 +55,9 @@ export const loginAdmin = wrapAsync(async (req, res) => {
 
   req.session.admin = {
     id: admin._id,
+    name:admin.name,
     email: admin.email,
+    avatar: admin.avatar,
   };
 
   return sendResponse(res, Responses.adminLogin.LOGIN_SUCCESS);

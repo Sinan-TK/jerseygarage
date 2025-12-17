@@ -7,7 +7,7 @@ export const isLoggedIn = (req, res, next) => {
   next();
 };
 
-export const adminExists = (req, res, next) => {
+export const adminExists = async (req, res, next) => {
   // if (req.session.admin) {
   //   return res.redirect("/admin/dashboard");
   // }

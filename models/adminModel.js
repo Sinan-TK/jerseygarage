@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
-
 // Admin Schema
 const adminSchema = new mongoose.Schema(
   {
@@ -16,6 +15,10 @@ const adminSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+    },
+    avatar: {
+      type: String,
+      default: "/img/default-user.png",
     },
     password_hash: {
       type: String,

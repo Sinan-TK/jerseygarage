@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import User from "../../models/userModel.js";
 import Otp from "../../models/otpModel.js";
-import otpGenerator from "otp-generator"; //remove
+import Product from "../../models/productModel.js";
+import Variant from "../../models/varientModel.js";
+import Category from "../../models/categoryModel.js";
 import sendOTP from "../../utils/sendOtp.js";
 import { generateOtp } from "../../utils/GenerateOtp.js";
 import * as Responses from "../../utils/responses/user/auth.responses.js";
@@ -330,13 +332,38 @@ export const newPassValidation = wrapAsync(async (req, res) => {
 // 15.HOME PAGE
 // ======================================================================
 
-export const renderHomePage = wrapAsync((req, res) => {
+export const renderHomePage = wrapAsync(async (req, res) => {
+  const products = await Product.aggregate([
+    { $match: { is_active: true } },
+    { $sample: { size: 8 } },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "_id",
+        foreignField: "product_id",
+        as: "variants",
+      },
+    },
+    {
+      $addFields: {
+        variants: {
+          $filter: {
+            input: "$variants",
+            as: "variant",
+            cond: { $eq: ["$$variant.is_available", true] },
+          },
+        },
+      },
+    },
+  ]);
+
   res.render("user/pages/home", {
     title: "Home",
     pageCSS: "home",
     showHeader: true,
     showFooter: true,
     pageJS: "",
+    products,
   });
 });
 
@@ -344,10 +371,103 @@ export const renderHomePage = wrapAsync((req, res) => {
 // 16.SHOP PAGE
 // ======================================================================
 
-export const renderShopPage = wrapAsync((req, res) => {
+export const renderShopPage = wrapAsync(async (req, res) => {
+  const { category, team, size, minRange, maxRange } = req.query;
+
+  console.log(category, team, size, minRange, maxRange);
+
+  const variantFilter = {};
+
+  if (size) {
+    variantFilter.size = size;
+  }
+
+  if (minRange || maxRange) {
+    variantFilter.base_price = {
+      ...(minRange && { $gte: Number(minRange) }),
+      ...(maxRange && { $lte: Number(maxRange) }),
+    };
+  }
+
+  let productIds = [];
+
+  if (Object.keys(variantFilter).length > 0) {
+    const variants = await Variant.find(variantFilter).select("product_id");
+    productIds = variants.map((v) => v.product_id);
+  }
+
+  const categoryfilter = await Category.findOne({ name: category }, { _id: 1 });
+
+  // console.log(categoryfilter);
+
+  const filter = {};
+
+  if (category) {
+    filter.category = categoryfilter;
+  }
+
+  // if (team) {
+  //   filter.teamName = team;
+  // }
+
+  if (productIds.length) {
+    filter._id = { $in: productIds };
+  }
+
+  // console.log(filter);
+
+  const products = await Product.aggregate([
+    { $match: filter },
+
+    {
+      $lookup: {
+        from: "variants",
+        localField: "_id",
+        foreignField: "product_id",
+        as: "variants",
+      },
+    },
+
+    {
+      $addFields: {
+        variants: {
+          $filter: {
+            input: "$variants",
+            as: "variant",
+            cond: { $eq: ["$$variant.is_available", true] },
+          },
+        },
+      },
+    },
+
+    // { $sample: { size: 9 } },
+  ]);
+
+  products.forEach((product) => {
+    console.log(product.name);
+  });
+
+  const categories = await Category.find({}, { _id: 1, name: 1 });
+
   res.render("user/pages/shop", {
     title: "Shop",
     pageCSS: "shop",
+    showFooter: true,
+    showHeader: true,
+    pageJS: "",
+    categories,
+    products,
+  });
+});
+
+// ======================================================================
+// 17.PRODUCT DETAIL PAGE RENDER
+// ======================================================================
+
+export const productDetailPage = wrapAsync((req, res) => {
+  res.render("user/pages/productdetails", {
+    title: "Product detail",
+    pageCSS: "productdetails",
     showFooter: true,
     showHeader: true,
     pageJS: "",

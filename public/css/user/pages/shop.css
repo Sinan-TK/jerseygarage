@@ -196,94 +196,48 @@ input[type=range]::-webkit-slider-thumb {
     }
 }
 
-
-.shop-card {
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #fff;
-    transition: transform .2s, box-shadow .2s;
+.product-item {
+  background-color: white;
+  border: 1px solid #ddd;
+  text-align: center;
+  transition: transform 0.2s;
+  overflow: hidden;
+  /* border-top-left-radius: 15px;
+  border-top-right-radius: 15px; */
+  border-radius: 10px;
 }
 
-.shop-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
+.product-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.product-img {
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
+.product-item img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-/* Smaller image height on mobile */
-@media (max-width: 600px) {
-    .product-img {
-        height: 300px;
-    }
+.product-price-base {
+  color: #cc0000;
+  font-weight: bold;
 }
 
-
-.shop-card-body {
-    padding: 15px;
+.product-price-normal {
+  color: rgb(116, 116, 116);
+  /* font-size: 17px; */
+  font-weight: 600;
+  text-decoration: line-through;
 }
 
-.product-title {
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.product-team {
-    font-size: .85rem;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.price-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.price {
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-.add-btn {
-    background: #000;
-    color: #fff;
-    padding: 8px 14px;
-    font-size: .85rem;
-    border: none;
-    /* Add border: none for button */
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background .2s;
-}
-
-.add-btn:hover {
-    background: #333;
-}
-
-.sort-box {
-    text-align: right;
-    margin-bottom: 20px;
-}
-
-/* Full width sort box on smaller screens */
-@media (max-width: 900px) {
-    .sort-box {
-        text-align: left;
-    }
+.price-section{
+  display: flex;
+  justify-content: center;
+  gap: 15px;
 }
 
 
-.sort-box select {
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
+
 
 /* title & subtitle */
 .page-title {
@@ -295,4 +249,115 @@ input[type=range]::-webkit-slider-thumb {
 .page-subtitle {
     color: #666;
     margin-bottom: 20px;
+}
+
+
+.bw-btn-group {
+    margin-top: 15px;
+    justify-content: flex-end;
+    display: flex;
+    gap: 10px;
+}
+
+.bw-btn-group button {
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #000;
+}
+
+/* CLEAR – white button */
+.bw-btn-group .btn-clear {
+    background-color: #fff;
+    color: #000;
+}
+
+.bw-btn-group .btn-clear:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+/* APPLY – black button */
+.bw-btn-group .btn-apply {
+    background-color: #000;
+    color: #fff;
+}
+
+.bw-btn-group .btn-apply:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 220px;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Selected box */
+.dropdown-selected {
+  padding: 10px 14px;
+  border: 1px solid #000;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+/* .dropdown-selected::after {
+  content: ;
+  font-size: 14px;
+} */
+
+.dropdown-selected:hover {
+  background-color: #f5f5f5;
+}
+
+/* Options box */
+.dropdown-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  border: 1px solid #000;
+  border-radius: 6px;
+  background-color: #ffffffed;
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Option item */
+.dropdown-options li {
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+
+.dropdown-options li:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Active state */
+.custom-dropdown.active .dropdown-options {
+  display: block;
+}
+
+.div-custom-dropdown{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
 }

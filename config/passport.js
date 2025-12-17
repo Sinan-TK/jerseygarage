@@ -38,7 +38,7 @@ export default () => {
             googleId: profile.id,
             full_name: profile.displayName,
             email: email,
-            avatar:"https://res.cloudinary.com/dn6i64qk6/image/upload/v1763988711/user-default-image_ifyyaj.webp",
+            avatar:"https://t3.ftcdn.net/jpg/06/33/54/78/360_F_633547842_AugYzexTpMJ9z1YcpTKUBoqBF0CUCk10.jpg",
             password_hash: null,
             is_verified: true,
           });

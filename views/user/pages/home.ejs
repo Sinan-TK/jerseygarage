@@ -1,113 +1,123 @@
 <main class="main-body">
-    <!-- HERO -->
-    <section class="hero-banner">
-      <div class="hero-content">
-        <!-- <h1>Now Available</h1> -->
-        <button class="shop-btn">Shop Now</button>
-      </div>
-    </section>
+  <!-- HERO -->
+  <section class="hero-banner">
+    <div class="hero-content">
+      <!-- <h1>Now Available</h1> -->
+      <button class="shop-btn">Shop Now</button>
+    </div>
+  </section>
 
-    <!-- PRODUCTS -->
-    <section class="trending-products">
-      <h2>Trending Products</h2>
-      <div class="product-grid">
-        <script>
-          const products = [
-            "Blue National Jersey","Dark Red Home Jersey","Grey Training Top","Classic Red Opel",
-            "Retro Blue Kit","Vintage Red ABC","Barcelona Away Kit","Argentina Home Kit",
-            "Juventus Black Kit","Real Madrid White","Inter Milan Blue","PSG Red Edition"
-          ];
-          const prices = [
-            "$49.99","$59.99","$45.00","$65.00",
-            "$55.00","$75.00","$70.00","$52.00",
-            "$60.00","$68.00","$64.00","$50.00"
-          ];
-          const colors = [
-            "007bff","8B0000","333333","D22B2B",
-            "004080","FF4500","000080","00A499",
-            "111111","f2f2f2","2233aa","aa0000"
-          ];
-          document.write(products.map((name, i) => `
-            <div class="product-item">
-              <img src="https://placehold.co/300x350/${colors[i]}/fff?text=${encodeURIComponent(name)}" alt="${name}">
-              <div class="product-details">
-                <p class="product-name">${name}</p>
-                <p class="product-price">${prices[i]}</p>
-              </div>
+  <!-- PRODUCTS -->
+  <section class="trending-products">
+    <h2>Trending Products</h2>
+    <div class="product-grid">
+
+      <% products.forEach((product)=> {%>
+        <div class="product-item">
+          <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+          <div class="product-details">
+            <p class="product-name">
+              <%=product.name%>
+            </p>
+            <div class="price-section">
+              <p class="product-price-normal">
+                <% const sVariant=product.variants.find(v=> v.size === "L");
+                  %>
+
+                  <%=`₹${sVariant.normal_price}` %>
+              </p>
+              <p class="product-price-base">
+                <% const lVariant=product.variants.find(v=> v.size === "L");
+                  %>
+
+                  <%=`₹${lVariant.base_price}` %>
+              </p>
             </div>
-          `).join(""));
-        </script>
-      </div>
-    </section>
+          </div>
+        </div>
 
-    <!-- REVIEWS -->
-    <section class="customer-reviews">
-      <h2>Customer Reviews</h2>
-      <div class="review-container">
-        <div class="review-card">
-          <div class="quote-icon">❝</div>
-          <p class="review-text">Good quality and received in 3 days. Comfortable jersey, logo quality is great. Loved it!</p>
-          <div class="review-author"><i class="fas fa-user-circle"></i><span>Nihin E</span></div>
-          <div class="review-stars">★★★★★</div>
-        </div>
-        <div class="review-card">
-          <div class="quote-icon">❝</div>
-          <p class="review-text">Best jersey I’ve ever purchased. Quality is superb, really loved it. Must buy for fans!</p>
-          <div class="review-author"><i class="fas fa-user-circle"></i><span>Nabeela C</span></div>
-          <div class="review-stars">★★★★★</div>
-        </div>
-        <div class="review-card">
-          <div class="quote-icon">❝</div>
-          <p class="review-text">Amazing products! Ordered multiple jerseys, never disappointed. Great customer service!</p>
-          <div class="review-author"><i class="fas fa-user-circle"></i><span>Hindustani Bhai</span></div>
-          <div class="review-stars">★★★★★</div>
-        </div>
-        <div class="review-card">
-          <div class="quote-icon">❝</div>
-          <p class="review-text">Good quality and received in 3 days. Comfortable jersey, logo quality is great. Loved it!</p>
-          <div class="review-author"><i class="fas fa-user-circle"></i><span>Nihin E</span></div>
-          <div class="review-stars">★★★★★</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROMO -->
-    <section class="welcome-promo">
-      <div class="promo-text-area">
-        <p class="follow-us">Follow us</p>
-        <h2>Welcome to JerseyGarage</h2>
-        <p class="tagline">— where your game shines. Discover our premium jerseys and wear your passion!</p>
-        <div class="promo-logo">
-          <p class="jersey-brand">JerseyGarage</p>
-        </div>
-      </div>
-      <div class="promo-image-area">
-        <img src="https://placehold.co/600x400/FF0000/FFFFFF?text=Couple+Promo" alt="Couple in jerseys">
-      </div>
-    </section>
-  </main>
-
-  <!-- FULL-WIDTH CAROUSEL -->
-  <section class="brand-carousel">
-    <div class="carousel-track">
-      <span class="carousel-item"><i class="fas fa-futbol"></i> 100% QUALITY FOOTBALL PRODUCTS</span>
-      <span class="carousel-item"><i class="fas fa-star"></i> LIMITED EDITION RELEASES</span>
-      <span class="carousel-item"><i class="fas fa-gift"></i> DISCOUNTS ON YOUR FIRST ORDERS</span>
-      <span class="carousel-item"><i class="fas fa-tshirt"></i> PREMIUM SPORTSWEAR AVAILABLE</span>
-      <span class="carousel-item"><i class="fas fa-shipping-fast"></i> FAST WORLDWIDE SHIPPING</span>
-      <span class="carousel-item"><i class="fas fa-futbol"></i> 100% QUALITY FOOTBALL PRODUCTS</span>
-      <span class="carousel-item"><i class="fas fa-star"></i> LIMITED EDITION RELEASES</span>
-      <span class="carousel-item"><i class="fas fa-gift"></i> DISCOUNTS ON YOUR FIRST ORDERS</span>
+        <% }) %>
     </div>
   </section>
 
-  <!-- VALUE PROPS -->
-  <section class="value-props-section">
-    <h2 class="value-title">Quality, Offers, and Surprises Await!</h2>
-    <div class="props-grid">
-      <div class="prop-item"><i class="fas fa-medal fa-3x"></i><p>Top-notch quality jerseys</p></div>
-      <div class="prop-item"><i class="fas fa-percent fa-3x"></i><p>Exclusive discounts and deals</p></div>
-      <div class="prop-item"><i class="fas fa-shipping-fast fa-3x"></i><p>Fast and reliable delivery</p></div>
+  <!-- REVIEWS -->
+  <section class="customer-reviews">
+    <h2>Customer Reviews</h2>
+    <div class="review-container">
+      <div class="review-card">
+        <div class="quote-icon">❝</div>
+        <p class="review-text">Good quality and received in 3 days. Comfortable jersey, logo quality is great. Loved it!
+        </p>
+        <div class="review-author"><i class="fas fa-user-circle"></i><span>Nihin E</span></div>
+        <div class="review-stars">★★★★★</div>
+      </div>
+      <div class="review-card">
+        <div class="quote-icon">❝</div>
+        <p class="review-text">Best jersey I’ve ever purchased. Quality is superb, really loved it. Must buy for fans!
+        </p>
+        <div class="review-author"><i class="fas fa-user-circle"></i><span>Nabeela C</span></div>
+        <div class="review-stars">★★★★★</div>
+      </div>
+      <div class="review-card">
+        <div class="quote-icon">❝</div>
+        <p class="review-text">Amazing products! Ordered multiple jerseys, never disappointed. Great customer service!
+        </p>
+        <div class="review-author"><i class="fas fa-user-circle"></i><span>Hindustani Bhai</span></div>
+        <div class="review-stars">★★★★★</div>
+      </div>
+      <div class="review-card">
+        <div class="quote-icon">❝</div>
+        <p class="review-text">Good quality and received in 3 days. Comfortable jersey, logo quality is great. Loved it!
+        </p>
+        <div class="review-author"><i class="fas fa-user-circle"></i><span>Nihin E</span></div>
+        <div class="review-stars">★★★★★</div>
+      </div>
     </div>
-    <button class="about-button">About JerseyGarage</button>
   </section>
+
+  <!-- PROMO -->
+  <section class="welcome-promo">
+    <div class="promo-text-area">
+      <p class="follow-us">Follow us</p>
+      <h2>Welcome to JerseyGarage</h2>
+      <p class="tagline">— where your game shines. Discover our premium jerseys and wear your passion!</p>
+      <div class="promo-logo">
+        <p class="jersey-brand">JerseyGarage</p>
+      </div>
+    </div>
+    <div class="promo-image-area">
+      <img src="https://cdn.cosmos.so/c3d08d8b-eadf-42a0-bbb0-1f85d21f2194?format=jpeg" alt="Couple in jerseys">
+    </div>
+  </section>
+</main>
+
+<!-- FULL-WIDTH CAROUSEL -->
+<section class="brand-carousel">
+  <div class="carousel-track">
+    <span class="carousel-item"><i class="fas fa-futbol"></i> 100% QUALITY FOOTBALL PRODUCTS</span>
+    <span class="carousel-item"><i class="fas fa-star"></i> LIMITED EDITION RELEASES</span>
+    <span class="carousel-item"><i class="fas fa-gift"></i> DISCOUNTS ON YOUR FIRST ORDERS</span>
+    <span class="carousel-item"><i class="fas fa-tshirt"></i> PREMIUM SPORTSWEAR AVAILABLE</span>
+    <span class="carousel-item"><i class="fas fa-shipping-fast"></i> FAST WORLDWIDE SHIPPING</span>
+    <span class="carousel-item"><i class="fas fa-futbol"></i> 100% QUALITY FOOTBALL PRODUCTS</span>
+    <span class="carousel-item"><i class="fas fa-star"></i> LIMITED EDITION RELEASES</span>
+    <span class="carousel-item"><i class="fas fa-gift"></i> DISCOUNTS ON YOUR FIRST ORDERS</span>
+  </div>
+</section>
+
+<!-- VALUE PROPS -->
+<section class="value-props-section">
+  <h2 class="value-title">Quality, Offers, and Surprises Await!</h2>
+  <div class="props-grid">
+    <div class="prop-item"><i class="fas fa-medal fa-3x"></i>
+      <p>Top-notch quality jerseys</p>
+    </div>
+    <div class="prop-item"><i class="fas fa-percent fa-3x"></i>
+      <p>Exclusive discounts and deals</p>
+    </div>
+    <div class="prop-item"><i class="fas fa-shipping-fast fa-3x"></i>
+      <p>Fast and reliable delivery</p>
+    </div>
+  </div>
+  <button class="about-button">About JerseyGarage</button>
+</section>
