@@ -424,7 +424,14 @@ document.querySelectorAll(".action-btn").forEach((actionBtn) => {
         }
       }
     } catch (err) {
-      toastr.error("Action failed", "Error");
+      const error = err.response?.data;
+
+
+
+      console.log(error);
+
+
+      toastr.error(error.message||"Something went wrong", "Failed");
     }
   });
 });

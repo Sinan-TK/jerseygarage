@@ -5,7 +5,6 @@ import { wrapAsync } from "../../utils/wrapAsync.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import cloudinary from "../../config/cloudinary.js";
 import upload from "../../middlewares/multer.js";
-// import { categorySchema } from "../../validators/categoryValidator.js";
 import { paginate } from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/product.response.js";
@@ -207,15 +206,22 @@ export const blockProduct = wrapAsync(async (req, res) => {
 export const unblockProduct = wrapAsync(async (req, res) => {
   const id = req.params.id;
 
+  const categoryId = await Product.findOne({_id:id}).select("category");
+
+  const catStatus = await Category.findOne({_id:categoryId.category}).select("is_active");
+
+  if(!catStatus.is_active){
+    return sendResponse(res,Responses.productStatus.CATEGORY_BLOCKED);
+  }
+
+
   const data = await Product.findByIdAndUpdate(
     id,
     { is_active: true },
     { new: true }
   );
-  res.json({
-    success: true,
-    message: "Product Listed!",
-  });
+
+  return sendResponse(res,Responses.productStatus.PRODUCT_UNBLOCK);
 });
 
 // ======================================================================
@@ -232,13 +238,10 @@ export const removeImage = wrapAsync(async (req, res) => {
     });
   }
 
-  //Extract Cloudinary public_id from URL
   const publicId = imageUrl.split("/").pop().split(".")[0];
 
-  //Remove image from Cloudinary
   await cloudinary.uploader.destroy(`products/${publicId}`);
 
-  //Remove image from MongoDB
   await Product.findByIdAndUpdate(
     productId,
     { $pull: { images: imageUrl } },
@@ -268,14 +271,12 @@ export const editProduct = wrapAsync(async (req, res) => {
       const { productName, teamName, description, category } = req.body;
       const productId = req.params.id;
 
-      // ===== BASIC VALIDATION =====
       if (!productName)
         return sendResponse(res, Responses.addProduct.NO_PRODUCT);
       if (!category) return sendResponse(res, Responses.addProduct.NO_CATEGORY);
       if (!teamName) return sendResponse(res, Responses.addProduct.NO_TEAM);
       if (!description) return sendResponse(res, Responses.addProduct.NO_DES);
 
-      // ===== PARSE PRICE DATA =====
       let stock = {};
       let normalPrice = {};
       let basePrice = {};
@@ -300,13 +301,11 @@ export const editProduct = wrapAsync(async (req, res) => {
         }
       }
 
-      // ===== FIND PRODUCT =====
       const product = await Product.findById(productId);
       if (!product) {
         return sendResponse(res, Responses.addProduct.PRODUCT_NOT_FOUND);
       }
 
-      // ===== UPDATE BASIC PRODUCT FIELDS =====
       const categoryDoc = await Category.findOne({ name: category });
       if (!categoryDoc) {
         return sendResponse(res, Responses.addProduct.CATEGORY_NOT_EXIST);
@@ -317,7 +316,6 @@ export const editProduct = wrapAsync(async (req, res) => {
       product.description = description;
       product.category = categoryDoc._id;
 
-      // ===== HANDLE IMAGES (EDIT WITH MIN/MAX VALIDATION) =====
       let uploadedImages = [];
 
       if (req.files && req.files.length > 0) {
@@ -339,7 +337,6 @@ export const editProduct = wrapAsync(async (req, res) => {
         }
       }
 
-      // 🔥 FINAL IMAGE COUNT VALIDATION
       const finalImageCount = product.images.length + uploadedImages.length;
 
       if (finalImageCount < 3) {
@@ -350,14 +347,12 @@ export const editProduct = wrapAsync(async (req, res) => {
         return sendResponse(res, Responses.addProduct.MAX_IMAGE);
       }
 
-      // append only AFTER validation
       if (uploadedImages.length > 0) {
         product.images.push(...uploadedImages);
       }
 
       await product.save();
 
-      // ===== UPDATE VARIANTS =====
       for (let size of sizes) {
         await Variant.findOneAndUpdate(
           { product_id: product._id, size },

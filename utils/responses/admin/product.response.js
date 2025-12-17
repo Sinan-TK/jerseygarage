@@ -59,20 +59,18 @@ export const addProduct = Object.freeze({
   },
 });
 
-export const categoryStatus = Object.freeze({
-  CATEGORY_BLOCK: {
-    code: 200,
-    message: "Category blocked successfully!",
+export const productStatus = Object.freeze({
+  CATEGORY_BLOCKED:{
+    code:403,
+    message:"Category is blocked",
   },
-  CATEGORY_UNBLOCK: {
+  PRODUCT_BLOCK: {
     code: 200,
-    message: "Category unblocked successfully!",
+    message: "Product blocked successfully!",
+  },
+  PRODUCT_UNBLOCK: {
+    code: 200,
+    message: "Product unblocked successfully!",
   },
 });
 
-export const editCategory = Object.freeze({
-  CATEGORY_EXIST: {
-    code: 404,
-    message: "Category already exists!",
-  },
-});
