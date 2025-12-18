@@ -21,7 +21,21 @@
         <!-- RIGHT DETAILS -->
         <div class="product-info">
             <p class="breadcrumb">
-                HOME / FEATURED / MANCHESTER UNITED 2001/2002 AWAY KIT BECKHAM POLO
+                <% breadcrumbs.forEach((c, i)=> { %>
+                    <% if (c.url) { %>
+                        <a href="<%= c.url %>">
+                            <%= c.label %>
+                        </a>
+                        <% } else { %>
+                            <span>
+                                <%= c.label %>
+                            </span>
+                            <% } %>
+
+                                <% if (i < breadcrumbs.length - 1) { %>
+                                    <span>/</span>
+                                    <% } %>
+                                        <% }) %>
             </p>
 
             <h1>
@@ -59,26 +73,18 @@
 
             <div class="sizes">
                 <p>Size :</p>
-                <% console.log(product[0].variants) %>
-                    <!-- <div class="size-box">
-                        <button class="<%= selectedVariant.size === 'S' ? 'active' : '' %>"><strong>S</strong></button>
-                        <button class="<%= selectedVariant.size === 'M' ? 'active' : '' %>"><strong>M</strong></button>
-                        <button class="<%= selectedVariant.size === 'L' ? 'active' : '' %>"><strong>L</strong></button>
-                        <button class="<%= selectedVariant.size === 'XL' ? 'active' : '' %>"><strong>XL</strong></button>
-                        <button class="<%= selectedVariant.size === 'XXL' ? 'active' : '' %>"><strong>XXL</strong></button>
-                    </div> -->
-                    <div class="size-box">
-                        <button data-size="S"
-                            class="size-btn <%= selectedVariant?.size === 'S' ? 'active' : '' %>"><strong>S</strong></button>
-                        <button data-size="M"
-                            class="size-btn <%= selectedVariant?.size === 'M' ? 'active' : '' %>"><strong>M</strong></button>
-                        <button data-size="L"
-                            class="size-btn <%= selectedVariant?.size === 'L' ? 'active' : '' %>"><strong>L</strong></button>
-                        <button data-size="XL"
-                            class="size-btn <%= selectedVariant?.size === 'XL' ? 'active' : '' %>"><strong>XL</strong></button>
-                        <button data-size="XXL"
-                            class="size-btn <%= selectedVariant?.size === 'XXL' ? 'active' : '' %>"><strong>XXL</strong></button>
-                    </div>
+                <div class="size-box">
+                    <button data-size="S"
+                        class="size-btn <%= selectedVariant?.size === 'S' ? 'active' : '' %>"><strong>S</strong></button>
+                    <button data-size="M"
+                        class="size-btn <%= selectedVariant?.size === 'M' ? 'active' : '' %>"><strong>M</strong></button>
+                    <button data-size="L"
+                        class="size-btn <%= selectedVariant?.size === 'L' ? 'active' : '' %>"><strong>L</strong></button>
+                    <button data-size="XL"
+                        class="size-btn <%= selectedVariant?.size === 'XL' ? 'active' : '' %>"><strong>XL</strong></button>
+                    <button data-size="XXL"
+                        class="size-btn <%= selectedVariant?.size === 'XXL' ? 'active' : '' %>"><strong>XXL</strong></button>
+                </div>
 
             </div>
 
@@ -179,5 +185,5 @@
 
 </div>
 <script>
-    const variants = <%- JSON.stringify(product[0].variants) %>;
+    const variants = <% - JSON.stringify(product[0].variants) %>;
 </script>

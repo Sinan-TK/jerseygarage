@@ -13,6 +13,8 @@ import * as userValidators from "../../validators/userValidators.js";
 import { paginate } from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import productBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
+import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -566,6 +568,11 @@ export const productDetailPage = wrapAsync(async (req, res) => {
 
   finalRelatedProducts.sort(() => 0.5 - Math.random());
 
+  const pCategory = product[0].category_details[0].name;
+  const pName = { id: product[0]._id ,name: product[0].name,}
+
+  const breadcrumbs = buildBreadcrumbs({ category: pCategory, product: pName });
+
   res.render("user/pages/productdetails", {
     title: "Product detail",
     pageCSS: "productdetails",
@@ -574,5 +581,6 @@ export const productDetailPage = wrapAsync(async (req, res) => {
     showFooter: true,
     showHeader: true,
     pageJS: "productdetails.js",
+    breadcrumbs,
   });
 });

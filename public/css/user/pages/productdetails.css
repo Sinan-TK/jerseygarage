@@ -36,8 +36,9 @@
 
 /* INFO */
 .breadcrumb {
-    font-size: 12px;
+    font-size: 14px;
     color: #888;
+    text-transform: uppercase;
 }
 
 .product-info h1 {
@@ -430,4 +431,8 @@
 .size-btn.disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.breadcrumb{
+    
 }
