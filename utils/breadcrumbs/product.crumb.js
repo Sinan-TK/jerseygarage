@@ -13,10 +13,8 @@ const buildBreadcrumbs = ({ category, product }) => {
   }
 
   if (product) {
-    crumbs.push({ label: product.name, url: null });
+    crumbs.push({ label: product, url: null });
   }
-
-  console.log(crumbs)
 
   return crumbs;
 };

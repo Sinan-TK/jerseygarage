@@ -569,7 +569,7 @@ export const productDetailPage = wrapAsync(async (req, res) => {
   finalRelatedProducts.sort(() => 0.5 - Math.random());
 
   const pCategory = product[0].category_details[0].name;
-  const pName = { id: product[0]._id ,name: product[0].name,}
+  const pName = product[0].name;
 
   const breadcrumbs = buildBreadcrumbs({ category: pCategory, product: pName });
 

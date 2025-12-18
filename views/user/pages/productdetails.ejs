@@ -36,6 +36,7 @@
                                     <span>/</span>
                                     <% } %>
                                         <% }) %>
+
             </p>
 
             <h1>
@@ -43,7 +44,8 @@
             </h1>
 
             <div class="price">
-                <% let selectedVariant=null; const sizes=["S", "M" , "L" , "XL" , "XXL" ]; for (let size of sizes) {
+                <% let selectedVariant=null; const sizes=["S", "M" , "L" , "XL" , "XXL" ]; 
+                for (let size of sizes) {
                     const match=product[0].variants.find( v=> v.size === size && v.is_available === true);
 
                     if (match) {
@@ -53,12 +55,16 @@
                     }
                     %>
 
-                    <% if (selectedVariant) { %>
+                    <% if(product[0].is_active === true){
+                    if (selectedVariant) { %>
                         <span class="old" id="normalPrice">₹<%= selectedVariant.normal_price %></span>
                         <span class="new" id="basePrice">₹<%= selectedVariant.base_price %></span>
                         <% } else { %>
                             <span class="new">Out of stock</span>
-                            <% } %>
+                            <% }}
+                            else{ %>
+                                <span class="new">Currently Unavailable</span>
+                                <%}%>
 
             </div>
 
@@ -185,5 +191,7 @@
 
 </div>
 <script>
-    const variants = <% - JSON.stringify(product[0].variants) %>;
+    const variants = <%- JSON.stringify(product[0].variants)%>;
+    const active = <%- JSON.stringify(product[0].is_active)%>;
+
 </script>

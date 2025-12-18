@@ -52,6 +52,13 @@ sizeButtons.forEach(btn => {
   const size = btn.dataset.size;
   const variant = variants.find(v => v.size === size && v.is_available);
 
+  if(!active){
+    btn.disabled = true;
+    btn.classList.add("disabled");
+    btn.classList.remove("active");
+    return;
+  }
+
   // disable unavailable sizes
   if (!variant) {
     btn.disabled = true;
