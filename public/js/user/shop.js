@@ -92,25 +92,47 @@ function getCheckedValue(name) {
   return checked ? checked.value : null;
 }
 
-//filter
-document.querySelector(".btn-apply").addEventListener("click", async () => {
+document.querySelector(".btn-apply").addEventListener("click", () => {
   const category = getCheckedValue("categories") || "";
   const team = getCheckedValue("team") || "";
   const size = getCheckedValue("size") || "";
+  // const sort = document.querySelector(".dropdown-selected").value||"";
   const minRange = document.getElementById("minRange").value;
   const maxRange = document.getElementById("maxRange").value;
 
-  try {
-    const res = await axios.get("/shop", {
-      params: {
-        category,
-        team,
-        size,
-        minRange,
-        maxRange,
-      },
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  // fill hidden inputs
+  document.getElementById("f-category").value = category;
+  document.getElementById("f-team").value = team;
+  document.getElementById("f-size").value = size;
+  document.getElementById("f-minRange").value = minRange;
+  document.getElementById("f-maxRange").value = maxRange;
+  document.getElementById("f-sort").value = selected.dataset.value || "";
+
+  // submit form (GET → page reload → EJS re-render)
+  document.getElementById("filterForm").submit();
+});
+
+options.forEach((option) => {
+  option.addEventListener("click", () => {
+    // update UI
+    selected.innerHTML = `${option.textContent} <i class="fa-solid fa-caret-down"></i>`;
+    selected.dataset.value = option.dataset.value;
+
+    // set hidden input
+    document.getElementById("f-sort").value = option.dataset.value;
+    document.getElementById("f-category").value =
+      getCheckedValue("categories") || "";
+    document.getElementById("f-team").value = getCheckedValue("team") || "";
+    document.getElementById("f-size").value = getCheckedValue("size") || "";
+    document.getElementById("f-minRange").value =
+      document.getElementById("minRange").value;
+    document.getElementById("f-maxRange").value =
+      document.getElementById("maxRange").value;
+
+    // close dropdown
+    sortDropdown.classList.remove("active");
+
+    // 🔥 SUBMIT FORM IMMEDIATELY
+    document.getElementById("filterForm").submit();
+  });
 });

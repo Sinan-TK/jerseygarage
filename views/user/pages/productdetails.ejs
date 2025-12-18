@@ -157,13 +157,13 @@
                             </p>
                             <div class="price-section">
                                 <p class="product-price-normal">
-                                    <% const sVariant=product.variants.find(v=> v.size === "L");
+                                    <% const sVariant=product.variants.find(v=> v.size === "S");
                                         %>
 
                                         <%=`₹${sVariant.normal_price}` %>
                                 </p>
                                 <p class="product-price-base">
-                                    <% const lVariant=product.variants.find(v=> v.size === "L");
+                                    <% const lVariant=product.variants.find(v=> v.size === "S");
                                         %>
 
                                         <%=`₹${lVariant.base_price}` %>

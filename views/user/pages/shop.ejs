@@ -13,7 +13,10 @@
                     </button>
                     <div class="dropdown-content">
                         <% categories.forEach((category)=> { %>
-                            <label><input type="radio" name="categories" value="<%=category.name%>">
+                            <label><input type="radio" name="categories" value="<%= category.name %>"
+                                    <%=selectedCategory===category.name ? "checked" : "" %>
+                                >
+
                                 <%=category.name%>
                             </label>
                             <%})%>
@@ -27,12 +30,14 @@
                     <div class="dropdown-content">
                         <% const uniqueTeams=new Set(); %>
 
-                            <% products.forEach(product=> { %>
-                                <% if (!uniqueTeams.has(product.teamName)) { %>
-                                    <% uniqueTeams.add(product.teamName); %>
+                            <% teamNames.forEach(team=> { %>
+                                <% if (!uniqueTeams.has(team.teamName)) { %>
+                                    <% uniqueTeams.add(team.teamName); %>
                                         <label>
-                                            <input type="radio" name="team" value="<%= product.teamName %>">
-                                            <%= product.teamName %>
+                                            <input type="radio" name="team" value="<%= team.teamName %>"
+                                                <%=selectedTeam===team.teamName ? "checked" : "" %>
+                                            >
+                                            <%= team.teamName %>
                                         </label>
                                         <% } %>
                                             <% }) %>
@@ -42,11 +47,16 @@
                 <div class="filter-section">
                     <p class="filter-title">Size</p>
                     <div class="filter-content">
-                        <label><input type="radio" name="size" value="S"> S</label>
-                        <label><input type="radio" name="size" value="M"> M</label>
-                        <label><input type="radio" name="size" value="L"> L</label>
-                        <label><input type="radio" name="size" value="XL"> XL</label>
-                        <label><input type="radio" name="size" value="XXL"> XXL</label>
+                        <label><input type="radio" name="size" value="S" <%=selectedSize==="S" ? "checked" : "" %>>
+                            S</label>
+                        <label><input type="radio" name="size" value="M" <%=selectedSize==="M" ? "checked" : "" %>>
+                            M</label>
+                        <label><input type="radio" name="size" value="L" <%=selectedSize==="L" ? "checked" : "" %>>
+                            L</label>
+                        <label><input type="radio" name="size" value="XL" <%=selectedSize==="XL" ? "checked" : "" %>>
+                            XL</label>
+                        <label><input type="radio" name="size" value="XXL" <%=selectedSize==="XXL" ? "checked" : "" %>>
+                            XXL</label>
                     </div>
                 </div>
 
@@ -54,8 +64,10 @@
                     <p class="filter-title">Price Range</p>
                     <div class="price-slider">
                         <div class="range-container">
-                            <input type="range" id="minRange" min="0" max="2000" value="0">
-                            <input type="range" id="maxRange" min="0" max="2000" value="2000">
+                            <input type="range" id="minRange" name="minRange" min="0" max="2000"
+                                value="<%= minRange %>">
+                            <input type="range" id="maxRange" name="maxRange" min="0" max="2000"
+                                value="<%= maxRange %>">
                         </div>
                         <p id="priceDisplay">₹0 - ₹2000</p>
                     </div>
@@ -76,8 +88,14 @@
 
                 <div class="div-custom-dropdown">
                     <div class="custom-dropdown" id="sortDropdown">
-                        <div class="dropdown-selected">All<i class="fa-solid fa-caret-down"></i></div>
+                        <div class="dropdown-selected" data-value="<%= selectedSort %>">
+                            <%= selectedSort==="price_low" ? "Price: Low to High" : selectedSort==="price_high"
+                                ? "Price: High to Low" : selectedSort==="az" ? "A-Z" : selectedSort==="za" ? "Z–A"
+                                : "All" %>
+                                <i class="fa-solid fa-caret-down"></i>
+                        </div>
                         <ul class="dropdown-options">
+                            <li data-value="all">All</li>
                             <li data-value="price_low">Price: Low to High</li>
                             <li data-value="price_high">Price: High to Low</li>
                             <li data-value="az">A-Z</li>
@@ -87,98 +105,45 @@
                 </div>
 
 
-
                 <div class="shop-grid">
 
                     <% products.forEach((product)=> { %>
-                        <div class="product-item">
-                            <img src="<%=product.images[0]%>" alt="<%=product.name%>">
-                            <div class="product-details">
-                                <p class="product-name">
-                                    <%=product.name%>
-                                </p>
-                                <div class="price-section">
-                                    <p class="product-price-normal">
-                                        <% const sVariant=product.variants.find(v=> v.size === "L");
-                                            %>
-
-                                            <%=`₹${sVariant.normal_price}` %>
+                        <a href="/product/<%= product._id %>">
+                            <div class="product-item">
+                                <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+                                <div class="product-details">
+                                    <p class="product-name">
+                                        <%=product.name%>
                                     </p>
-                                    <p class="product-price-base">
-                                        <% const lVariant=product.variants.find(v=> v.size === "L");
-                                            %>
+                                    <div class="price-section">
+                                        <p class="product-price-normal">
+                                            <% const sVariant=product.variants.find(v=> v.size === "S");
+                                                %>
 
-                                            <%=`₹${lVariant.base_price}` %>
-                                    </p>
+                                                <%=`₹${sVariant.normal_price}` %>
+                                        </p>
+                                        <p class="product-price-base">
+                                            <% const lVariant=product.variants.find(v=> v.size === "S");
+                                                %>
+
+                                                <%=`₹${lVariant.base_price}` %>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
 
                         <% }) %>
 
-                            <!-- <div class="shop-card">
-                        <img class="product-img" src="https://i.ibb.co/HF7W6jZ/realball.jpg"
-                            alt="Real Madrid Home Jersey">
-                        <div class="shop-card-body">
-                            <p class="product-title">Real Madrid Home 2023</p>
-                            <p class="product-team">Real Madrid</p>
-                            <div class="price-row">
-                                <p class="price">₹1,599</p>
-                                <button class="add-btn">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div> -->
+                            <form method="GET" action="/shop" id="filterForm">
+                                <input type="hidden" name="category" id="f-category">
+                                <input type="hidden" name="team" id="f-team">
+                                <input type="hidden" name="size" id="f-size">
+                                <input type="hidden" name="minRange" id="f-minRange">
+                                <input type="hidden" name="maxRange" id="f-maxRange">
+                                <input type="hidden" name="sort" id="f-sort">
+                            </form>
 
-                            <!-- <div class="shop-card">
-                        <img class="product-img" src="https://i.ibb.co/kgf3mgk/barca.jpg"
-                            alt="Barcelona Classic Jersey">
-                        <div class="shop-card-body">
-                            <p class="product-title">Barcelona Classic 2015</p>
-                            <p class="product-team">Barcelona</p>
-                            <div class="price-row">
-                                <p class="price">₹1,399</p>
-                                <button class="add-btn">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div> -->
-
-                            <!-- <div class="shop-card">
-                        <img class="product-img" src="https://i.ibb.co/4JRf2k8/bayern.jpg"
-                            alt="Bayern Munich Limited Edition Jersey">
-                        <div class="shop-card-body">
-                            <p class="product-title">Bayern Munich Limited</p>
-                            <p class="product-team">Bayern Munich</p>
-                            <div class="price-row">
-                                <p class="price">₹1,999</p>
-                                <button class="add-btn">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div> -->
-
-                            <!-- <div class="shop-card">
-                        <img class="product-img" src="https://i.ibb.co/HVb76ox/liverpool.jpg"
-                            alt="Liverpool Five Sleeves Jersey">
-                        <div class="shop-card-body">
-                            <p class="product-title">Liverpool Five Sleeves</p>
-                            <p class="product-team">Liverpool</p>
-                            <div class="price-row">
-                                <p class="price">₹1,699</p>
-                                <button class="add-btn">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div> -->
-
-                            <!-- <div class="shop-card">
-                        <img class="product-img" src="https://i.ibb.co/HYpcqgn/psg.jpg" alt="PSG Away Jersey">
-                        <div class="shop-card-body">
-                            <p class="product-title">PSG Away 2024</p>
-                            <p class="product-team">Paris Saint-Germain</p>
-                            <div class="price-row">
-                                <p class="price">₹1,499</p>
-                                <button class="add-btn">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div> -->
 
                 </div>
 

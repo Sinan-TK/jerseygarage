@@ -374,14 +374,14 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const renderShopPage = wrapAsync(async (req, res) => {
-  const { category, team, size, minRange, maxRange } = req.query;
+  const { category, team, size, minRange, maxRange, sort } = req.query;
 
-  console.log(category, team, size, minRange, maxRange);
+  console.log(sort);
 
   const variantFilter = {};
 
   if (size) {
-    variantFilter.size = size;
+    variantFilter.size = Array.isArray(size) ? { $in: size } : size;
   }
 
   if (minRange || maxRange) {
@@ -396,60 +396,80 @@ export const renderShopPage = wrapAsync(async (req, res) => {
   if (Object.keys(variantFilter).length > 0) {
     const variants = await Variant.find(variantFilter).select("product_id");
     productIds = variants.map((v) => v.product_id);
+
+    if (productIds.length === 0) {
+      return res.render("user/pages/shop", {
+        title: "Shop",
+        pageCSS: "shop",
+        showFooter: true,
+        showHeader: true,
+        pageJS: "",
+        categories: await Category.find({}, { _id: 1, name: 1 }),
+        products: [],
+      });
+    }
   }
-
-  const categoryfilter = await Category.findOne({ name: category }, { _id: 1 });
-
-  // console.log(categoryfilter);
 
   const filter = {};
 
   if (category) {
-    filter.category = categoryfilter;
+    const categoryDoc = await Category.findOne({ name: category }).select(
+      "_id"
+    );
+    if (categoryDoc) filter.category = categoryDoc._id;
   }
 
-  // if (team) {
-  //   filter.teamName = team;
-  // }
+  if (team) {
+    filter.teamName = Array.isArray(team) ? { $in: team } : team;
+  }
 
   if (productIds.length) {
     filter._id = { $in: productIds };
   }
 
-  // console.log(filter);
+  let sortStage = { createdAt: -1 };
+  if (sort === "all") sortStage = { createdAt: -1 };
+  if (sort === "price_low") sortStage = { sPrice: 1 };
+  if (sort === "price_high") sortStage = { sPrice: -1 };
+  if (sort === "az") sortStage = { name: 1 };
+  if (sort === "za") sortStage = { name: -1 };
 
   const products = await Product.aggregate([
     { $match: filter },
-
     {
       $lookup: {
         from: "variants",
-        localField: "_id",
-        foreignField: "product_id",
+        let: { productId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$product_id", "$$productId"] },
+                  { $eq: ["$size", "S"] },
+                ],
+              },
+            },
+          },
+        ],
         as: "variants",
       },
     },
-
     {
       $addFields: {
-        variants: {
-          $filter: {
-            input: "$variants",
-            as: "variant",
-            cond: { $eq: ["$$variant.is_available", true] },
-          },
-        },
+        sPrice: { $arrayElemAt: ["$variants.base_price", 0] },
       },
     },
-
-    // { $sample: { size: 9 } },
+    { $sort: sortStage },
   ]);
 
-  products.forEach((product) => {
-    console.log(product.name);
+  products.forEach((element) => {
+    console.log(element.name);
   });
 
   const categories = await Category.find({}, { _id: 1, name: 1 });
+
+  const teamNames = await Product.find().select("teamName");
 
   res.render("user/pages/shop", {
     title: "Shop",
@@ -457,8 +477,16 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     showFooter: true,
     showHeader: true,
     pageJS: "",
+    teamNames,
     categories,
     products,
+
+    selectedCategory: category || "",
+    selectedTeam: team || "",
+    selectedSize: size || "",
+    minRange: minRange || 0,
+    maxRange: maxRange || 2000,
+    selectedSort: sort || "",
   });
 });
 
@@ -488,8 +516,6 @@ export const productDetailPage = wrapAsync(async (req, res) => {
       },
     },
   ]);
-
-  // console.log(product[0].category);
 
   const relatedProducts = await Product.aggregate([
     {
