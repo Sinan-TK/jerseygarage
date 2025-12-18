@@ -7,8 +7,6 @@ const router = express.Router();
 
 router.use(authMiddleware.userLayout);
 
-// CHECK THE SESSION.USER
-
 router.use(authMiddleware.profileIcon);
 
 router.get("/google",authMiddleware.isLoggedIn,passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -17,25 +15,25 @@ router.get("/google/callback",authMiddleware.isLoggedIn,passport.authenticate("g
 
 router.get('/login' ,authMiddleware.isLoggedIn , authController.loginPage);
 
-router.post('/login',authController.userVerification);
+router.post('/login',authMiddleware.isLoggedIn,authController.userVerification);
 
 router.get('/signup',authMiddleware.isLoggedIn,authMiddleware.isMailFound,authController.signUpPage);
 
-router.post('/signup', authController.getEmail);
+router.post('/signup',authMiddleware.isLoggedIn, authController.getEmail);
 
-router.get('/verify-otp', authMiddleware.noMailFound ,authController.renderOtpPage);
+router.get('/register',authMiddleware.isLoggedIn,authMiddleware.isMailFound, authController.renderSignupDetails);
 
-router.post('/verify-otp', authController.otpVerification);
-
-router.post('/resend-otp', authController.resendOtp);
-
-router.get('/register',authMiddleware.isMailFound, authController.renderSignupDetails);
-
-router.post('/register',authController.saveSignupDetails);
+router.post('/register',authMiddleware.isLoggedIn,authController.saveSignupDetails);
 
 router.get('/forgotpassword',authMiddleware.isLoggedIn ,authController.renderForgetPasswordPage);
 
-router.post('/forgotpassword',authController.emailVerification);
+router.post('/forgotpassword',authMiddleware.isLoggedIn ,authController.emailVerification);
+
+router.get('/verify-otp', authMiddleware.noMailFound ,authController.renderOtpPage);
+
+router.post('/verify-otp', authMiddleware.noMailFound,authController.otpVerification);
+
+router.post('/resend-otp', authMiddleware.noMailFound,authController.resendOtp);
 
 router.get('/newpassword',authMiddleware.isMailFound ,authController.renderNewPassPage);
 

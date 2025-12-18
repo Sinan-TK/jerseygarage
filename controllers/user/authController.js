@@ -61,8 +61,6 @@ export const userVerification = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.loginUser.USER_NOT_FOUND);
   }
 
-  console.log(user);
-
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
     return sendResponse(res, Responses.loginUser.PASSWORD_NOT_MATCH);
@@ -72,11 +70,11 @@ export const userVerification = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.loginUser.USER_BLOCKED);
   }
   
-
   // Store session
   req.session.user = {
     id: user._id,
     email: user.email,
+    blocked: user.is_blocked,
   };
 
   return sendResponse(res, Responses.loginUser.LOGIN);

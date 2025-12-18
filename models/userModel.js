@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
 
     avatar: {
       type: String,
-      default: "/img/default-user.png",
+      default: "https://t3.ftcdn.net/jpg/06/33/54/78/360_F_633547842_AugYzexTpMJ9z1YcpTKUBoqBF0CUCk10.jpg",
     },
 
     phone_no: {
