@@ -47,6 +47,7 @@ if (window.innerWidth > 768) {
 const sizeButtons = document.querySelectorAll(".size-btn");
 const normalPriceEl = document.getElementById("normalPrice");
 const basePriceEl = document.getElementById("basePrice");
+const stock = document.getElementById("stock");
 
 sizeButtons.forEach(btn => {
   const size = btn.dataset.size;
@@ -70,6 +71,7 @@ sizeButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     normalPriceEl.textContent = `₹${variant.normal_price}`;
     basePriceEl.textContent = `₹${variant.base_price}`;
+    stock.textContent = `Only ₹${variant.stock} left in stock`;
 
     sizeButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");

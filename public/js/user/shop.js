@@ -132,7 +132,10 @@ options.forEach((option) => {
     // close dropdown
     sortDropdown.classList.remove("active");
 
-    // 🔥 SUBMIT FORM IMMEDIATELY
     document.getElementById("filterForm").submit();
   });
 });
+
+// document.querySelector(".search-apply").addEventListener("click",()=>{
+//   document.getElementById("filterForm").submit();
+// })

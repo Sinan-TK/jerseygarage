@@ -86,21 +86,31 @@
                 <h1 class="page-title">Shop Jerseys</h1>
                 <p class="page-subtitle">Discover your perfect jersey</p>
 
-                <div class="div-custom-dropdown">
-                    <div class="custom-dropdown" id="sortDropdown">
-                        <div class="dropdown-selected" data-value="<%= selectedSort %>">
-                            <%= selectedSort==="price_low" ? "Price: Low to High" : selectedSort==="price_high"
-                                ? "Price: High to Low" : selectedSort==="az" ? "A-Z" : selectedSort==="za" ? "Z–A"
-                                : "All" %>
-                                <i class="fa-solid fa-caret-down"></i>
+                <!-- <div class="top-bar"> -->
+                <div>
+
+                    <!-- <div class="search-box" >
+                        <input type="text" id="searchInput" class="product-search" placeholder="Search products...">
+                    </div>
+
+                    <div><button type="button" class="btn-apply search-apply">Apply</button></div> -->
+
+                    <div class="div-custom-dropdown">
+                        <div class="custom-dropdown" id="sortDropdown">
+                            <div class="dropdown-selected" data-value="<%= selectedSort %>">
+                                <%= selectedSort==="price_low" ? "Price: Low to High" : selectedSort==="price_high"
+                                    ? "Price: High to Low" : selectedSort==="az" ? "A-Z" : selectedSort==="za" ? "Z–A"
+                                    : "All" %>
+                                    <i class="fa-solid fa-caret-down"></i>
+                            </div>
+                            <ul class="dropdown-options">
+                                <li data-value="all">All</li>
+                                <li data-value="price_low">Price: Low to High</li>
+                                <li data-value="price_high">Price: High to Low</li>
+                                <li data-value="az">A-Z</li>
+                                <li data-value="za">Z-A</li>
+                            </ul>
                         </div>
-                        <ul class="dropdown-options">
-                            <li data-value="all">All</li>
-                            <li data-value="price_low">Price: Low to High</li>
-                            <li data-value="price_high">Price: High to Low</li>
-                            <li data-value="az">A-Z</li>
-                            <li data-value="za">Z-A</li>
-                        </ul>
                     </div>
                 </div>
 
