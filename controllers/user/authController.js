@@ -15,6 +15,7 @@ import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import productBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
+import * as authService from "../../services/user/authService.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -36,7 +37,6 @@ export const loginPage = wrapAsync((req, res) => {
 
 export const googleCallback = wrapAsync((req, res) => {
   req.session.user = true;
-  // User logged in successfully
   res.redirect("/");
 });
 
@@ -56,26 +56,13 @@ export const userVerification = wrapAsync(async (req, res) => {
 
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    return sendResponse(res, Responses.loginUser.USER_NOT_FOUND);
+  const result = await authService.verifyUserLogin(email, password);
+
+  if (result?.error) {
+    return sendResponse(res, result.error);
   }
 
-  const isMatch = await user.comparePassword(password);
-  if (!isMatch) {
-    return sendResponse(res, Responses.loginUser.PASSWORD_NOT_MATCH);
-  }
-
-  if(user.is_blocked){
-    return sendResponse(res, Responses.loginUser.USER_BLOCKED);
-  }
-  
-  // Store session
-  req.session.user = {
-    id: user._id,
-    email: user.email,
-    blocked: user.is_blocked,
-  };
+  req.session.user = result.user;
 
   return sendResponse(res, Responses.loginUser.LOGIN);
 });
@@ -110,18 +97,14 @@ export const getEmail = wrapAsync(async (req, res) => {
 
   const { email } = req.body;
 
-  console.log(email);
+  const result = await authService.emailVerification(email);
 
-  const existingUser = await User.findOne({ email });
-
-  if (existingUser) {
-    return sendResponse(res, Responses.signupUserEmail.USER_FOUND);
+  if (result?.error) {
+    return sendResponse(res, result.error);
   }
 
-  await generateOtp(email, "signup", "SignUp OTP. ");
-
-  req.session.tempEmail = email;
-  req.session.otpPurpose = "signup";
+  req.session.tempEmail = result.data.email;
+  req.session.otpPurpose = result.data.purpose;
 
   return sendResponse(res, Responses.signupUserEmail.EMAIL_OK);
 });
@@ -163,26 +146,17 @@ export const otpVerification = wrapAsync(async (req, res) => {
   }
 
   const { otpValue } = req.body;
-  console.log(otpValue);
 
-  const otpDoc = await Otp.findOne({ email, purpose, is_used: false });
+  const result = await authService.otpVerify(email, purpose, otpValue);
 
-  if (!otpDoc) {
-    return sendResponse(res, Responses.otpVerify.OTP_EXPIRED);
+  if (result?.error) {
+    return sendResponse(res, result.error);
   }
-
-  if (otpDoc.otp_code !== otpValue) {
-    return sendResponse(res, Responses.otpVerify.INCORRECT_OTP);
-  }
-
-  otpDoc.is_used = true;
-  await otpDoc.save();
 
   if (purpose === "signup") {
     return sendResponse(res, Responses.otpVerify.REGISTER);
-  } else {
-    return sendResponse(res, Responses.otpVerify.NEWPASSWORD);
   }
+  return sendResponse(res, Responses.otpVerify.NEWPASSWORD);
 });
 
 // ======================================================================
