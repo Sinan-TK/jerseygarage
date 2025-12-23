@@ -13,30 +13,44 @@
     <div class="product-grid">
 
       <% products.forEach((product)=> {%>
-      <a href="/product/<%= product._id %>">
-        <div class="product-item">
-          <img src="<%=product.images[0]%>" alt="<%=product.name%>">
-          <div class="product-details">
-            <p class="product-name">
-              <%=product.name%>
-            </p>
-            <div class="price-section">
-              <p class="product-price-normal">
-                <% const sVariant=product.variants.find(v=> v.size === "S");
-                  %>
+        <a href="/product/<%= product._id %>">
+          <div class="product-item">
 
-                  <%=`₹${sVariant.normal_price}` %>
-              </p>
-              <p class="product-price-base">
-                <% const lVariant=product.variants.find(v=> v.size === "S");
-                  %>
+            <!-- WISHLIST ICON -->
+            <div class="product-actions">
+              <button class="wishlist-btn" title="Add to Wishlist">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+            </div>
 
-                  <%=`₹${lVariant.base_price}` %>
+            <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+
+            <div class="product-details">
+              <p class="product-name">
+                <%= product.name %>
               </p>
+
+              <div class="price-section">
+                <p class="product-price-normal">
+                  <% const sVariant=product.variants.find(v=> v.size === "S"); %>
+                    ₹<%= sVariant.normal_price %>
+                </p>
+
+                <p class="product-price-base">
+                  <% const lVariant=product.variants.find(v=> v.size === "S"); %>
+                    ₹<%= lVariant.base_price %>
+                </p>
+              </div>
+
+              <!-- ADD TO CART BUTTON -->
+              <button class="add-to-cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Add to Cart
+              </button>
             </div>
           </div>
-        </div>
-      </a>
+
+        </a>
 
         <% }) %>
     </div>

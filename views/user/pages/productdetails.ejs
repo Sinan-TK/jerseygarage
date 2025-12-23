@@ -61,13 +61,13 @@
                         <span class="old" id="normalPrice">₹<%= selectedVariant.normal_price %></span>
                         <span class="new" id="basePrice">₹<%= selectedVariant.base_price %></span>
                         <p id="stock" style="font-size: smaller;">
-                                        Only <%= selectedVariant.stock %> left in stock
-                                    </p>
+                            Only <%= selectedVariant.stock %> left in stock
+                        </p>
                         <% } else { %>
                             <span class="new">Out of stock</span>
                             <% }} else{ %>
                                 <span class="new">Currently Unavailable</span>
-                                <%}%>                     
+                                <%}%>
             </div>
 
             <ul class="features">
@@ -164,27 +164,41 @@
             <% relatedProducts.forEach((product)=> {%>
                 <a href="/product/<%= product._id %>">
                     <div class="product-item">
+
+                        <!-- WISHLIST ICON -->
+                        <div class="product-actions">
+                            <button class="wishlist-btn" title="Add to Wishlist">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+
                         <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+
                         <div class="product-details">
                             <p class="product-name">
-                                <%=product.name%>
+                                <%= product.name %>
                             </p>
+
                             <div class="price-section">
                                 <p class="product-price-normal">
-                                    <% const sVariant=product.variants.find(v=> v.size === "S");
-                                        %>
-
-                                        <%=`₹${sVariant.normal_price}` %>
+                                    <% const sVariant=product.variants.find(v=> v.size === "S"); %>
+                                        ₹<%= sVariant.normal_price %>
                                 </p>
-                                <p class="product-price-base">
-                                    <% const lVariant=product.variants.find(v=> v.size === "S");
-                                        %>
 
-                                        <%=`₹${lVariant.base_price}` %>
+                                <p class="product-price-base">
+                                    <% const lVariant=product.variants.find(v=> v.size === "S"); %>
+                                        ₹<%= lVariant.base_price %>
                                 </p>
                             </div>
+
+                            <!-- ADD TO CART BUTTON -->
+                            <button class="add-to-cart-btn">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                Add to Cart
+                            </button>
                         </div>
                     </div>
+
                 </a>
 
                 <% }) %>

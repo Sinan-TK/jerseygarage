@@ -6,12 +6,12 @@ export const userLayout = (req, res, next) => {
 };
 
 export const isLoggedIn = (req, res, next) => {
-  if (req.session.user) {
-    if (!req.session.user.blocked) {
-      console.log("isLoggedIn", req.session.user);
-      return res.redirect("/");
-    }
-  }
+  // if (req.session.user) {
+  //   if (!req.session.user.blocked) {
+  //     console.log("isLoggedIn", req.session.user);
+  //     return res.redirect("/");
+  //   }
+  // }
   next();
 };
 

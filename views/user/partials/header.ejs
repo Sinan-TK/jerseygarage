@@ -37,17 +37,9 @@
       <a href="#" class="menu-item"><span class="icon"><img src="/images/user/header/about-logo.png" alt="about" style="width: 27px ;"></span> About</a>
 
       <div class="section-title">Categories</div>
-      <a href="#" class="category-item">Retro Jerseys <span>›</span></a>
-      <a href="#" class="category-item">Five Sleeves <span>›</span></a>
-      <a href="#" class="category-item">Classic Jerseys <span>›</span></a>
-      <a href="#" class="category-item">Limited Edition <span>›</span></a>
-      <a href="#" class="category-item">National Teams <span>›</span></a>
-      <a href="#" class="category-item">Club Jerseys <span>›</span></a>
-      <a href="#" class="category-item">Training Kits <span>›</span></a>
-      <a href="#" class="category-item">Goalkeeper Kits <span>›</span></a>
-      <a href="#" class="category-item">Accessories <span>›</span></a>
-      <a href="#" class="category-item">Retro Jackets <span>›</span></a>
-      <a href="#" class="category-item">Fan Gear <span>›</span></a>
+      <% sideBarCategories.forEach((cat)=>{ %>
+      <a href="http://localhost:3000/shop?category=<%= cat.name %>" class="category-item"><%= cat.name %> <span>›</span></a>
+      <% }) %>
     </div>
 
     <div class="sidebar-footer">

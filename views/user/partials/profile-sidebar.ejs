@@ -1,0 +1,21 @@
+<ul class="menu">
+  <li class="<%= active === 'personal' ? 'active' : '' %>">
+    <a href="/profile">Personal Info</a>
+  </li>
+
+  <li class="<%= active === 'addresses' ? 'active' : '' %>">
+    <a href="/profile/addresses">Addresses</a>
+  </li>
+
+  <li class="<%= active === 'wishlist' ? 'active' : '' %>">
+    <a href="/profile/wishlist">Wishlist</a>
+  </li>
+
+  <li class="<%= active === 'orders' ? 'active' : '' %>">
+    <a href="/profile/orders">Orders</a>
+  </li>
+
+  <li class="logout">
+    <a href="/logout">Logout</a>
+  </li>
+</ul>

@@ -357,8 +357,6 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 export const renderShopPage = wrapAsync(async (req, res) => {
   const { category, team, size, minRange, maxRange, sort } = req.query;
 
-  console.log(sort);
-
   const variantFilter = {};
 
   if (size) {
@@ -443,10 +441,6 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     },
     { $sort: sortStage },
   ]);
-
-  products.forEach((element) => {
-    console.log(element.name);
-  });
 
   const categories = await Category.find({}, { _id: 1, name: 1 });
 
