@@ -1,9 +1,9 @@
 import User from "../models/userModel.js";
 
-export const userLayout = (req, res, next) => {
-  res.locals.layout = "user/layouts/layout";
-  next();
-};
+// export const userLayout = (req, res, next) => {
+//   res.locals.layout = "user/layouts/layout";
+//   next();
+// };
 
 export const isLoggedIn = (req, res, next) => {
   // if (req.session.user) {

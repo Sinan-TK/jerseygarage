@@ -6,6 +6,6 @@ export const adminLayout = (req, res, next) => {
 };
 
 export const userLayout = (req, res, next) => {
-  res.locals.layout = "admin/layouts/layout"; 
+  res.locals.layout = "user/layouts/layout";
   next();
 };

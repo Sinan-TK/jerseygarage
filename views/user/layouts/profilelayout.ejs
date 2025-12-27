@@ -1,11 +1,33 @@
 <div class="account-container">
 
   <aside class="account-sidebar">
-    <%- include('../partials/profile-sidebar') %>
+    <div class="user-card">
+      <div class="avatar"><img src="<%= userDetails.avatar %>" alt="dp"></div>
+      <h4><%= userDetails.full_name %></h4>
+      <p><%= userDetails.email %></p>
+    </div>
+
+    <ul class="profile-menu">
+      <li class="<%= title === 'User Profile' ? 'active' : '' %>">
+        <a href="/profile">Personal Information</a>
+      </li>
+      <li>
+        <a href="/profile/addresses">Addresses</a>
+      </li>
+      <li>
+        <a href="/profile/wishlist">Wishlist</a>
+      </li>
+      <li>
+        <a href="/profile/orders">Order History</a>
+      </li>
+      <li class="logout">
+        <a href="/logout">Logout</a>
+      </li>
+    </ul>
   </aside>
 
   <main class="account-content">
-    <%- include(view) %>
+    <%- include("../pages/" + view) %>
   </main>
 
 </div>

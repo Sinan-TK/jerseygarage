@@ -1,16 +1,151 @@
-
 /* ===============================
-   PROFILE LAYOUT BASE
+   ACCOUNT LAYOUT
 ================================ */
-.profile-wrapper * {
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, sans-serif;
+.account-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  padding: 0 16px;
 }
 
-.account-container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 16px;
-    display: flex;
-    gap: 24px;
+/* ===============================
+   SIDEBAR
+================================ */
+.account-sidebar {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  height: fit-content;
+}
+
+/* ===============================
+   USER CARD
+================================ */
+.user-card {
+  text-align: center;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.avatar{
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  margin: 0 auto 12px;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /* 🔑 keeps aspect ratio */
+  display: block;
+}
+
+.user-card h4 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.user-card p {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ===============================
+   SIDEBAR MENU
+================================ */
+.profile-menu {
+  list-style: none;
+}
+
+.profile-menu li {
+  margin-bottom: 6px;
+}
+
+.profile-menu a {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  color: #374151;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.profile-menu li.active a,
+.profile-menu a:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.profile-menu li.logout a {
+  color: #dc2626;
+}
+
+.profile-menu li.logout a:hover {
+  background: #fee2e2;
+}
+
+/* ===============================
+   MAIN CONTENT
+================================ */
+.account-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===============================
+   COMMON CARD (for included views)
+================================ */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* ===============================
+   STATS / GRID HELPERS
+================================ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+  .account-container {
+    grid-template-columns: 1fr;
+    margin: 20px auto;
+  }
+
+  .account-sidebar {
+    order: 2;
+  }
+
+  .account-content {
+    order: 1;
+  }
 }

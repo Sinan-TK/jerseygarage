@@ -1,21 +1,45 @@
-<ul class="menu">
-  <li class="<%= active === 'personal' ? 'active' : '' %>">
-    <a href="/profile">Personal Info</a>
-  </li>
+<div class="profile-page">
 
-  <li class="<%= active === 'addresses' ? 'active' : '' %>">
-    <a href="/profile/addresses">Addresses</a>
-  </li>
+  <!-- SIDEBAR -->
+  <aside class="profile-sidebar">
+    <div class="user-card">
+      <div class="avatar"></div>
+      <h4>name</h4>
+      <p>mail</p>
+    </div>
 
-  <li class="<%= active === 'wishlist' ? 'active' : '' %>">
-    <a href="/profile/wishlist">Wishlist</a>
-  </li>
+    <ul class="profile-menu">
+      <li class="active">
+        <a href="/profile">Personal Information</a>
+      </li>
+      <li>
+        <a href="/profile/addresses">Addresses</a>
+      </li>
+      <li>
+        <a href="/profile/wishlist">Wishlist</a>
+      </li>
+      <li>
+        <a href="/profile/orders">Order History</a>
+      </li>
+      <li class="logout">
+        <a href="/logout">Logout</a>
+      </li>
+    </ul>
+  </aside>
 
-  <li class="<%= active === 'orders' ? 'active' : '' %>">
-    <a href="/profile/orders">Orders</a>
-  </li>
+  <!-- RIGHT CONTENT -->
+  <section class="profile-content">
 
-  <li class="logout">
-    <a href="/logout">Logout</a>
-  </li>
-</ul>
+    <div class="card">
+      <h3>Personal Information</h3>
+      <!-- your personal info cards -->
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">₹500</div>
+      <div class="stat-card">12 Referrals</div>
+    </div>
+
+  </section>
+
+</div>
