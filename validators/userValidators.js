@@ -69,3 +69,20 @@ export const emailCheck = Joi.object({
     "string.email": "Enter a valid email!",
   }),
 });
+
+export const personalInfo = Joi.object({
+  fullName: Joi.string().required().messages({
+    "string.empty": "Please enter your name!",
+  }),
+  email: Joi.string().email().required().messages({
+    "string.empty": "Please enter the email!",
+    "string.email": "Enter a valid email!",
+  }),
+  phoneNo: Joi.string()
+  .pattern(/^[6-9]\d{9}$/)
+  .optional()
+  .allow("")
+  .messages({
+    "string.pattern.base": "Invalid phone number"
+  })
+});

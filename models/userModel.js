@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema(
 
     avatar: {
       type: String,
-      default: "https://t3.ftcdn.net/jpg/06/33/54/78/360_F_633547842_AugYzexTpMJ9z1YcpTKUBoqBF0CUCk10.jpg",
+      default:
+        "https://t3.ftcdn.net/jpg/06/33/54/78/360_F_633547842_AugYzexTpMJ9z1YcpTKUBoqBF0CUCk10.jpg",
     },
 
     phone_no: {
@@ -32,11 +33,10 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-    // ⭐ Password NOT required if Google login
     password_hash: {
       type: String,
       required: function () {
-        return !this.googleId;     // Require password only for normal signup
+        return !this.googleId; // Require password only for normal signup
       },
     },
     referral_code: {
@@ -67,7 +67,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ⭐ Hash password only if exists (for Google users, it won't)
 userSchema.pre("save", async function (next) {
   if (!this.password_hash) return next();
   if (!this.isModified("password_hash")) return next();
@@ -81,7 +80,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// ⭐ Compare passwords only if user has one
 userSchema.methods.comparePassword = async function (enteredPassword) {
   if (!this.password_hash) return false;
   return await bcrypt.compare(enteredPassword, this.password_hash);

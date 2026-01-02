@@ -3,6 +3,7 @@ import * as authController from "../controllers/user/authController.js";
 import * as authMiddleware from "../middlewares/authMiddleware.js";
 import { sidebarData } from "../middlewares/sidebarMiddleware.js";
 import { userLayout } from "../middlewares/layoutMiddleware.js";
+import { checkBlockedUser } from "../middlewares/userBlockMiddleware.js";
 import passport from "passport";
 
 const router = express.Router();
@@ -10,6 +11,8 @@ const router = express.Router();
 router.use(userLayout);
 
 router.use(sidebarData);
+
+router.use(checkBlockedUser);
 
 router.use(authMiddleware.profileIcon);
 

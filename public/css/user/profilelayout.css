@@ -66,7 +66,7 @@
   margin-bottom: 6px;
 }
 
-.profile-menu a {
+.profile-menu a,.profile-menu button {
   display: flex;
   align-items: center;
   padding: 10px 12px;
@@ -81,13 +81,16 @@
 .profile-menu a:hover {
   background: #f3f4f6;
   color: #111827;
+  font-weight: 550;
 }
 
-.profile-menu li.logout a {
+.profile-menu li.logout button {
   color: #dc2626;
+  width: 100%;
+  background: white;
 }
 
-.profile-menu li.logout a:hover {
+.profile-menu li.logout button:hover {
   background: #fee2e2;
 }
 

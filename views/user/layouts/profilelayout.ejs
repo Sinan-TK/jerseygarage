@@ -9,25 +9,27 @@
 
     <ul class="profile-menu">
       <li class="<%= title === 'User Profile' ? 'active' : '' %>">
-        <a href="/profile">Personal Information</a>
+        <a href="/user/profile">Personal Information</a>
       </li>
-      <li>
-        <a href="/profile/addresses">Addresses</a>
+      <li class="<%= title === 'User Addresses' ? 'active' : '' %>">
+        <a href="/user/address">Addresses</a>
       </li>
-      <li>
-        <a href="/profile/wishlist">Wishlist</a>
+      <li class="<%= title === 'User Wishlist' ? 'active' : '' %>">
+        <a href="/user/wishlist">Wishlist</a>
       </li>
-      <li>
-        <a href="/profile/orders">Order History</a>
+      <li class="<%= title === 'User Orders' ? 'active' : '' %>">
+        <a href="/user/orders">Order History</a>
       </li>
       <li class="logout">
-        <a href="/logout">Logout</a>
+        <form action="/user/logout" method="post">
+        <button id="logoutBtn" type="submit"><strong>Logout</strong></button>
+        </form>
       </li>
     </ul>
   </aside>
 
   <main class="account-content">
-    <%- include("../pages/" + view) %>
+    <%- include("../pages/profile/" + view) -%>
   </main>
 
 </div>

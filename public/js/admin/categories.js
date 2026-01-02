@@ -271,11 +271,6 @@ async function editConfirm() {
       errorBox.style.display = "none";
       errorText.innerHTML = "";
     }, 3000);
-
-    // errorBox.style.display = "flex";
-    // errorText.innerText = res.data.message;
-
-    // console.log("Something went wrong!!", err);
   }
 }
 

@@ -36,7 +36,12 @@ export const loginPage = wrapAsync((req, res) => {
 // ======================================================================
 
 export const googleCallback = wrapAsync((req, res) => {
-  req.session.user = true;
+  const user = req.user;
+  req.session.user = {
+    id: user._id,
+    email: user.email,
+    blocked: user.is_blocked,
+  };
   res.redirect("/");
 });
 
@@ -116,7 +121,6 @@ export const getEmail = wrapAsync(async (req, res) => {
 export const renderOtpPage = wrapAsync((req, res) => {
   res.render("user/pages/otp-verify", {
     title: "OTP Verification",
-    errorMessage: "",
     pageCSS: "otp-verify",
     showHeader: true,
     showFooter: true,

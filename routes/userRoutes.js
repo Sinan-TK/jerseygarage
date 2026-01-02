@@ -5,6 +5,7 @@ import * as userController from "../controllers/user/userController.js";
 import { userLayout } from "../middlewares/layoutMiddleware.js";
 import { sidebarData } from "../middlewares/sidebarMiddleware.js";
 import { Userdetails } from "../middlewares/profileUserDetails.js";
+import { checkBlockedUser } from "../middlewares/userBlockMiddleware.js";
 
 const router = express.Router();
 
@@ -12,29 +13,24 @@ router.use(userLayout);
 
 router.use(sidebarData);
 
+router.use(checkBlockedUser);
+
 router.use(Userdetails);
 
 router.use(authMiddleware.profileIcon);
 
+router.get("/profile", userController.profileRender);
 
-router.get("/profile",(req,res)=>{
-  res.render("user/layouts/profilelayout",{
-    title:"User Profile",
-    pageCSS:"profile",
-    view:"profile",
-    profile:true,
-    showHeader:true,
-    showFooter:true,
-    pageJS:"profile.js",
-  });
-})
+router.patch("/profile/edit", userController.editPersonalInfo);
+
+// router.get("/email/otp-verify", userController.emailOtpPage);
+
+router.get("/address", userController.addressRender);
 
 router.get("/cart", userController.cartRender);
 
-router.post("/logout",(req,res)=>{
-  delete req.session.user;
-  res.redirect("/");
-})
+router.get("/wishlist", userController.wishlistRender);
 
+router.post("/logout", userController.userLogout);
 
 export default router;

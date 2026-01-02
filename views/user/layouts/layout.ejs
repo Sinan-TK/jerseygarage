@@ -10,28 +10,28 @@
 
   <!-- Global / Layout CSS -->
   <link rel="stylesheet" href="/css/user/layout.css">
-  <% if(typeof profile != undefined){%>
+  <% if(typeof profile !=undefined){%>
     <link rel="stylesheet" href="/css/user/profilelayout.css">
-  <% } %>
-  
-
-  <!-- toastr -->
-  <link rel="stylesheet" href="/vendor/toastr/toastr.min.css">
-  <script src="/vendor/toastr/jquery.min.js"></script>
-  <script src="/vendor/toastr/toastr.min.js"></script>
-
-  <!-- Partials CSS -->
-  <link rel="stylesheet" href="/css/user/partials/header.css">
-  <link rel="stylesheet" href="/css/user/partials/footer.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-
-  <!-- Page-specific CSS -->
-  <% if (pageCSS) { %>
-    <link rel="stylesheet" href="/css/user/pages/<%= pageCSS %>.css">
     <% } %>
+
+
+      <!-- toastr -->
+      <link rel="stylesheet" href="/vendor/toastr/toastr.min.css">
+      <script src="/vendor/toastr/jquery.min.js"></script>
+      <script src="/vendor/toastr/toastr.min.js"></script>
+
+      <!-- Partials CSS -->
+      <link rel="stylesheet" href="/css/user/partials/header.css">
+      <link rel="stylesheet" href="/css/user/partials/footer.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+      <!-- Page-specific CSS -->
+      <% if (pageCSS) { %>
+        <link rel="stylesheet" href="/css/user/pages/<%= pageCSS %>.css">
+        <% } %>
 </head>
 
 <body>
@@ -57,10 +57,14 @@
                   timeOut: 5000,
                 };
               </script>
-
-              <% if (pageJS) { %>
-                <script src="/js/user/<%= pageJS %>"></script>
+              <% if(typeof profile !=undefined){%>
+                <script src="/js/user/profilelayout.js"></script>
                 <% } %>
+
+                  <% if (pageJS) { %>
+                    <script src="/js/user/<%= pageJS %>"></script>
+                    <% } %>
+
 
 </body>
 

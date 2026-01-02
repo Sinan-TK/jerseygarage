@@ -1,0 +1,99 @@
+<main class="account-main">
+
+    <!-- PERSONAL INFORMATION -->
+    <section class="card personal-card">
+        <div class="card-header">
+            <h3>Personal Information</h3>
+            <div class="edit-btns">
+                <button class="edit-btn"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+                <button onclick="editSubmit()" class="edit-btn edit-submit"><i class="fa-solid fa-check"></i> Submit</button>
+                <a href="/user/profile" class="edit-btn edit-cancel"><i class="fa-solid fa-ban"></i> Cancel</a>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span>Full Name</span>
+                <p id="full_name">
+                    <%= userDetails.full_name %>
+                </p>
+            </div>
+
+            <div class="info-item">
+                <span>Email Address</span>
+                <p id="email">
+                    <%= userDetails.email %>
+                </p>
+            </div>
+
+            <div class="info-item">
+                <span>Phone Number</span>
+                <p id="phone_no">
+                    <%= userDetails.phone_no !=null ? userDetails.phone_no : " N/A" %>
+                </p>
+            </div>
+
+            <div class="info-item">
+                <span>Member Since</span>
+                <p id="date">
+                    <%= new Date(userDetails.createdAt).toLocaleDateString("en-US") %>
+                </p>
+            </div>
+
+            <div class="info-item">
+                <span>Password</span>
+                <p>************ <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-row">
+
+        <div class="card stat-card">
+            <div class="stat-top">
+                <span>Wallet Balance</span>
+                <a href="#" class="link">See details →</a>
+            </div>
+            <h2>₹500</h2>
+        </div>
+
+        <div class="card stat-card">
+            <div class="stat-top">
+                <span>Total Referrals</span>
+                <a href="#" class="link">See details →</a>
+            </div>
+            <h2>12</h2>
+        </div>
+
+    </section>
+
+</main>
+
+<!-- OTP MODAL -->
+<div class="otp-modal" id="otpModal">
+  <div class="otp-backdrop"></div>
+
+  <div class="otp-box">
+    <h3>Verify OTP</h3>
+    <p class="otp-text">
+      Enter the 6-digit OTP sent to your email
+    </p>
+
+    <form onsubmit="submitOtp(event)">
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+      </div>
+
+      <button type="submit" class="otp-btn">Verify OTP</button>
+    </form>
+
+    <button class="otp-close" onclick="closeOtpModal()">×</button>
+  </div>
+</div>

@@ -30,3 +30,10 @@ async function loginUser() {
     }, 3000);
   }
 }
+
+const params = new URLSearchParams(window.location.search);
+const isBlocked = params.get("blocked");
+
+if (isBlocked === "true") {
+  toastr.error("Your account has been blocked!", "Blocked");
+}
