@@ -118,6 +118,13 @@ export const wishlistRender = (req, res) => {
 // 6. USER LOGOUT
 // ======================================================================
 export const userLogout = (req, res) => {
-  delete req.session.user;
-  res.redirect("/");
+  req.session.destroy((err) => {
+    if (err) {
+      console.log("User logout error:", err);
+    }
+
+    res.clearCookie("user.sid", { path: "/" });
+
+    return res.redirect("/");
+  });
 };

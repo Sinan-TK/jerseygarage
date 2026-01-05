@@ -55,7 +55,7 @@ export const loginAdmin = wrapAsync(async (req, res) => {
 
   req.session.admin = {
     id: admin._id,
-    name:admin.name,
+    name: admin.name,
     email: admin.email,
     avatar: admin.avatar,
   };
@@ -161,7 +161,7 @@ export const logOut = wrapAsync((req, res) => {
       console.log("Admin logout error:", err);
     }
 
-    res.clearCookie("admin.sid");
+    res.clearCookie("admin.sid", { path: "/admin" });
 
     return res.redirect("/admin/login");
   });
@@ -180,4 +180,3 @@ export const featureNotAvailable = wrapAsync((req, res) => {
     pageJS: "",
   });
 });
-
