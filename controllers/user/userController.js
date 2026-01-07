@@ -169,10 +169,19 @@ export const addWishlist = wrapAsync(async (req, res) => {
   const productId = req.params.id;
   console.log(productId);
 
+  const isMatch = await Wishlist.exists({
+    user_id,
+    items: productId,
+  });
+
+  if(isMatch){
+    return sendResponse(res,Responses.addWishlist.ALREADY_EXIST);
+  }
+
   
 
 
-  
+
 });
 
 // ======================================================================

@@ -32,8 +32,29 @@
 
               <div class="price-section">
                 <p class="product-price-normal">
-                  <% const sVariant=product.variants.find(v=> v.size === "S"); %>
-                    ₹<%= sVariant.normal_price %>
+
+                  <% let selectedVariant=null; for (let size of ["S", "M" , "L" , "XL" , "XXL" ]) { const
+                    match=product.variants.find( (v)=> v.size === size && v.is_available === true && v.stock > 0
+                    );
+
+                    if (match) {
+                    selectedVariant = match;
+                    break;
+                    }
+                    }
+                    %>
+
+                    <% if (selectedVariant) { %>
+                      ₹<%= selectedVariant.normal_price %>
+                        <% } else { %>
+                          <span>Out of Stock</span>
+                          <% } %>
+
+
+
+
+                            <% const sVariant=product.variants.find(v=> v.size === "S"); %>
+                              ₹<%= sVariant.normal_price %>
                 </p>
 
                 <p class="product-price-base">
