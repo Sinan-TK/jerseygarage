@@ -3,15 +3,12 @@ import Admin from "../../models/adminModel.js";
 import User from "../../models/userModel.js";
 import Category from "../../models/categoryModel.js";
 import Product from "../../models/productModel.js";
-// import cloudinary from "../../config/cloudinary.js";
-// import upload from "../../middlewares/multer.js";
 import * as Responses from "../../utils/responses/admin/admin.response.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { wrapAsync } from "../../utils/wrapAsync.js";
 import { adminSchema } from "../../validators/adminValidators.js";
 import { paginate } from "../../utils/pagination.js";
-
-// const uploadImages = upload.array("images", 5);
+import * as adminService from "../../services/admin/adminService.js";
 
 // ======================================================================
 // 1. RENDER LOGIN PAGE
@@ -41,24 +38,13 @@ export const loginAdmin = wrapAsync(async (req, res) => {
 
   const { email, password } = req.body;
 
-  // Check if the admin exists
-  const admin = await Admin.findOne({ email });
-  if (!admin) {
-    return sendResponse(res, Responses.adminLogin.ADMIN_NOT_FOUND);
+  const result = await adminService.adminLoginLogic(email, password);
+
+  if (result?.error) {
+    return sendResponse(res, result.error);
   }
 
-  // Verify the password
-  const isMatch = await admin.comparePassword(password);
-  if (!isMatch) {
-    return sendResponse(res, Responses.adminLogin.INVALID_PASSWORD);
-  }
-
-  req.session.admin = {
-    id: admin._id,
-    name: admin.name,
-    email: admin.email,
-    avatar: admin.avatar,
-  };
+  req.session.admin = result.admin;
 
   return sendResponse(res, Responses.adminLogin.LOGIN_SUCCESS);
 });
@@ -123,7 +109,6 @@ export const searchUser = wrapAsync(async (req, res) => {
   let page = req.query.page || 1;
   const search = req.query.searchContent || "";
   const status = req.query.userStatus || "all";
-  console.log(search, status);
 
   let filter = {};
 

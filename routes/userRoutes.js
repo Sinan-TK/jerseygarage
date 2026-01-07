@@ -15,22 +15,26 @@ router.use(sidebarData);
 
 router.use(checkBlockedUser);
 
-router.use(Userdetails);
+// router.use(Userdetails);
 
 router.use(authMiddleware.profileIcon);
 
-router.get("/profile", userController.profileRender);
+router.get("/profile",Userdetails, userController.profileRender);
 
-router.patch("/profile/edit", userController.editPersonalInfo);
+router.patch("/profile/edit",Userdetails, userController.editPersonalInfo);
 
 // router.get("/email/otp-verify", userController.emailOtpPage);
 
-router.get("/address", userController.addressRender);
+router.get("/address",Userdetails, userController.addressRender);
 
-router.get("/cart", userController.cartRender);
+router.post("/address",Userdetails, userController.addAddress);
 
-router.get("/wishlist", userController.wishlistRender);
+router.get("/cart",Userdetails, userController.cartRender);
 
-router.post("/logout", userController.userLogout);
+router.get("/wishlist",Userdetails, userController.wishlistRender);
+
+router.post("/wishlist/:id",userMiddleware.userNotFound,Userdetails,userController.addWishlist);
+
+router.post("/logout",Userdetails, userController.userLogout);
 
 export default router;

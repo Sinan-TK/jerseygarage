@@ -17,4 +17,17 @@ export const personalInfoEdit = Object.freeze({
     redirectToFrontend: "/user/email/otp-verify",
   },
 });
-  
+
+export const addAddress = Object.freeze({
+  ADDRESS_ADDED: {
+    code: 201,
+    message: "Address added successfully!!",
+  },
+});
+
+export const addWishlist = Object.freeze({
+  NO_USER: {
+    code: 201,
+    message: "Address added successfully!!",
+  },
+});

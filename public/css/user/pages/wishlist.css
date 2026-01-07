@@ -1,5 +1,3 @@
-
-
 /* PAGE */
 .wishlist-page {
   background: #ffffff;
@@ -109,4 +107,16 @@
     align-items: flex-start;
     gap: 8px;
   }
+}
+
+.empty-wishlist {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.empty-wishlist p{
+  font-weight: 600;
 }

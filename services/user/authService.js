@@ -1,8 +1,10 @@
 import User from "../../models/userModel.js";
 import * as Responses from "../../utils/responses/user/auth.responses.js";
-// import { sendResponse } from "../../utils/sendResponse.js";
 import { generateOtp } from "../../utils/GenerateOtp.js";
 import Otp from "../../models/otpModel.js";
+
+//=============================================================================
+//=============================================================================
 
 export const verifyUserLogin = async (email, password) => {
   const user = await User.findOne({ email });
@@ -28,6 +30,9 @@ export const verifyUserLogin = async (email, password) => {
   };
 };
 
+//=============================================================================
+//=============================================================================
+
 export const emailVerification = async (email) => {
   const existingUser = await User.findOne({ email });
 
@@ -44,6 +49,9 @@ export const emailVerification = async (email) => {
     },
   };
 };
+
+//=============================================================================
+//=============================================================================
 
 export const otpVerify = async (email, purpose, otpValue) => {
   const otpDoc = await Otp.findOne({ email, purpose, is_used: false });

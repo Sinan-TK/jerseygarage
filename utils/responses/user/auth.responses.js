@@ -14,7 +14,7 @@ export const loginUser = Object.freeze({
   LOGIN: {
     code: 200,
     message: "Login successful!",
-    redirectToFrontend: "/",
+    redirectToFrontend: "/user/profile",
   },
 });
 
