@@ -419,6 +419,7 @@ export const renderShopPage = wrapAsync(async (req, res) => {
 
   const products = await Product.aggregate([
     { $match: filter },
+    { $match: { is_active: true } },
     {
       $lookup: {
         from: "variants",
