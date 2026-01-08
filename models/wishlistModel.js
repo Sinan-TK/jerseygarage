@@ -6,19 +6,25 @@ const wishlistSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // one wishlist per user
+      unique: true,
     },
 
     items: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        variant_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Variant",
+          required: true,
+        },
+
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
   },
-  {
-    timestamps: true, // createdAt & updatedAt
-  }
+  { timestamps: true }
 );
 
 const Wishlist = mongoose.model("Wishlist", wishlistSchema);

@@ -114,7 +114,7 @@ h2 {
   width: 100%;
   height: auto;
   display: block;
-} 
+}
 
 
 .product-price-base {
@@ -128,11 +128,11 @@ h2 {
   text-decoration: line-through;
 }
 
-.price-section{
+.price-section {
   display: flex;
   justify-content: center;
   gap: 15px;
-} 
+}
 
 .product-item {
   position: relative;
@@ -148,11 +148,9 @@ h2 {
   z-index: 10;
 }
 
-.product-actions button {
+.wishlist-btn {
   width: 36px;
   height: 36px;
-  background: #fff;
-  border: 1px solid #ddd;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -161,16 +159,31 @@ h2 {
   transition: all 0.25s ease;
 }
 
-.product-actions i {
+.isWishlistedFalse {
+  background: #ffffff;
+  border: 1px solid #ddd;
+}
+
+.isWishlistedTrue {
+  background: #000000;
+  border: 1px solid #ddd;
+}
+
+.isWishlistedTrue i{
+  color: #fff;
+  font-size: 14px;
+}
+
+.isWishlistedFalse i {
   font-size: 14px;
   color: #000;
 }
 
-.product-actions button:hover {
+.wishlist-btn:hover {
   background: #000;
 }
 
-.product-actions button:hover i {
+.wishlist-btn:hover i {
   color: #fff;
 }
 

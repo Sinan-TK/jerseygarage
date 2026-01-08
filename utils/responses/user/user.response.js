@@ -28,7 +28,12 @@ export const addAddress = Object.freeze({
 export const addWishlist = Object.freeze({
   ALREADY_EXIST: {
     code: 201,
-    message: "Item already added!!",
+    message: "Product removed from wishlist!!",
+    data: false,
   },
-  
+  PRODUCT_ADDED: {
+    code: 200,
+    message: "Product added to wishlist!!",
+    data: true,
+  },
 });

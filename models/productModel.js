@@ -22,7 +22,6 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
-    // 🔥 Shared images for all variants
     images: {
       type: [String],
       required: true,

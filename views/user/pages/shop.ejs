@@ -120,42 +120,61 @@
                     <% products.forEach((product)=> { %>
                         <a href="/product/<%= product._id %>">
                             <div class="product-item">
+                                <% let selectedVariant=null; for (let size of ["S", "M" , "L" , "XL" , "XXL" ]) { const
+                                    match=product.variants.find( (v)=> v.size === size && v.is_available === true &&
+                                    v.stock > 0
+                                    );
 
-                                <!-- WISHLIST ICON -->
-                                <div class="product-actions">
-                                    <button class="wishlist-btn" title="Add to Wishlist">
-                                        <i class="fa-regular fa-heart"></i>
-                                    </button>
-                                </div>
+                                    if (match) {
+                                    selectedVariant = match;
+                                    break;
+                                    }
+                                    }
+                                    %>
 
-                                <img src="<%=product.images[0]%>" alt="<%=product.name%>">
-
-                                <div class="product-details">
-                                    <p class="product-name">
-                                        <%= product.name %>
-                                    </p>
-
-                                    <div class="price-section">
-                                        <p class="product-price-normal">
-                                            <% const sVariant=product.variants.find(v=> v.size === "S"); %>
-                                                ₹<%= sVariant.normal_price %>
-                                        </p>
-
-                                        <p class="product-price-base">
-                                            <% const lVariant=product.variants.find(v=> v.size === "S"); %>
-                                                ₹<%= lVariant.base_price %>
-                                        </p>
+                                    <!-- WISHLIST ICON -->
+                                    <div class="product-actions">
+                                        <% let isWishlisted=false; if (wishlist && wishlist.items && selectedVariant) {
+                                            for (let item of wishlist.items) { if (
+                                            item.variant_id.toString()===selectedVariant._id.toString() ) {
+                                            isWishlisted=true; break; } } } %>
+                                            <button data-varient="<%= selectedVariant._id %>"
+                                                class="wishlist-btn  <%= isWishlisted ? `isWishlistedTrue` : `isWishlistedFalse` %>"
+                                                title="Add to Wishlist">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </button>
                                     </div>
 
-                                    <!-- ADD TO CART BUTTON -->
-                                    <button class="add-to-cart-btn">
-                                        <i class="fa-solid fa-cart-shopping"></i>
-                                        Add to Cart
-                                    </button>
-                                </div>
+                                    <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+
+                                    <div class="product-details">
+                                        <p class="product-name">
+                                            <%= product.name %>
+                                        </p>
+
+                                        <div class="price-section">
+                                            <p class="product-price-normal">
+                                                <% const sVariant=product.variants.find(v=> v.size === "S"); %>
+                                                    ₹<%= sVariant.normal_price %>
+                                            </p>
+
+                                            <p class="product-price-base">
+                                                <% const lVariant=product.variants.find(v=> v.size === "S"); %>
+                                                    ₹<%= lVariant.base_price %>
+                                            </p>
+                                        </div>
+
+                                        <!-- ADD TO CART BUTTON -->
+                                        <button class="add-to-cart-btn">
+                                            <i class="fa-solid fa-cart-shopping"></i>
+                                            Add to Cart
+                                        </button>
+                                    </div>
                             </div>
 
                         </a>
+
+
 
                         <% }) %>
 
@@ -171,12 +190,34 @@
 
                 </div>
 
+                <!-- PAGINATION -->
+                <div class="pagination">
+
+                    <!-- LEFT ARROW: show ONLY if NOT first page -->
+                    <% if (currentPage> 1) { %>
+                        <a href="/shop?page=<%= currentPage - 1 %>" class="arrow-btn">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                        <% } %>
+
+                            <!-- CURRENT PAGE NUMBER -->
+                            <span class="current-page-display">
+                                <%= currentPage %>
+                            </span>
+
+                            <!-- RIGHT ARROW: show ONLY if NOT last page -->
+                            <% if (currentPage < totalPages) { %>
+                                <a href="/shop?page=<%= currentPage + 1 %>" class="arrow-btn">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                                <% } %>
+                </div>
+
             </div>
 
         </div>
-    </div>
 
 
-    <script src="/js/user/shop.js"></script>
+        <script src="/js/user/shop.js"></script>
 
 </section>

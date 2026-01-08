@@ -33,7 +33,7 @@ router.get("/cart",Userdetails, userController.cartRender);
 
 router.get("/wishlist",Userdetails, userController.wishlistRender);
 
-router.post("/wishlist/:id",userMiddleware.userNotFound,Userdetails,userController.addWishlist);
+router.post("/wishlist",userMiddleware.userNotFound,Userdetails,userController.addWishlist);
 
 router.post("/logout",Userdetails, userController.userLogout);
 

@@ -6,7 +6,8 @@ import addressValidators from "../../validators/addressValidators.js";
 import User from "../../models/userModel.js";
 import Address from "../../models/addressModel.js";
 import Wishlist from "../../models/wishlistModel.js";
-import send from "send";
+import Variant from "../../models/varientModel.js";
+import { ObjectId } from "mongodb";
 import { response } from "express";
 
 // ======================================================================
@@ -166,22 +167,31 @@ export const wishlistRender = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const addWishlist = wrapAsync(async (req, res) => {
-  const productId = req.params.id;
-  console.log(productId);
+  const { variantId } = req.body;
+  const user_id = req.session.user.id;
+  const variant_Id = new ObjectId(variantId);
 
-  const isMatch = await Wishlist.exists({
+  const exists = await Wishlist.exists({
     user_id,
-    items: productId,
+    "items.variant_id": variant_Id,
   });
 
-  if(isMatch){
-    return sendResponse(res,Responses.addWishlist.ALREADY_EXIST);
+  if (exists) {
+    await Wishlist.updateOne(
+      { user_id },
+      { $pull: { items: { variant_id: variant_Id } } }
+    );
+
+    return sendResponse(res, Responses.addWishlist.ALREADY_EXIST);
   }
 
-  
+  await Wishlist.findOneAndUpdate(
+    { user_id },
+    { $addToSet: { items: { variant_id: variant_Id } } },
+    { upsert: true }
+  );
 
-
-
+  return sendResponse(res, Responses.addWishlist.PRODUCT_ADDED);
 });
 
 // ======================================================================

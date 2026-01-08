@@ -252,8 +252,6 @@ input[type=range]::-webkit-slider-thumb {
 .product-actions button {
   width: 36px;
   height: 36px;
-  background: #fff;
-  border: 1px solid #ddd;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -263,6 +261,26 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 .product-actions i {
+  font-size: 14px;
+  color: #000;
+}
+
+.isWishlistedFalse {
+  background: #ffffff;
+  border: 1px solid #ddd;
+}
+
+.isWishlistedTrue {
+  background: #000000;
+  border: 1px solid #ddd;
+}
+
+.isWishlistedTrue i{
+  color: #fff;
+  font-size: 14px;
+}
+
+.isWishlistedFalse i {
   font-size: 14px;
   color: #000;
 }
@@ -489,4 +507,84 @@ input[type=range]::-webkit-slider-thumb {
 .search-apply:hover {
     background: white;
     color: black;
+}
+
+/* ===============================
+   PAGINATION CONTAINER
+================================ */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 30px 0;
+}
+
+/* ===============================
+   ARROW BUTTONS
+================================ */
+.arrow-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.arrow-btn i {
+  font-size: 14px;
+}
+
+.arrow-btn:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* Disabled arrow (optional) */
+.arrow-btn.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* ===============================
+   CURRENT PAGE
+================================ */
+.current-page-display {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 480px) {
+  .pagination {
+    gap: 10px;
+  }
+
+  .arrow-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .current-page-display {
+    height: 34px;
+    font-size: 13px;
+  }
 }

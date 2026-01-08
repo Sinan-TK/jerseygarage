@@ -7,26 +7,26 @@ document.querySelectorAll(".product-item").forEach((item) => {
 const wishlistBtn = document.querySelectorAll(".wishlist-btn");
 
 wishlistBtn.forEach((btn) => {
-  btn.addEventListener("click", async(e) => {
-    e.preventDefault();   // stops link navigation
-    e.stopPropagation();  // stops bubbling
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault(); // stops link navigation
+    e.stopPropagation(); // stops bubbling
 
-    const productId = btn.dataset.productId;
-    console.log(productId);
+    const variantId = btn.dataset.varient;
 
     try {
-      const res = await axios.post(`/user/wishlist/${productId}`);
+      const res = await axios.post(`/user/wishlist`, { variantId });
 
-      toastr.success(res);
-
+      if (res.data.data) {
+        toastr.success(res.data.message, "Added!!");
+        btn.classList.replace("isWishlistedFalse", "isWishlistedTrue");
+      } else {
+        toastr.success(res.data.message, "Removed!!");
+        btn.classList.replace("isWishlistedTrue", "isWishlistedFalse");
+      }
     } catch (err) {
       const error = err.response?.data;
-      console.log(error);
 
-      toastr.error(error?.message,"Sorry!")
+      toastr.error(error?.message, "Error!!");
     }
-
   });
 });
-
-console.log(res);

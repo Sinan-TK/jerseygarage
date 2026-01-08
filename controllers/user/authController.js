@@ -4,6 +4,7 @@ import Otp from "../../models/otpModel.js";
 import Product from "../../models/productModel.js";
 import Variant from "../../models/varientModel.js";
 import Category from "../../models/categoryModel.js";
+import Wishlist from "../../models/wishlistModel.js";
 import sendOTP from "../../utils/sendOtp.js";
 import { generateOtp } from "../../utils/GenerateOtp.js";
 import * as Responses from "../../utils/responses/user/auth.responses.js";
@@ -344,11 +345,19 @@ export const renderHomePage = wrapAsync(async (req, res) => {
     },
   ]);
 
+  let wishlist = null;
+
+  if (req.session.user) {
+    const user_id = new ObjectId(req.session.user.id);
+    wishlist = await Wishlist.findOne({ user_id }).select("items").lean();
+  }
+
   res.render("user/pages/home", {
     title: "Home",
     pageCSS: "home",
     showHeader: true,
     showFooter: true,
+    wishlist,
     pageJS: "home.js",
     products,
   });
@@ -359,8 +368,26 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const renderShopPage = wrapAsync(async (req, res) => {
-  const { category, team, size, minRange, maxRange, sort } = req.query;
+  const {
+    category,
+    team,
+    size,
+    minRange,
+    maxRange,
+    sort,
+    page,
+  } = req.query;
 
+  /* =============================
+     PAGINATION SETUP
+  ============================== */
+  const currentPage = parseInt(page) || 1;
+  const limit = 6;
+  const skip = (currentPage - 1) * limit;
+
+  /* =============================
+     VARIANT FILTER
+  ============================== */
   const variantFilter = {};
 
   if (size) {
@@ -380,7 +407,7 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     const variants = await Variant.find(variantFilter).select("product_id");
     productIds = variants.map((v) => v.product_id);
 
-    if (productIds.length === 0) {
+    if (!productIds.length) {
       return res.render("user/pages/shop", {
         title: "Shop",
         pageCSS: "shop",
@@ -389,16 +416,19 @@ export const renderShopPage = wrapAsync(async (req, res) => {
         pageJS: "",
         categories: await Category.find({}, { _id: 1, name: 1 }),
         products: [],
+        currentPage,
+        totalPages: 0,
       });
     }
   }
 
-  const filter = {};
+  /* =============================
+     PRODUCT FILTER
+  ============================== */
+  const filter = { is_active: true };
 
   if (category) {
-    const categoryDoc = await Category.findOne({ name: category }).select(
-      "_id"
-    );
+    const categoryDoc = await Category.findOne({ name: category }).select("_id");
     if (categoryDoc) filter.category = categoryDoc._id;
   }
 
@@ -410,16 +440,27 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     filter._id = { $in: productIds };
   }
 
+  /* =============================
+     SORT LOGIC
+  ============================== */
   let sortStage = { createdAt: -1 };
-  if (sort === "all") sortStage = { createdAt: -1 };
   if (sort === "price_low") sortStage = { sPrice: 1 };
   if (sort === "price_high") sortStage = { sPrice: -1 };
   if (sort === "az") sortStage = { name: 1 };
   if (sort === "za") sortStage = { name: -1 };
 
+  /* =============================
+     TOTAL COUNT (FOR PAGINATION)
+  ============================== */
+  const totalProducts = await Product.countDocuments(filter);
+  const totalPages = Math.ceil(totalProducts / limit);
+
+  /* =============================
+     PRODUCT AGGREGATION
+  ============================== */
   const products = await Product.aggregate([
     { $match: filter },
-    { $match: { is_active: true } },
+
     {
       $lookup: {
         from: "variants",
@@ -430,7 +471,7 @@ export const renderShopPage = wrapAsync(async (req, res) => {
               $expr: {
                 $and: [
                   { $eq: ["$product_id", "$$productId"] },
-                  { $eq: ["$size", "S"] },
+                  { $eq: ["$size", "S"] }, // default size
                 ],
               },
             },
@@ -439,27 +480,50 @@ export const renderShopPage = wrapAsync(async (req, res) => {
         as: "variants",
       },
     },
+
     {
       $addFields: {
         sPrice: { $arrayElemAt: ["$variants.base_price", 0] },
       },
     },
+
     { $sort: sortStage },
+    { $skip: skip },
+    { $limit: limit },
   ]);
 
+  /* =============================
+     AUX DATA
+  ============================== */
   const categories = await Category.find({}, { _id: 1, name: 1 });
-
   const teamNames = await Product.find().select("teamName");
 
+  /* =============================
+     WISHLIST
+  ============================== */
+  let wishlist = null;
+
+  if (req.session.user) {
+    const user_id = new ObjectId(req.session.user.id);
+    wishlist = await Wishlist.findOne({ user_id })
+      .select("items")
+      .lean();
+  }
+
+  /* =============================
+     RENDER
+  ============================== */
   res.render("user/pages/shop", {
     title: "Shop",
     pageCSS: "shop",
     showFooter: true,
     showHeader: true,
     pageJS: "",
-    teamNames,
-    categories,
+
     products,
+    categories,
+    teamNames,
+    wishlist,
 
     selectedCategory: category || "",
     selectedTeam: team || "",
@@ -467,9 +531,11 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     minRange: minRange || 0,
     maxRange: maxRange || 2000,
     selectedSort: sort || "",
+
+    currentPage,
+    totalPages,
   });
 });
-
 // ======================================================================
 // 17.PRODUCT DETAIL PAGE RENDER
 // ======================================================================
