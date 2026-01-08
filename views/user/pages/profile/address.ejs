@@ -37,7 +37,7 @@
                     <div class="edit-delete">
                         <button class="edit-link"><i class="fa-solid fa-pen-to-square"></i></button>
                         <% if(!address.is_default){ %>
-                            <button class="delete-link"><i class="fa-solid fa-trash"></i></button>
+                            <button class="delete-link" data-id="<%= address._id %>"><i class="fa-solid fa-trash"></i></button>
                             <% }else{ %>
                                 <p class="default-txt">default</p>
                                 <%}%>

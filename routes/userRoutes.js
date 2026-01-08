@@ -29,11 +29,15 @@ router.get("/address",Userdetails, userController.addressRender);
 
 router.post("/address",Userdetails, userController.addAddress);
 
+router.patch("/address/:id",Userdetails,userController.removeAddress)
+
 router.get("/cart",Userdetails, userController.cartRender);
 
 router.get("/wishlist",Userdetails, userController.wishlistRender);
 
 router.post("/wishlist",userMiddleware.userNotFound,Userdetails,userController.addWishlist);
+
+router.patch("/wishlist/:id",Userdetails,userController.removeWishlist);
 
 router.post("/logout",Userdetails, userController.userLogout);
 

@@ -56,128 +56,117 @@ export const productsPageRender = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const addProduct = wrapAsync(async (req, res) => {
-  uploadImages(req, res, (err) => {
-    if (err) {
-      return sendResponse(res, {
-        code: 400,
-        message: err.message || "File upload error!",
-      });
+  try {
+    const { productName, teamName, description, category } = req.body;
+
+    if (!productName) {
+      sendResponse(res, Responses.addProduct.NO_PRODUCT);
+      return;
     }
 
-    (async () => {
-      try {
-        const { productName, teamName, description, category } = req.body;
+    if (!category) {
+      sendResponse(res, Responses.addProduct.NO_CATEGORY);
+      return;
+    }
 
-        if (!productName) {
-          sendResponse(res, Responses.addProduct.NO_PRODUCT);
-          return;
-        }
+    if (!teamName) {
+      sendResponse(res, Responses.addProduct.NO_TEAM);
+      return;
+    }
 
-        if (!category) {
-          sendResponse(res, Responses.addProduct.NO_CATEGORY);
-          return;
-        }
+    if (!description) {
+      sendResponse(res, Responses.addProduct.NO_DES);
+      return;
+    }
 
-        if (!teamName) {
-          sendResponse(res, Responses.addProduct.NO_TEAM);
-          return;
-        }
+    let stock = {};
+    let normalPrice = {};
+    let basePrice = {};
 
-        if (!description) {
-          sendResponse(res, Responses.addProduct.NO_DES);
-          return;
-        }
+    try {
+      stock = JSON.parse(req.body.stock || "{}");
+      normalPrice = JSON.parse(req.body.normalPrice || "{}");
+      basePrice = JSON.parse(req.body.basePrice || "{}");
+    } catch {
+      sendResponse(res, Responses.addProduct.INVALID_FORMAT);
+      return;
+    }
 
-        let stock = {};
-        let normalPrice = {};
-        let basePrice = {};
+    if (!req.files || req.files.length === 0) {
+      sendResponse(res, Responses.addProduct.NO_IMAGE);
+      return;
+    }
 
-        try {
-          stock = JSON.parse(req.body.stock || "{}");
-          normalPrice = JSON.parse(req.body.normalPrice || "{}");
-          basePrice = JSON.parse(req.body.basePrice || "{}");
-        } catch {
-          sendResponse(res, Responses.addProduct.INVALID_FORMAT);
-          return;
-        }
+    if (req.files.length < 3) {
+      sendResponse(res, Responses.addProduct.MIN_IMAGE);
+      return;
+    }
 
-        if (!req.files || req.files.length === 0) {
-          sendResponse(res, Responses.addProduct.NO_IMAGE);
-          return;
-        }
+    if (req.files.length > 5) {
+      sendResponse(res, Responses.addProduct.MAX_IMAGE);
+      return;
+    }
 
-        if (req.files.length < 3) {
-          sendResponse(res, Responses.addProduct.MIN_IMAGE);
-          return;
-        }
+    const sizes = ["S", "M", "L", "XL", "XXL"];
 
-        if (req.files.length > 5) {
-          sendResponse(res, Responses.addProduct.MAX_IMAGE);
-          return;
-        }
-
-        const sizes = ["S", "M", "L", "XL", "XXL"];
-
-        for (let size of sizes) {
-          if (!stock[size] || !normalPrice[size] || !basePrice[size]) {
-            sendResponse(res, Responses.addProduct.SIZE_REQ);
-            return;
-          }
-
-          if (Number(normalPrice[size]) < Number(basePrice[size])) {
-            sendResponse(res, Responses.addProduct.PRICE_LOGIC);
-            return;
-          }
-        }
-
-        const uploadedImages = [];
-
-        for (let file of req.files) {
-          const result = await new Promise((resolve, reject) => {
-            cloudinary.uploader
-              .upload_stream({ folder: "products" }, (error, response) => {
-                if (error) reject(error);
-                else resolve(response);
-              })
-              .end(file.buffer);
-          });
-
-          uploadedImages.push(result.secure_url);
-        }
-
-        const categoryDoc = await Category.findOne({ name: category });
-
-        if (!categoryDoc) {
-          sendResponse(res, Responses.addProduct.CATEGORY_NOT_EXIST);
-          return;
-        }
-
-        const product = await Product.create({
-          name: productName,
-          teamName,
-          description,
-          category: categoryDoc._id,
-          images: uploadedImages,
-        });
-
-        await Variant.insertMany(
-          sizes.map((size) => ({
-            product_id: product._id,
-            size,
-            base_price: Number(basePrice[size]),
-            normal_price: Number(normalPrice[size]),
-            stock: Number(stock[size]),
-            is_available: Number(stock[size]) > 0,
-          }))
-        );
-
-        sendResponse(res, Responses.addProduct.PRODUCT_ADDED);
-      } catch (error) {
-        console.error("Add Product Error:", error);
-        sendResponse(res, Responses.addProduct.ERROR_500);
+    for (let size of sizes) {
+      if (!stock[size] || !normalPrice[size] || !basePrice[size]) {
+        sendResponse(res, Responses.addProduct.SIZE_REQ);
+        return;
       }
-    })();
-  });
+
+      if (Number(normalPrice[size]) < Number(basePrice[size])) {
+        sendResponse(res, Responses.addProduct.PRICE_LOGIC);
+        return;
+      }
+    }
+
+    const uploadedImages = [];
+
+    for (let file of req.files) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: "products" }, (error, response) => {
+            if (error) reject(error);
+            else resolve(response);
+          })
+          .end(file.buffer);
+      });
+
+      uploadedImages.push(result.secure_url);
+    }
+
+    const categoryDoc = await Category.findOne({ name: category });
+
+    if (!categoryDoc) {
+      sendResponse(res, Responses.addProduct.CATEGORY_NOT_EXIST);
+      return;
+    }
+
+    const product = await Product.create({
+      name: productName,
+      teamName,
+      description,
+      category: categoryDoc._id,
+      images: uploadedImages,
+    });
+
+    await Variant.insertMany(
+      sizes.map((size) => ({
+        product_id: product._id,
+        size,
+        base_price: Number(basePrice[size]),
+        normal_price: Number(normalPrice[size]),
+        stock: Number(stock[size]),
+        is_available: Number(stock[size]) > 0,
+      }))
+    );
+
+    sendResponse(res, Responses.addProduct.PRODUCT_ADDED);
+  } catch (error) {
+    console.error("Add Product Error:", error);
+    sendResponse(res, Responses.addProduct.ERROR_500);
+  }
 });
 
 // ======================================================================
@@ -246,7 +235,7 @@ export const removeImage = wrapAsync(async (req, res) => {
     { new: true }
   );
 
-  return sendResponse(res,Responses.removeImg.IMG_ROMOVED);
+  return sendResponse(res, Responses.removeImg.IMG_ROMOVED);
 });
 
 // ======================================================================
@@ -254,117 +243,108 @@ export const removeImage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const editProduct = wrapAsync(async (req, res) => {
-  uploadImages(req, res, async (err) => {
-    if (err) {
-      return sendResponse(res, {
-        code: 400,
-        message: err.message || "File upload error!",
-      });
-    }
+
+  try {
+    const { productName, teamName, description, category } = req.body;
+    const productId = req.params.id;
+
+    if (!productName) return sendResponse(res, Responses.addProduct.NO_PRODUCT);
+    if (!category) return sendResponse(res, Responses.addProduct.NO_CATEGORY);
+    if (!teamName) return sendResponse(res, Responses.addProduct.NO_TEAM);
+    if (!description) return sendResponse(res, Responses.addProduct.NO_DES);
+
+    let stock = {};
+    let normalPrice = {};
+    let basePrice = {};
 
     try {
-      const { productName, teamName, description, category } = req.body;
-      const productId = req.params.id;
+      stock = JSON.parse(req.body.stock || "{}");
+      normalPrice = JSON.parse(req.body.normalPrice || "{}");
+      basePrice = JSON.parse(req.body.basePrice || "{}");
+    } catch {
+      return sendResponse(res, Responses.addProduct.INVALID_FORMAT);
+    }
 
-      if (!productName)
-        return sendResponse(res, Responses.addProduct.NO_PRODUCT);
-      if (!category) return sendResponse(res, Responses.addProduct.NO_CATEGORY);
-      if (!teamName) return sendResponse(res, Responses.addProduct.NO_TEAM);
-      if (!description) return sendResponse(res, Responses.addProduct.NO_DES);
+    const sizes = ["S", "M", "L", "XL", "XXL"];
 
-      let stock = {};
-      let normalPrice = {};
-      let basePrice = {};
-
-      try {
-        stock = JSON.parse(req.body.stock || "{}");
-        normalPrice = JSON.parse(req.body.normalPrice || "{}");
-        basePrice = JSON.parse(req.body.basePrice || "{}");
-      } catch {
-        return sendResponse(res, Responses.addProduct.INVALID_FORMAT);
+    for (let size of sizes) {
+      if (!stock[size] || !normalPrice[size] || !basePrice[size]) {
+        return sendResponse(res, Responses.addProduct.SIZE_REQ);
       }
 
-      const sizes = ["S", "M", "L", "XL", "XXL"];
-
-      for (let size of sizes) {
-        if (!stock[size] || !normalPrice[size] || !basePrice[size]) {
-          return sendResponse(res, Responses.addProduct.SIZE_REQ);
-        }
-
-        if (Number(normalPrice[size]) < Number(basePrice[size])) {
-          return sendResponse(res, Responses.addProduct.PRICE_LOGIC);
-        }
+      if (Number(normalPrice[size]) < Number(basePrice[size])) {
+        return sendResponse(res, Responses.addProduct.PRICE_LOGIC);
       }
+    }
 
-      const product = await Product.findById(productId);
-      if (!product) {
-        return sendResponse(res, Responses.addProduct.PRODUCT_NOT_FOUND);
-      }
+    const product = await Product.findById(productId);
+    if (!product) {
+      return sendResponse(res, Responses.addProduct.PRODUCT_NOT_FOUND);
+    }
 
-      const categoryDoc = await Category.findOne({ name: category });
-      if (!categoryDoc) {
-        return sendResponse(res, Responses.addProduct.CATEGORY_NOT_EXIST);
-      }
+    const categoryDoc = await Category.findOne({ name: category });
+    if (!categoryDoc) {
+      return sendResponse(res, Responses.addProduct.CATEGORY_NOT_EXIST);
+    }
 
-      product.name = productName;
-      product.teamName = teamName;
-      product.description = description;
-      product.category = categoryDoc._id;
+    product.name = productName;
+    product.teamName = teamName;
+    product.description = description;
+    product.category = categoryDoc._id;
 
-      let uploadedImages = [];
+    let uploadedImages = [];
 
-      if (req.files && req.files.length > 0) {
-        if (req.files.length > 5) {
-          return sendResponse(res, Responses.addProduct.MAX_IMAGE);
-        }
-
-        for (let file of req.files) {
-          const result = await new Promise((resolve, reject) => {
-            cloudinary.uploader
-              .upload_stream({ folder: "products" }, (error, response) => {
-                if (error) reject(error);
-                else resolve(response);
-              })
-              .end(file.buffer);
-          });
-
-          uploadedImages.push(result.secure_url);
-        }
-      }
-
-      const finalImageCount = product.images.length + uploadedImages.length;
-
-      if (finalImageCount < 3) {
-        return sendResponse(res, Responses.addProduct.MIN_IMAGE);
-      }
-
-      if (finalImageCount > 5) {
+    if (req.files && req.files.length > 0) {
+      if (req.files.length > 5) {
         return sendResponse(res, Responses.addProduct.MAX_IMAGE);
       }
 
-      if (uploadedImages.length > 0) {
-        product.images.push(...uploadedImages);
+      for (let file of req.files) {
+        const result = await new Promise((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream({ folder: "products" }, (error, response) => {
+              if (error) reject(error);
+              else resolve(response);
+            })
+            .end(file.buffer);
+        });
+
+        uploadedImages.push(result.secure_url);
       }
-
-      await product.save();
-
-      for (let size of sizes) {
-        await Variant.findOneAndUpdate(
-          { product_id: product._id, size },
-          {
-            base_price: Number(basePrice[size]),
-            normal_price: Number(normalPrice[size]),
-            stock: Number(stock[size]),
-            is_available: Number(stock[size]) > 0,
-          },
-          { upsert: true }
-        );
-      }
-
-      return sendResponse(res, Responses.addProduct.PRODUCT_EDITED);
-    } catch (error) {
-      console.error("Edit Product Error:", error);
-      return sendResponse(res, Responses.addProduct.ERROR_500);
     }
-  });
+
+    const finalImageCount = product.images.length + uploadedImages.length;
+
+    if (finalImageCount < 3) {
+      return sendResponse(res, Responses.addProduct.MIN_IMAGE);
+    }
+
+    if (finalImageCount > 5) {
+      return sendResponse(res, Responses.addProduct.MAX_IMAGE);
+    }
+
+    if (uploadedImages.length > 0) {
+      product.images.push(...uploadedImages);
+    }
+
+    await product.save();
+
+    for (let size of sizes) {
+      await Variant.findOneAndUpdate(
+        { product_id: product._id, size },
+        {
+          base_price: Number(basePrice[size]),
+          normal_price: Number(normalPrice[size]),
+          stock: Number(stock[size]),
+          is_available: Number(stock[size]) > 0,
+        },
+        { upsert: true }
+      );
+    }
+
+    return sendResponse(res, Responses.addProduct.PRODUCT_EDITED);
+  } catch (error) {
+    console.error("Edit Product Error:", error);
+    return sendResponse(res, Responses.addProduct.ERROR_500);
+  }
 });

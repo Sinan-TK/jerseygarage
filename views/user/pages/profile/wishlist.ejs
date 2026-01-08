@@ -16,20 +16,26 @@
       <div class="wishlist-grid">
 
         <!-- CARD -->
-        <% products.forEach((product)=>{ %>
-          <div class="wishlist-card">
-            <button class="remove-btn">×</button>
+        <% products.forEach((product)=>{%>
+          <a href="/product/<%= product.variant_id.product_id._id %>">
+            <div class="wishlist-card">
+              <button class="remove-btn" data-item="<%= product.variant_id._id %>">×</button>
 
-            <div class="product-img"></div>
+              <div class="product-img"><img src="<%= product.variant_id.product_id.images[0] %>"></div>
 
-            <div class="product-info">
-              <h4>Premium Sports Jersey</h4>
-              <p class="variant">Size: L</p>
-              <p class="price">₹1,299</p>
+              <div class="product-info">
+                <h4>
+                  <%= product.variant_id.product_id.name %>
+                </h4>
+                <p class="variant">Size: <%= product.variant_id.size %>
+                </p>
+                <p class="price">₹<%= product.variant_id.base_price %>
+                </p>
+              </div>
+
+              <button class="cart-btn">Add to Cart</button>
             </div>
-
-            <button class="cart-btn">Add to Cart</button>
-          </div>
+          </a>
           <%})%>
       </div>
       <%}%>

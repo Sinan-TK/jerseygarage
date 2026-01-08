@@ -25,6 +25,13 @@ export const addAddress = Object.freeze({
   },
 });
 
+export const removeAddress = Object.freeze({
+  REMOVED:{
+    code:201,
+    message:"Address removed successfully!!"
+  }
+})
+
 export const addWishlist = Object.freeze({
   ALREADY_EXIST: {
     code: 201,
@@ -35,5 +42,12 @@ export const addWishlist = Object.freeze({
     code: 200,
     message: "Product added to wishlist!!",
     data: true,
+  },
+});
+
+export const removeWishlist = Object.freeze({
+  REMOVED: {
+    code: 201,
+    message: "Product removed from wishlist!!",
   },
 });

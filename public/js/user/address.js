@@ -26,13 +26,12 @@ document
       const res = await axios.post("/user/address", formData);
 
       if (res.data.success) {
+        toastr.success(res.data.message, "Success");
 
-        toastr.success(res.data.message,"Success");
-        // Close modal
-        closeAddAddressModal();
-
-        // Optional: reload to show new address
-        window.location.reload();
+        setTimeout(() => {
+          closeAddAddressModal();
+          window.location.reload();
+        }, 2000);
       }
     } catch (err) {
       const error = err.response?.data;
@@ -61,3 +60,23 @@ function closeAddAddressModal() {
   modal.style.display = "none";
 }
 
+document.querySelectorAll(".delete-link").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const id = btn.dataset.id;
+
+    try {
+      const res = await axios.patch(`/user/address/${id}`);
+
+      if (res.data.success) {
+        toastr.success(res.data.message, "Removed!!");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (err) {
+      const error = res.response?.data;
+
+      toastr.error(error.message, "Error!!");
+    }
+  });
+});

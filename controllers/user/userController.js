@@ -9,6 +9,7 @@ import Wishlist from "../../models/wishlistModel.js";
 import Variant from "../../models/varientModel.js";
 import { ObjectId } from "mongodb";
 import { response } from "express";
+import send from "send";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -53,7 +54,6 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 
   const { fullName, email, phoneNo } = req.body;
 
-  //   console.log(req.session.user);
   const user = await User.findById(req.session.user.id);
 
   const result = await User.findByIdAndUpdate(
@@ -141,20 +141,43 @@ export const addAddress = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
+// 4. ADDRESS DELETE
+// ======================================================================
+
+export const removeAddress = wrapAsync(async (req, res) => {
+  const id = new ObjectId(req.params.id);
+
+  await Address.findOneAndDelete({ _id: id });
+
+  return sendResponse(res, Responses.removeAddress.REMOVED);
+});
+
+// ======================================================================
 // 5. WISHLIST PAGE RENDER
 // ======================================================================
 export const wishlistRender = wrapAsync(async (req, res) => {
-  const user_id = req.session.user.id;
+  const user_id = new ObjectId(req.session.user.id);
 
-  const products = await Wishlist.find({ user_id })
-    .sort({ createdAt: -1 })
+  const wishlist = await Wishlist.findOne({ user_id })
+    .populate({
+      path: "items.variant_id",
+      populate: {
+        path: "product_id",
+        select: "name images teamName", // populate product from variant
+      },
+    })
     .lean();
+
+  // Safe fallback
+  const items = wishlist ? wishlist.items : [];
 
   res.render("user/layouts/profilelayout", {
     title: "User Wishlist",
     pageCSS: "wishlist",
     view: "wishlist",
-    products,
+
+    products: items,
+
     profile: true,
     showHeader: true,
     showFooter: true,
@@ -192,6 +215,26 @@ export const addWishlist = wrapAsync(async (req, res) => {
   );
 
   return sendResponse(res, Responses.addWishlist.PRODUCT_ADDED);
+});
+
+// ======================================================================
+// 6. REMOVE ITEM FROM WISHLIST
+// ======================================================================
+
+export const removeWishlist = wrapAsync(async (req, res) => {
+  const id = new ObjectId(req.params.id);
+  const user_id = req.session.user.id;
+
+  await Wishlist.updateOne(
+    { user_id },
+    {
+      $pull: {
+        items: { variant_id: id },
+      },
+    }
+  );
+
+  return sendResponse(res, Responses.removeWishlist.REMOVED);
 });
 
 // ======================================================================
