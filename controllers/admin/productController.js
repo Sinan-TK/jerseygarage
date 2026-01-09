@@ -176,11 +176,7 @@ export const addProduct = wrapAsync(async (req, res) => {
 export const blockProduct = wrapAsync(async (req, res) => {
   const id = req.params.id;
 
-  const data = await Product.findByIdAndUpdate(
-    id,
-    { is_active: false },
-    { new: true }
-  );
+  await Product.findByIdAndUpdate(id, { is_active: false });
 
   return sendResponse(res, Responses.productStatus.PRODUCT_BLOCK);
 });
@@ -202,10 +198,9 @@ export const unblockProduct = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.productStatus.CATEGORY_BLOCKED);
   }
 
-  const data = await Product.findByIdAndUpdate(
+  await Product.findByIdAndUpdate(
     id,
     { is_active: true },
-    { new: true }
   );
 
   return sendResponse(res, Responses.productStatus.PRODUCT_UNBLOCK);
@@ -243,7 +238,6 @@ export const removeImage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const editProduct = wrapAsync(async (req, res) => {
-
   try {
     const { productName, teamName, description, category } = req.body;
     const productId = req.params.id;
