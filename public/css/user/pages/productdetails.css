@@ -481,3 +481,43 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.quantity-box {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 42px;
+  margin-bottom: 15px;
+}
+
+.qty-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: #f9fafb;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.qty-btn:hover {
+  background: #e5e7eb;
+}
+
+.quantity-box input {
+  width: 50px;
+  height: 42px;
+  border: none;
+  text-align: center;
+  font-size: 15px;
+  outline: none;
+}
+
+/* Remove arrows in number input */
+.quantity-box input::-webkit-inner-spin-button,
+.quantity-box input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

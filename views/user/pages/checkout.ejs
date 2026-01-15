@@ -23,37 +23,40 @@
                 <p class="muted">Select Shipping Address</p>
 
                 <% addresses.forEach((address)=>{ %>
-                    <label class="radio-card active">
-                        <input type="radio" name="address" checked />
+                    <label class="radio-card <%= address.is_default ? 'active':'' %>">
+                        <input type="radio" name="address" <%= address.is_default ? 'checked':'' %>/>
                         <div class="radio-content">
+                            <% if(address.is_default){ %>
                             <div class="title">
-                                Home <span class="badge">Default</span>
+                                <%= address.address_type %> <span class="badge">Default</span>
                             </div>
-                            <p>John Doe</p>
-                            <p>123 Main Street</p>
-                            <p>San Francisco, CA 94103</p>
+                            <% } %>
+                            <p>
+                                <%= address.full_name %>
+                            </p>
+                            <p>
+                                <%= address.phone_no %>
+                            </p>
+                            <p>
+                                <%= address.address_line %>
+                            </p>
+                            <p>
+                                <%= address.city %>, <%= address.zip_code %>
+                            </p>
+                            <p>
+                                <%= address.state %>, <%= address.country %>
+                            </p>
                         </div>
                         <span class="edit">Edit</span>
                     </label>
-                <% })%>
+                    <% })%>
 
-                <label class="radio-card">
-                    <input type="radio" name="address" />
-                    <div class="radio-content">
-                        <div class="title">Work</div>
-                        <p>John Doe</p>
-                        <p>456 Market Street</p>
-                        <p>San Francisco, CA 94105</p>
-                    </div>
-                    <span class="edit">Edit</span>
-                </label>
-
-                <label class="radio-card">
-                    <input type="radio" name="address" />
-                    <div class="radio-content">
-                        <div class="title">Use a different address</div>
-                    </div>
-                </label>
+                        <label class="radio-card">
+                            <input type="radio" name="address" />
+                            <div class="radio-content">
+                                <div class="title">Use a different address</div>
+                            </div>
+                        </label>
             </section>
 
             <!-- PAYMENT -->

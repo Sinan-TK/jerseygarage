@@ -298,12 +298,10 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     })
     .lean();
 
-  console.log(addresses);
-
   res.render("user/pages/checkout", {
     pageCSS: "checkout",
     pageJS: "checkout.js",
-    title: "OTP Verification",
+    title: "Checkout Page",
     addresses,
     showHeader: true,
     showFooter: true,

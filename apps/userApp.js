@@ -21,7 +21,7 @@ userApp.use(
     saveUninitialized: false,
     cookie: {
       path: "/",
-      maxAge: 1000 * 60 * 10, // 10 minutes
+      maxAge: 1000 * 60 * 30, // 10 minutes
       httpOnly: true,
     },
   })

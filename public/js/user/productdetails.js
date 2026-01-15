@@ -77,3 +77,25 @@ sizeButtons.forEach(btn => {
     btn.classList.add("active");
   });
 });
+
+
+const qtyInput = document.getElementById("quantity");
+const plusBtn = document.getElementById("qty-plus");
+const minusBtn = document.getElementById("qty-minus");
+
+plusBtn.addEventListener("click", () => {
+  qtyInput.value = parseInt(qtyInput.value) + 1;
+});
+
+minusBtn.addEventListener("click", () => {
+  if (parseInt(qtyInput.value) > 1) {
+    qtyInput.value = parseInt(qtyInput.value) - 1;
+  }
+});
+
+// Prevent manual invalid values
+qtyInput.addEventListener("input", () => {
+  if (qtyInput.value < 1 || qtyInput.value === "") {
+    qtyInput.value = 1;
+  }
+});
