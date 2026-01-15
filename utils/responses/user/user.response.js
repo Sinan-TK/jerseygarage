@@ -25,6 +25,13 @@ export const addAddress = Object.freeze({
   },
 });
 
+export const editAddress = Object.freeze({
+  ADDRESS_EDITED: {
+    code: 201,
+    message: "Address edited successfully!!",
+  },
+});
+
 export const removeAddress = Object.freeze({
   REMOVED:{
     code:201,

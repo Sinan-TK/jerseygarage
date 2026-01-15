@@ -9,7 +9,7 @@ import Wishlist from "../../models/wishlistModel.js";
 import Variant from "../../models/varientModel.js";
 import { ObjectId } from "mongodb";
 import { response } from "express";
-import send from "send";
+// import send from "send";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -155,6 +155,53 @@ export const removeAddress = wrapAsync(async (req, res) => {
 // ======================================================================
 // 5. WISHLIST PAGE RENDER
 // ======================================================================
+
+export const editAddress = wrapAsync(async (req, res) => {
+  const addressId = new ObjectId(req.params.id);
+  const user_id = req.session.user.id;
+
+  const { error, value } = addressValidators.validate(req.body);
+
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
+  }
+
+  // If setting this address as default → unset others
+  if (value.is_default) {
+    await Address.updateMany(
+      { user_id },
+      { $set: { is_default: false } }
+    );
+  }
+
+  // ✅ Update ONLY the selected address
+  const result = await Address.updateOne(
+    { _id: addressId, user_id },
+    {
+      $set: {
+        ...value,
+        user_id,
+      },
+    }
+  );
+
+  if (result.matchedCount === 0) {
+    return sendResponse(res, {
+      code: 404,
+      message: "Address not found",
+    });
+  }
+
+  return sendResponse(res, Responses.editAddress.ADDRESS_EDITED);
+});
+
+
+// ======================================================================
+// 5. WISHLIST PAGE RENDER
+// ======================================================================
 export const wishlistRender = wrapAsync(async (req, res) => {
   const user_id = new ObjectId(req.session.user.id);
 
@@ -235,6 +282,32 @@ export const removeWishlist = wrapAsync(async (req, res) => {
   );
 
   return sendResponse(res, Responses.removeWishlist.REMOVED);
+});
+
+// ======================================================================
+// 6. USER LOGOUT
+// ======================================================================
+
+export const checkoutPage = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const addresses = await Address.find({ user_id })
+    .sort({
+      is_default: -1,
+      created_at: -1,
+    })
+    .lean();
+
+  console.log(addresses);
+
+  res.render("user/pages/checkout", {
+    pageCSS: "checkout",
+    pageJS: "checkout.js",
+    title: "OTP Verification",
+    addresses,
+    showHeader: true,
+    showFooter: true,
+  });
 });
 
 // ======================================================================

@@ -27,11 +27,11 @@ export default Joi.object({
       "string.empty": "ZIP code is required",
       "string.pattern.base": "Enter a valid 6-digit PIN code",
     }),
-  address_line1: Joi.string().required().messages({
-    "string.empty": "Address-1 is required",
+  address_type: Joi.string().required().messages({
+    "string.empty": "Address Type is required",
   }),
-  address_line2: Joi.string().required().messages({
-    "string.empty": "Address-2 is required",
+  address_line: Joi.string().required().messages({
+    "string.empty": "Address is required",
   }),
   is_default: Joi.boolean().optional(),
 });

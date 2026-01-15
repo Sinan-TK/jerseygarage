@@ -10,9 +10,9 @@ document
 
     const formData = {
       full_name: form.full_name.value.trim(),
+      address_type: form.address_type.value.trim(),
       phone_no: form.phone_no.value.trim(),
-      address_line1: form.address_line1.value.trim(),
-      address_line2: form.address_line2.value.trim(),
+      address_line: form.address_line.value.trim(),
       city: form.city.value.trim(),
       state: form.state.value.trim(),
       zip_code: form.zip_code.value.trim(),
@@ -80,3 +80,75 @@ document.querySelectorAll(".delete-link").forEach((btn) => {
     }
   });
 });
+
+function closeEditAddressModal() {
+  document.getElementById("editAddressModal").style.display = "none";
+}
+
+function openEditAddressModal(btn) {
+  //   const address = JSON.parse(btn.dataset.address);
+  const address = JSON.parse(decodeURIComponent(btn.dataset.address));
+
+  document.getElementById("edit_address_id").value = address._id;
+  document.getElementById("edit_full_name").value = address.full_name;
+  document.getElementById("edit_address_type").value = address.address_type;
+  document.getElementById("edit_phone_no").value = address.phone_no;
+  document.getElementById("edit_address_line").value = address.address_line;
+  document.getElementById("edit_city").value = address.city;
+  document.getElementById("edit_state").value = address.state;
+  document.getElementById("edit_zip_code").value = address.zip_code;
+  document.getElementById("edit_country").value = address.country;
+  document.getElementById("edit_is_default").checked = address.is_default;
+
+  document.getElementById("editAddressModal").style.display = "flex";
+}
+
+document
+  .getElementById("editAddressForm")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const btn = form.querySelector("#edit-submit");
+
+    btn.innerHTML = "Saving...";
+    btn.disabled = true;
+
+    const addressId = form.address_id.value;
+
+    console.log(addressId);
+
+    const formData = {
+      full_name: form.full_name.value.trim(),
+      address_type: form.address_type.value.trim(),
+      phone_no: form.phone_no.value.trim(),
+      address_line: form.address_line.value.trim(),
+      city: form.city.value.trim(),
+      state: form.state.value.trim(),
+      zip_code: form.zip_code.value.trim(),
+      country: form.country.value.trim(),
+      is_default: form.is_default.checked,
+    };
+
+    // console.log(formData);
+    try {
+      const res = await axios.patch(
+        `/user/address/edit/${addressId}`,
+        formData
+      );
+      if (res.data.success) {
+        toastr.success(res.data.message, "Success");
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    } catch (err) {
+      const error = err.response?.data;
+
+      toastr.error(error?.message, "Error!!");
+
+      btn.innerHTML = "Update Address";
+      btn.disabled = false;
+    }
+  });

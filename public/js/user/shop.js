@@ -77,8 +77,6 @@ options.forEach((option) => {
     selected.innerHTML = `${option.textContent} <i class="fa-solid fa-caret-down"></i>`;
     selected.dataset.value = option.dataset.value;
     sortDropdown.classList.remove("active");
-
-    console.log("Selected sort:", option.dataset.value);
   });
 });
 
@@ -100,6 +98,8 @@ document.querySelector(".btn-apply").addEventListener("click", () => {
   const minRange = document.getElementById("minRange").value;
   const maxRange = document.getElementById("maxRange").value;
 
+  const page = document.querySelector(".current-page-display").innerHTML.trim();
+
   // fill hidden inputs
   document.getElementById("f-category").value = category;
   document.getElementById("f-team").value = team;
@@ -107,6 +107,9 @@ document.querySelector(".btn-apply").addEventListener("click", () => {
   document.getElementById("f-minRange").value = minRange;
   document.getElementById("f-maxRange").value = maxRange;
   document.getElementById("f-sort").value = selected.dataset.value || "";
+  document.getElementById("f-page").value = page;
+
+  console.log(page);
 
   // submit form (GET → page reload → EJS re-render)
   document.getElementById("filterForm").submit();
@@ -136,11 +139,11 @@ options.forEach((option) => {
   });
 });
 
-document.querySelectorAll(".product-item").forEach((item) => {
-  item.addEventListener("click", () => {
-    console.log(item.dataset.id);
-  });
-});
+// document.querySelectorAll(".product-item").forEach((item) => {
+//   item.addEventListener("click", () => {
+//     console.log(item.dataset.id);
+//   });
+// });
 
 const wishlistBtn = document.querySelectorAll(".wishlist-btn");
 
@@ -151,7 +154,7 @@ wishlistBtn.forEach((btn) => {
 
     const variantId = btn.dataset.varient;
 
-    
+    console.log(variantId);
 
     try {
       const res = await axios.post(`/user/wishlist`, { variantId });

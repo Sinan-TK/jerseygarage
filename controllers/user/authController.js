@@ -258,7 +258,6 @@ export const emailVerification = wrapAsync(async (req, res) => {
   }
 
   const { email } = req.body;
-  console.log(email);
 
   const user = await User.findOne({ email });
   if (!user) return sendResponse(res, Responses.forgetPass.NOT_FOUND);
@@ -368,26 +367,12 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const renderShopPage = wrapAsync(async (req, res) => {
-  const {
-    category,
-    team,
-    size,
-    minRange,
-    maxRange,
-    sort,
-    page,
-  } = req.query;
+  const { category, team, size, minRange, maxRange, sort, page } = req.query;
 
-  /* =============================
-     PAGINATION SETUP
-  ============================== */
   const currentPage = parseInt(page) || 1;
   const limit = 6;
   const skip = (currentPage - 1) * limit;
 
-  /* =============================
-     VARIANT FILTER
-  ============================== */
   const variantFilter = {};
 
   if (size) {
@@ -422,13 +407,12 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     }
   }
 
-  /* =============================
-     PRODUCT FILTER
-  ============================== */
   const filter = { is_active: true };
 
   if (category) {
-    const categoryDoc = await Category.findOne({ name: category }).select("_id");
+    const categoryDoc = await Category.findOne({ name: category }).select(
+      "_id"
+    );
     if (categoryDoc) filter.category = categoryDoc._id;
   }
 
@@ -440,24 +424,15 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     filter._id = { $in: productIds };
   }
 
-  /* =============================
-     SORT LOGIC
-  ============================== */
   let sortStage = { createdAt: -1 };
   if (sort === "price_low") sortStage = { sPrice: 1 };
   if (sort === "price_high") sortStage = { sPrice: -1 };
   if (sort === "az") sortStage = { name: 1 };
   if (sort === "za") sortStage = { name: -1 };
 
-  /* =============================
-     TOTAL COUNT (FOR PAGINATION)
-  ============================== */
   const totalProducts = await Product.countDocuments(filter);
   const totalPages = Math.ceil(totalProducts / limit);
 
-  /* =============================
-     PRODUCT AGGREGATION
-  ============================== */
   const products = await Product.aggregate([
     { $match: filter },
 
@@ -471,7 +446,7 @@ export const renderShopPage = wrapAsync(async (req, res) => {
               $expr: {
                 $and: [
                   { $eq: ["$product_id", "$$productId"] },
-                  { $eq: ["$size", "S"] }, // default size
+                  { $eq: ["$size", "S"] }, 
                 ],
               },
             },
@@ -492,27 +467,16 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     { $limit: limit },
   ]);
 
-  /* =============================
-     AUX DATA
-  ============================== */
   const categories = await Category.find({}, { _id: 1, name: 1 });
   const teamNames = await Product.find().select("teamName");
 
-  /* =============================
-     WISHLIST
-  ============================== */
   let wishlist = null;
 
   if (req.session.user) {
     const user_id = new ObjectId(req.session.user.id);
-    wishlist = await Wishlist.findOne({ user_id })
-      .select("items")
-      .lean();
+    wishlist = await Wishlist.findOne({ user_id }).select("items").lean();
   }
 
-  /* =============================
-     RENDER
-  ============================== */
   res.render("user/pages/shop", {
     title: "Shop",
     pageCSS: "shop",

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div class="checkout-container">
+
+        <!-- LEFT SECTION -->
+        <div class="checkout-left">
+
+            <h1 class="page-title">Checkout</h1>
+
+            <!-- SHIPPING -->
+            <section class="card">
+                <h2>Shipping Details</h2>
+                <p class="muted">Select Shipping Address</p>
+
+                <% addresses.forEach((address)=>{ %>
+                    <label class="radio-card active">
+                        <input type="radio" name="address" checked />
+                        <div class="radio-content">
+                            <div class="title">
+                                Home <span class="badge">Default</span>
+                            </div>
+                            <p>John Doe</p>
+                            <p>123 Main Street</p>
+                            <p>San Francisco, CA 94103</p>
+                        </div>
+                        <span class="edit">Edit</span>
+                    </label>
+                <% })%>
+
+                <label class="radio-card">
+                    <input type="radio" name="address" />
+                    <div class="radio-content">
+                        <div class="title">Work</div>
+                        <p>John Doe</p>
+                        <p>456 Market Street</p>
+                        <p>San Francisco, CA 94105</p>
+                    </div>
+                    <span class="edit">Edit</span>
+                </label>
+
+                <label class="radio-card">
+                    <input type="radio" name="address" />
+                    <div class="radio-content">
+                        <div class="title">Use a different address</div>
+                    </div>
+                </label>
+            </section>
+
+            <!-- PAYMENT -->
+            <section class="card">
+                <h2>Payment Method</h2>
+
+                <label class="radio-card active">
+                    <input type="radio" name="payment" checked />
+                    <div class="radio-content">
+                        <div class="title">Credit / Debit Card</div>
+                        <p class="muted">All major cards accepted</p>
+                    </div>
+                </label>
+
+                <label class="radio-card">
+                    <input type="radio" name="payment" />
+                    <div class="radio-content">
+                        <div class="title">UPI</div>
+                        <p class="muted">Google Pay, PhonePe, Paytm</p>
+                    </div>
+                </label>
+
+                <label class="radio-card">
+                    <input type="radio" name="payment" />
+                    <div class="radio-content">
+                        <div class="title">Net Banking</div>
+                        <p class="muted">Pay directly from your bank</p>
+                    </div>
+                </label>
+
+                <label class="radio-card">
+                    <input type="radio" name="payment" />
+                    <div class="radio-content">
+                        <div class="title">Wallets</div>
+                        <p class="muted">PayPal, Amazon Pay & more</p>
+                    </div>
+                </label>
+
+                <label class="radio-card">
+                    <input type="radio" name="payment" />
+                    <div class="radio-content">
+                        <div class="title">Cash on Delivery</div>
+                    </div>
+                </label>
+            </section>
+
+            <button class="place-order">PLACE ORDER</button>
+        </div>
+
+        <!-- RIGHT SECTION -->
+        <aside class="checkout-right">
+            <div class="summary-card">
+
+                <h3>Product Details</h3>
+
+                <div class="product">
+                    <img src="https://picsum.photos/100/70" />
+                    <div>
+                        <p class="product-name">Manchester United Home Jersey 2024</p>
+                        <p class="muted">Size: L</p>
+                        <strong>₹2999.00</strong>
+                    </div>
+                    <span class="remove">Remove</span>
+                </div>
+
+                <div class="product">
+                    <img src="https://picsum.photos/101/70" />
+                    <div>
+                        <p class="product-name">Real Madrid Away Jersey 2024</p>
+                        <p class="muted">Size: M</p>
+                        <strong>₹3299.00</strong>
+                    </div>
+                    <span class="remove">Remove</span>
+                </div>
+
+                <div class="divider"></div>
+
+                <p class="delivery">Estimated Delivery: <strong>Oct 15 - Oct 18</strong></p>
+
+                <div class="divider"></div>
+
+                <h3>Order Summary</h3>
+
+                <div class="row">
+                    <span>Subtotal (2 items)</span>
+                    <span>₹6298.00</span>
+                </div>
+                <div class="row">
+                    <span>Shipping</span>
+                    <span>₹99</span>
+                </div>
+                <div class="row">
+                    <span>Tax</span>
+                    <span>₹630</span>
+                </div>
+
+                <div class="row total">
+                    <span>Total</span>
+                    <span>₹7027.00</span>
+                </div>
+
+                <div class="promo">
+                    <input type="text" placeholder="SAVE20" />
+                    <button>APPLY</button>
+                </div>
+
+            </div>
+        </aside>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

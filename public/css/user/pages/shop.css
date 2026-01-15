@@ -46,6 +46,7 @@
     }
 }
 
+
 /* ===========================================
         FILTERS BOX
         =========================================== */
@@ -182,10 +183,18 @@ input[type=range]::-webkit-slider-thumb {
 /* ===========================================
         PRODUCT GRID & CARDS
         =========================================== */
-.shop-grid {
+/* .shop-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
+} */
+
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 260px));
+    gap: 24px;
+    justify-content: start;
 }
 
 /* Responsive grid adjustment for smaller screens */
@@ -197,131 +206,131 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 .product-item {
-  background-color: white;
-  border: 1px solid #ddd;
-  text-align: center;
-  transition: transform 0.2s;
-  overflow: hidden;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    text-align: center;
+    transition: transform 0.2s;
+    overflow: hidden;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 
 .product-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .product-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-} 
+    width: 100%;
+    height: auto;
+    display: block;
+}
 
 
 .product-price-base {
-  color: #cc0000;
-  font-weight: bold;
+    color: #cc0000;
+    font-weight: bold;
 }
 
 .product-price-normal {
-  color: rgb(116, 116, 116);
-  font-weight: 600;
-  text-decoration: line-through;
+    color: rgb(116, 116, 116);
+    font-weight: 600;
+    text-decoration: line-through;
 }
 
-.price-section{
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-} 
+.price-section {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
 
 .product-item {
-  position: relative;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  overflow: hidden;
+    position: relative;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    overflow: hidden;
 }
 
 .product-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
 }
 
 .product-actions button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.25s ease;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
 }
 
 .product-actions i {
-  font-size: 14px;
-  color: #000;
+    font-size: 14px;
+    color: #000;
 }
 
 .isWishlistedFalse {
-  background: #ffffff;
-  border: 1px solid #ddd;
+    background: #ffffff;
+    border: 1px solid #ddd;
 }
 
 .isWishlistedTrue {
-  background: #000000;
-  border: 1px solid #ddd;
+    background: #000000;
+    border: 1px solid #ddd;
 }
 
-.isWishlistedTrue i{
-  color: #fff;
-  font-size: 14px;
+.isWishlistedTrue i {
+    color: #fff;
+    font-size: 14px;
 }
 
 .isWishlistedFalse i {
-  font-size: 14px;
-  color: #000;
+    font-size: 14px;
+    color: #000;
 }
 
 .product-actions button:hover {
-  background: #000;
+    background: #000;
 }
 
 .product-actions button:hover i {
-  color: #fff;
+    color: #fff;
 }
 
 /* PRODUCT DETAILS */
 .product-details {
-  padding: 12px;
+    padding: 12px;
 }
 
 /* ADD TO CART BUTTON */
 .add-to-cart-btn {
-  margin-top: 12px;
-  width: 100%;
-  padding: 10px 0;
-  background: #000;
-  color: #fff;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s ease;
+    margin-top: 12px;
+    width: 100%;
+    padding: 10px 0;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
 }
 
 .add-to-cart-btn i {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 .add-to-cart-btn:hover {
-  background: #222;
+    background: #222;
 }
 
 
@@ -513,78 +522,78 @@ input[type=range]::-webkit-slider-thumb {
    PAGINATION CONTAINER
 ================================ */
 .pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin: 30px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 30px 0;
 }
 
 /* ===============================
    ARROW BUTTONS
 ================================ */
 .arrow-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #ddd;
-  background: #fff;
-  color: #333;
-  text-decoration: none;
-  transition: all 0.2s ease;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s ease;
 }
 
 .arrow-btn i {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 .arrow-btn:hover {
-  background: #000;
-  color: #fff;
-  border-color: #000;
+    background: #000;
+    color: #fff;
+    border-color: #000;
 }
 
 /* Disabled arrow (optional) */
 .arrow-btn.disabled {
-  pointer-events: none;
-  opacity: 0.4;
+    pointer-events: none;
+    opacity: 0.4;
 }
 
 /* ===============================
    CURRENT PAGE
 ================================ */
 .current-page-display {
-  min-width: 36px;
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 8px;
-  background: #000;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: #000;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ===============================
    RESPONSIVE
 ================================ */
 @media (max-width: 480px) {
-  .pagination {
-    gap: 10px;
-  }
+    .pagination {
+        gap: 10px;
+    }
 
-  .arrow-btn {
-    width: 34px;
-    height: 34px;
-  }
+    .arrow-btn {
+        width: 34px;
+        height: 34px;
+    }
 
-  .current-page-display {
-    height: 34px;
-    font-size: 13px;
-  }
+    .current-page-display {
+        height: 34px;
+        font-size: 13px;
+    }
 }

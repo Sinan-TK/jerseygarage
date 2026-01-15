@@ -16,13 +16,13 @@
                 <div class="address-card">
                     <div class="address-info">
                         <h4>
-                            <%= address.address_line1%>
+                            <%= address.address_type%>
                         </h4>
                         <p>
                             <%= address.full_name %>
                         </p>
                         <p>
-                            <%= address.address_line1 %>, <%= address.address_line2 %>
+                            <%= address.address_line %>
                         </p>
                         <p>
                             <%= address.city %>, <%= address.zip_code %>
@@ -35,9 +35,12 @@
                         </p>
                     </div>
                     <div class="edit-delete">
-                        <button class="edit-link"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="openEditAddressModal(this)"
+                            data-address="<%- encodeURIComponent(JSON.stringify(address)) %>" class="edit-link"><i
+                                class="fa-solid fa-pen-to-square"></i></button>
                         <% if(!address.is_default){ %>
-                            <button class="delete-link" data-id="<%= address._id %>"><i class="fa-solid fa-trash"></i></button>
+                            <button class="delete-link" data-id="<%= address._id %>"><i
+                                    class="fa-solid fa-trash"></i></button>
                             <% }else{ %>
                                 <p class="default-txt">default</p>
                                 <%}%>
@@ -62,18 +65,23 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="address_type">Address Type</label>
+                    <select name="address_type" id="address_type">
+                        <option value="Home">Home</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group full">
                     <label>Phone Number</label>
                     <input type="text" name="phone_no">
                 </div>
 
                 <div class="form-group full">
-                    <label>Address Line 1</label>
-                    <input type="text" name="address_line1">
-                </div>
-
-                <div class="form-group full">
-                    <label>Address Line 2</label>
-                    <input type="text" name="address_line2">
+                    <label>Address Line</label>
+                    <input type="text" name="address_line">
                 </div>
 
                 <div class="form-group">
@@ -108,6 +116,83 @@
                 </button>
                 <button type="submit" class="btn-primary" id="submitBtn">
                     Save Address
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ===============================
+     EDIT ADDRESS MODAL
+================================ -->
+<div class="modal-overlay" id="editAddressModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Address</h3>
+            <button class="close-btn" onclick="closeEditAddressModal()">×</button>
+        </div>
+
+        <form id="editAddressForm">
+            <input type="hidden" name="address_id" id="edit_address_id" />
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" id="edit_full_name" />
+                </div>
+
+                <div class="form-group">
+                    <label>Address Type</label>
+                    <select name="address_type" id="edit_address_type">
+                        <option value="Home">Home</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group full">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone_no" id="edit_phone_no" />
+                </div>
+
+                <div class="form-group full">
+                    <label>Address Line</label>
+                    <input type="text" name="address_line" id="edit_address_line" />
+                </div>
+
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" id="edit_city" />
+                </div>
+
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="state" id="edit_state" />
+                </div>
+
+                <div class="form-group">
+                    <label>ZIP Code</label>
+                    <input type="text" name="zip_code" id="edit_zip_code" />
+                </div>
+
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" name="country" id="edit_country" />
+                </div>
+
+                <div class="form-group checkbox full">
+                    <input type="checkbox" id="edit_is_default" name="is_default"/>
+                    <label for="edit_is_default">Set as default address</label>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" onclick="closeEditAddressModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary" id="edit-submit">
+                    Update Address
                 </button>
             </div>
         </form>

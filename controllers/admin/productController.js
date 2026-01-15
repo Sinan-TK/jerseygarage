@@ -119,6 +119,11 @@ export const addProduct = wrapAsync(async (req, res) => {
         sendResponse(res, Responses.addProduct.PRICE_LOGIC);
         return;
       }
+
+      if(Number(stock[size]<0)||Number(normalPrice[size]<0)||Number(basePrice[size]<0)){
+        sendResponse(res,Responses.addProduct.POSITIVE_LOGIC);
+        return;
+      }
     }
 
     const uploadedImages = [];
@@ -268,6 +273,11 @@ export const editProduct = wrapAsync(async (req, res) => {
 
       if (Number(normalPrice[size]) < Number(basePrice[size])) {
         return sendResponse(res, Responses.addProduct.PRICE_LOGIC);
+      }
+
+      if(Number(stock[size]<0)||Number(normalPrice[size]<0)||Number(basePrice[size]<0)){
+        sendResponse(res,Responses.addProduct.POSITIVE_LOGIC);
+        return;
       }
     }
 

@@ -41,6 +41,10 @@ export const addProduct = Object.freeze({
     code: 400,
     message: `Normal price must be greater than base price!`,
   },
+  POSITIVE_LOGIC: {
+    code: 400,
+    message: `Stock, Normal Price, and Base Price must be positive number!`,
+  },
   CATEGORY_NOT_EXIST: {
     code: 400,
     message: "Selected category does not exist!",
@@ -60,9 +64,9 @@ export const addProduct = Object.freeze({
 });
 
 export const productStatus = Object.freeze({
-  CATEGORY_BLOCKED:{
-    code:403,
-    message:"Category is blocked",
+  CATEGORY_BLOCKED: {
+    code: 403,
+    message: "Category is blocked",
   },
   PRODUCT_BLOCK: {
     code: 200,
@@ -80,4 +84,3 @@ export const removeImg = Object.freeze({
     message: "Image removed successfully!",
   },
 });
-

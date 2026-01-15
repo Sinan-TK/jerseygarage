@@ -1,35 +1,35 @@
 <section class="body">
-
     <div class="shop-wrapper">
-
         <div class="layout">
 
+            <!-- ================= FILTERS ================= -->
             <aside class="filters-box">
-
                 <h2>Filter</h2>
+
+                <!-- CATEGORY -->
                 <div class="dropdown" id="catDD">
                     <button class="dropdown-toggle" onclick="toggleDD('catDD')">
                         Categories <i class="fa-solid fa-angle-down"></i>
                     </button>
                     <div class="dropdown-content">
-                        <% categories.forEach((category)=> { %>
-                            <label><input type="radio" name="categories" value="<%= category.name %>"
+                        <% categories.forEach(category=> { %>
+                            <label>
+                                <input type="radio" name="categories" value="<%= category.name %>"
                                     <%=selectedCategory===category.name ? "checked" : "" %>
                                 >
-
-                                <%=category.name%>
+                                <%= category.name %>
                             </label>
-                            <%})%>
+                            <% }) %>
                     </div>
                 </div>
 
+                <!-- TEAMS -->
                 <div class="dropdown" id="teamDD">
                     <button class="dropdown-toggle" onclick="toggleDD('teamDD')">
                         Teams <i class="fa-solid fa-angle-down"></i>
                     </button>
                     <div class="dropdown-content">
                         <% const uniqueTeams=new Set(); %>
-
                             <% teamNames.forEach(team=> { %>
                                 <% if (!uniqueTeams.has(team.teamName)) { %>
                                     <% uniqueTeams.add(team.teamName); %>
@@ -44,30 +44,28 @@
                     </div>
                 </div>
 
+                <!-- SIZE -->
                 <div class="filter-section">
                     <p class="filter-title">Size</p>
                     <div class="filter-content">
-                        <label><input type="radio" name="size" value="S" <%=selectedSize==="S" ? "checked" : "" %>>
-                            S</label>
-                        <label><input type="radio" name="size" value="M" <%=selectedSize==="M" ? "checked" : "" %>>
-                            M</label>
-                        <label><input type="radio" name="size" value="L" <%=selectedSize==="L" ? "checked" : "" %>>
-                            L</label>
-                        <label><input type="radio" name="size" value="XL" <%=selectedSize==="XL" ? "checked" : "" %>>
-                            XL</label>
-                        <label><input type="radio" name="size" value="XXL" <%=selectedSize==="XXL" ? "checked" : "" %>>
-                            XXL</label>
+                        <% ["S","M","L","XL","XXL"].forEach(size=> { %>
+                            <label>
+                                <input type="radio" name="size" value="<%= size %>" <%=selectedSize===size ? "checked"
+                                    : "" %>
+                                >
+                                <%= size %>
+                            </label>
+                            <% }) %>
                     </div>
                 </div>
 
+                <!-- PRICE -->
                 <div class="filter-section">
                     <p class="filter-title">Price Range</p>
                     <div class="price-slider">
                         <div class="range-container">
-                            <input type="range" id="minRange" name="minRange" min="0" max="2000"
-                                value="<%= minRange %>">
-                            <input type="range" id="maxRange" name="maxRange" min="0" max="2000"
-                                value="<%= maxRange %>">
+                            <input type="range" id="minRange" min="0" max="2000" value="<%= minRange %>">
+                            <input type="range" id="maxRange" min="0" max="2000" value="<%= maxRange %>">
                         </div>
                         <p id="priceDisplay">₹0 - ₹2000</p>
                     </div>
@@ -77,135 +75,125 @@
                     <a href="/shop"><button type="button" class="btn-clear">Clear</button></a>
                     <button type="button" class="btn-apply">Apply</button>
                 </div>
-
-
             </aside>
 
+            <!-- ================= PRODUCTS ================= -->
             <div>
-
                 <h1 class="page-title">Shop Jerseys</h1>
                 <p class="page-subtitle">Discover your perfect jersey</p>
 
-                <!-- <div class="top-bar"> -->
-                <div>
-
-                    <!-- <div class="search-box" >
-                        <input type="text" id="searchInput" class="product-search" placeholder="Search products...">
-                    </div>
-
-                    <div><button type="button" class="btn-apply search-apply">Apply</button></div> -->
-
-                    <div class="div-custom-dropdown">
-                        <div class="custom-dropdown" id="sortDropdown">
-                            <div class="dropdown-selected" data-value="<%= selectedSort %>">
-                                <%= selectedSort==="price_low" ? "Price: Low to High" : selectedSort==="price_high"
-                                    ? "Price: High to Low" : selectedSort==="az" ? "A-Z" : selectedSort==="za" ? "Z–A"
-                                    : "All" %>
-                                    <i class="fa-solid fa-caret-down"></i>
-                            </div>
-                            <ul class="dropdown-options">
-                                <li data-value="all">All</li>
-                                <li data-value="price_low">Price: Low to High</li>
-                                <li data-value="price_high">Price: High to Low</li>
-                                <li data-value="az">A-Z</li>
-                                <li data-value="za">Z-A</li>
-                            </ul>
+                <!-- SORT -->
+                <div class="div-custom-dropdown">
+                    <div class="custom-dropdown" id="sortDropdown">
+                        <div class="dropdown-selected" data-value="<%= selectedSort %>">
+                            <%= selectedSort==="price_low" ? "Price: Low to High" : selectedSort==="price_high"
+                                ? "Price: High to Low" : selectedSort==="az" ? "A-Z" : selectedSort==="za" ? "Z-A"
+                                : "All" %>
+                                <i class="fa-solid fa-caret-down"></i>
                         </div>
+                        <ul class="dropdown-options">
+                            <li data-value="all">All</li>
+                            <li data-value="price_low">Price: Low to High</li>
+                            <li data-value="price_high">Price: High to Low</li>
+                            <li data-value="az">A-Z</li>
+                            <li data-value="za">Z-A</li>
+                        </ul>
                     </div>
                 </div>
 
-
+                <!-- GRID -->
                 <div class="shop-grid">
 
-                    <% products.forEach((product)=> { %>
-                        <a href="/product/<%= product._id %>">
+                    <% products.forEach(product=> { %>
+
+                        <% const sizePriority=["S","M","L","XL","XXL"]; let selectedVariant=null; for (const size of
+                            sizePriority) {   
+                            const match=product.variants.find(v=>
+                            v.size === size &&
+                            v.is_available &&
+                            v.stock > 0
+                            );
+                            if (match) {
+                            selectedVariant = match;
+                            break;
+                            }
+                            }
+
+                            const priceVariant = selectedVariant;
+
+                            let isWishlisted = false;
+                            if (wishlist?.items?.length && selectedVariant?._id) {
+                            isWishlisted = wishlist.items.some(
+                            item => item.variant_id.toString() === selectedVariant._id.toString()
+                            );
+                            }
+                            %>
+
+
+
                             <div class="product-item">
-                                <% let selectedVariant=null; for (let size of ["S", "M" , "L" , "XL" , "XXL" ]) { const
-                                    match=product.variants.find( (v)=> v.size === size && v.is_available === true &&
-                                    v.stock > 0
-                                    );
 
-                                    if (match) {
-                                    selectedVariant = match;
-                                    break;
-                                    }
-                                    }
-                                    %>
-
-                                    <!-- WISHLIST ICON -->
+                                <!-- WISHLIST -->
+                                <% if (selectedVariant) { %>
                                     <div class="product-actions">
-                                        <% let isWishlisted=false; if (wishlist && wishlist.items && selectedVariant) {
-                                            for (let item of wishlist.items) { if (
-                                            item.variant_id.toString()===selectedVariant._id.toString() ) {
-                                            isWishlisted=true; break; } } } %>
-                                            <button data-varient="<%= selectedVariant._id %>"
-                                                class="wishlist-btn  <%= isWishlisted ? `isWishlistedTrue` : `isWishlistedFalse` %>"
-                                                title="Add to Wishlist">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </button>
-                                    </div>
-
-                                    <img src="<%=product.images[0]%>" alt="<%=product.name%>">
-
-                                    <div class="product-details">
-                                        <p class="product-name">
-                                            <%= product.name %>
-                                        </p>
-
-                                        <div class="price-section">
-                                            <p class="product-price-normal">
-                                                <% const sVariant=product.variants.find(v=> v.size === "S"); %>
-                                                    ₹<%= sVariant.normal_price %>
-                                            </p>
-
-                                            <p class="product-price-base">
-                                                <% const lVariant=product.variants.find(v=> v.size === "S"); %>
-                                                    ₹<%= lVariant.base_price %>
-                                            </p>
-                                        </div>
-
-                                        <!-- ADD TO CART BUTTON -->
-                                        <button class="add-to-cart-btn">
-                                            <i class="fa-solid fa-cart-shopping"></i>
-                                            Add to Cart
+                                        <button data-varient="<%= selectedVariant._id %>"
+                                            class="wishlist-btn <%= isWishlisted ? 'isWishlistedTrue' : 'isWishlistedFalse' %>"
+                                            title="Add to Wishlist">
+                                            <i class="fa-regular fa-heart"></i>
                                         </button>
                                     </div>
+                                    <% } %>
+
+                                        <!-- PRODUCT LINK -->
+                                        <a href="/product/<%= product._id %>">
+                                            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+
+                                            <div class="product-details">
+                                                <p class="product-name">
+                                                    <%= product.name %>
+                                                </p>
+
+                                                <div class="price-section">
+                                                    <% if(priceVariant){ %>
+                                                    <p class="product-price-normal">
+                                                        ₹<%= priceVariant?.normal_price ?? "N/A" %>
+                                                    </p>
+                                                    <% } %>
+                                                    <p class="product-price-base">
+                                                        <!-- <%= priceVariant?.base_price ?? "N/A" %> -->
+                                                        <% if(priceVariant){ %>
+                                                            ₹<%= priceVariant?.base_price %>
+                                                        <% }else{ %>
+                                                            Stock Out
+                                                        <% } %>
+
+                                                    </p>
+                                                </div>
+
+                                                <button class="add-to-cart-btn">
+                                                    <i class="fa-solid fa-cart-shopping"></i>
+                                                    Add to Cart
+                                                </button>
+                                            </div>
+                                        </a>
                             </div>
 
-                        </a>
-
-
-
-                        <% }) %>
-
-                            <form method="GET" action="/shop" id="filterForm">
-                                <input type="hidden" name="category" id="f-category">
-                                <input type="hidden" name="team" id="f-team">
-                                <input type="hidden" name="size" id="f-size">
-                                <input type="hidden" name="minRange" id="f-minRange">
-                                <input type="hidden" name="maxRange" id="f-maxRange">
-                                <input type="hidden" name="sort" id="f-sort">
-                            </form>
-
+                            <% }) %>
 
                 </div>
 
                 <!-- PAGINATION -->
                 <div class="pagination">
-
-                    <!-- LEFT ARROW: show ONLY if NOT first page -->
                     <% if (currentPage> 1) { %>
                         <a href="/shop?page=<%= currentPage - 1 %>" class="arrow-btn">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                         <% } %>
 
-                            <!-- CURRENT PAGE NUMBER -->
                             <span class="current-page-display">
                                 <%= currentPage %>
                             </span>
 
-                            <!-- RIGHT ARROW: show ONLY if NOT last page -->
                             <% if (currentPage < totalPages) { %>
                                 <a href="/shop?page=<%= currentPage + 1 %>" class="arrow-btn">
                                     <i class="fa-solid fa-chevron-right"></i>
@@ -214,10 +202,18 @@
                 </div>
 
             </div>
-
         </div>
 
+        <form method="GET" action="/shop" id="filterForm">
+            <input type="hidden" name="category" id="f-category">
+            <input type="hidden" name="team" id="f-team">
+            <input type="hidden" name="size" id="f-size">
+            <input type="hidden" name="minRange" id="f-minRange">
+            <input type="hidden" name="maxRange" id="f-maxRange">
+            <input type="hidden" name="sort" id="f-sort">
+            <input type="hidden" name="page" id="f-page">
+        </form>
 
         <script src="/js/user/shop.js"></script>
-
+    </div>
 </section>

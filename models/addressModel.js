@@ -20,13 +20,13 @@ const addressSchema = new mongoose.Schema(
       trim: true,
     },
 
-    address_line1: {
+    address_type: {
       type: String,
       required: true,
       trim: true,
     },
 
-    address_line2: {
+    address_line: {
       type: String,
       trim: true,
       default: "",

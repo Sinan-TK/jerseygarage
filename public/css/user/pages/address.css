@@ -178,7 +178,6 @@
 /* Full-width inputs */
 .form-group.full {
   grid-column: span 2;
-
 }
 
 /* =================================================
@@ -281,6 +280,19 @@
   transform: translateY(-1px);
 }
 
+.form-group select {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-group select:focus {
+  border-color: #000000;
+}
+
 /* =================================================
    RESPONSIVE
 ================================================= */
@@ -306,3 +318,4 @@
 .delete-link{
   color: red;
 }
+

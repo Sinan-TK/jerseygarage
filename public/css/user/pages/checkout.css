@@ -1,0 +1,161 @@
+.checkout-container {
+    padding-block: 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.page-title {
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  margin-bottom: 10px;
+}
+
+.muted {
+  color: #777;
+  font-size: 14px;
+}
+
+.radio-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  position: relative;
+}
+
+.radio-card input {
+  display: none;
+}
+
+.radio-card.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.radio-content .title {
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 12px;
+  background: #e5e7eb;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+}
+
+.edit {
+  margin-left: auto;
+  color: #2563eb;
+  font-size: 14px;
+}
+
+.place-order {
+  width: 100%;
+  padding: 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* RIGHT */
+.checkout-right {
+  position: sticky;
+  top: 20px;
+}
+
+.summary-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.product {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.product img {
+  border-radius: 6px;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.remove {
+  margin-left: auto;
+  color: #2563eb;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 15px 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+.total {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.promo {
+  display: flex;
+  margin-top: 12px;
+}
+
+.promo input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px 0 0 6px;
+}
+
+.promo button {
+  padding: 10px 16px;
+  border: none;
+  background: #000;
+  color: #fff;
+  border-radius: 0 6px 6px 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .checkout-container {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-right {
+    position: static;
+  }
+}
