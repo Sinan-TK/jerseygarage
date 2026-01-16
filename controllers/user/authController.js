@@ -446,7 +446,7 @@ export const renderShopPage = wrapAsync(async (req, res) => {
               $expr: {
                 $and: [
                   { $eq: ["$product_id", "$$productId"] },
-                  { $eq: ["$size", "S"] }, 
+                  { $eq: ["$size", "S"] },
                 ],
               },
             },
@@ -508,7 +508,7 @@ export const productDetailPage = wrapAsync(async (req, res) => {
   const id = req.params.id;
 
   const product = await Product.aggregate([
-    { $match: { _id: new ObjectId(id) } },
+    { $match: { _id: new ObjectId(id), is_active: true } },
     {
       $lookup: {
         from: "variants",

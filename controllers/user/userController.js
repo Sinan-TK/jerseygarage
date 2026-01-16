@@ -9,6 +9,7 @@ import Wishlist from "../../models/wishlistModel.js";
 import Variant from "../../models/varientModel.js";
 import { ObjectId } from "mongodb";
 import { response } from "express";
+import { buildCheckoutItems } from "../../utils/buildCheckoutItems.js";
 // import send from "send";
 
 // ======================================================================
@@ -171,10 +172,7 @@ export const editAddress = wrapAsync(async (req, res) => {
 
   // If setting this address as default → unset others
   if (value.is_default) {
-    await Address.updateMany(
-      { user_id },
-      { $set: { is_default: false } }
-    );
+    await Address.updateMany({ user_id }, { $set: { is_default: false } });
   }
 
   // ✅ Update ONLY the selected address
@@ -197,7 +195,6 @@ export const editAddress = wrapAsync(async (req, res) => {
 
   return sendResponse(res, Responses.editAddress.ADDRESS_EDITED);
 });
-
 
 // ======================================================================
 // 5. WISHLIST PAGE RENDER
@@ -285,11 +282,51 @@ export const removeWishlist = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. USER LOGOUT
+// 6. BUY NOW
+// ======================================================================
+
+export const buyNow = (req, res) => {
+  const { product_id, variant_id, quantity } = req.body;
+
+  if (!req.session.user) {
+    return sendResponse(res, Responses.buyNowRes.NO_USER);
+  }
+
+  if (!product_id || quantity < 1 || !variant_id) {
+    return sendResponse(res, Responses.buyNowRes.INVALID);
+  }
+
+  req.session.buyNow = {
+    product_id,
+    variant_id,
+    quantity,
+  };
+
+  return sendResponse(res, Responses.buyNowRes.SUCCESS);
+};
+
+// ======================================================================
+// 6. CHECKOUT PAGE
 // ======================================================================
 
 export const checkoutPage = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
+  let items = [];
+  const shippingCharge = 50;
+
+  if (req.session.buyNow) {
+    items = [req.session.buyNow];
+  } else {
+    items = []; //await Cart.find({ user_id: req.user.id });
+  }
+
+  const checkoutItems = await buildCheckoutItems(items);
+
+  const subtotal = checkoutItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+  const total = subtotal+shippingCharge;
+
+  console.log(checkoutItems, subtotal);
 
   const addresses = await Address.find({ user_id })
     .sort({
@@ -302,7 +339,10 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     pageCSS: "checkout",
     pageJS: "checkout.js",
     title: "Checkout Page",
+    items: checkoutItems,
     addresses,
+    subtotal,
+    total,
     showHeader: true,
     showFooter: true,
   });

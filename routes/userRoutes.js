@@ -41,7 +41,9 @@ router.post("/wishlist",userMiddleware.userNotFound,Userdetails,userController.a
 
 router.patch("/wishlist/:id",Userdetails,userController.removeWishlist);
 
-router.get("/checkout",userController.checkoutPage)
+router.post("/buy-now",userController.buyNow);
+
+router.get("/checkout",userController.checkoutPage);
 
 router.post("/logout",Userdetails, userController.userLogout);
 

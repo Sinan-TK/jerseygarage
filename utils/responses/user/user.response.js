@@ -33,11 +33,11 @@ export const editAddress = Object.freeze({
 });
 
 export const removeAddress = Object.freeze({
-  REMOVED:{
-    code:201,
-    message:"Address removed successfully!!"
-  }
-})
+  REMOVED: {
+    code: 201,
+    message: "Address removed successfully!!",
+  },
+});
 
 export const addWishlist = Object.freeze({
   ALREADY_EXIST: {
@@ -56,5 +56,21 @@ export const removeWishlist = Object.freeze({
   REMOVED: {
     code: 201,
     message: "Product removed from wishlist!!",
+  },
+});
+
+export const buyNowRes = Object.freeze({
+  NO_USER: {
+    code: 400,
+    message: "Login Required!",
+  },
+  INVALID: {
+    code: 400,
+    message: "Invalid Request!!",
+  },
+  SUCCESS: {
+    code: 200,
+    message: "Buy now successfull!!",
+    redirectToFrontend: "/user/checkout",
   },
 });

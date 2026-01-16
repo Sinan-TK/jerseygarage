@@ -1,69 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
+<div class="checkout-container">
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout</title>
-    <link rel="stylesheet" href="style.css" />
-</head>
+    <!-- LEFT SECTION -->
+    <div class="checkout-left">
 
-<body>
+        <h1 class="page-title">Checkout</h1>
 
-    <div class="checkout-container">
+        <!-- SHIPPING -->
+        <section class="card">
+            <h2>Shipping Details</h2>
+            <p class="muted">Select Shipping Address</p>
 
-        <!-- LEFT SECTION -->
-        <div class="checkout-left">
+            <% addresses.forEach((address)=>{ %>
+                <label class="radio-card <%= address.is_default ? 'active':'' %>">
+                    <input type="radio" name="address" <%=address.is_default ? 'checked' :'' %>/>
+                    <div class="radio-content">
 
-            <h1 class="page-title">Checkout</h1>
-
-            <!-- SHIPPING -->
-            <section class="card">
-                <h2>Shipping Details</h2>
-                <p class="muted">Select Shipping Address</p>
-
-                <% addresses.forEach((address)=>{ %>
-                    <label class="radio-card <%= address.is_default ? 'active':'' %>">
-                        <input type="radio" name="address" <%= address.is_default ? 'checked':'' %>/>
-                        <div class="radio-content">
-                            <% if(address.is_default){ %>
-                            <div class="title">
-                                <%= address.address_type %> <span class="badge">Default</span>
-                            </div>
-                            <% } %>
-                            <p>
-                                <%= address.full_name %>
-                            </p>
-                            <p>
-                                <%= address.phone_no %>
-                            </p>
-                            <p>
-                                <%= address.address_line %>
-                            </p>
-                            <p>
-                                <%= address.city %>, <%= address.zip_code %>
-                            </p>
-                            <p>
-                                <%= address.state %>, <%= address.country %>
-                            </p>
+                        <div class="title">
+                            <%= address.address_type %>
+                                <% if(address.is_default){ %><span class="badge">Default</span>
+                                    <% } %>
                         </div>
-                        <span class="edit">Edit</span>
+
+                        <p>
+                            <%= address.full_name %>
+                        </p>
+                        <p>
+                            <%= address.phone_no %>
+                        </p>
+                        <p>
+                            <%= address.address_line %>
+                        </p>
+                        <p>
+                            <%= address.city %>, <%= address.zip_code %>
+                        </p>
+                        <p>
+                            <%= address.state %>, <%= address.country %>
+                        </p>
+                    </div>
+                    <span class="edit" onclick="openEditAddressModal(this)"
+                        data-address="<%- encodeURIComponent(JSON.stringify(address)) %>">Edit</span>
+                </label>
+                <% })%>
+
+                    <label class="radio-card" onclick="openAddAddressModal()">
+                        <input type="radio" name="address" />
+                        <div class="radio-content">
+                            <div class="title">Use a different address</div>
+                        </div>
                     </label>
-                    <% })%>
+        </section>
 
-                        <label class="radio-card">
-                            <input type="radio" name="address" />
-                            <div class="radio-content">
-                                <div class="title">Use a different address</div>
-                            </div>
-                        </label>
-            </section>
+        <!-- PAYMENT -->
+        <section class="card">
+            <h2>Payment Method</h2>
 
-            <!-- PAYMENT -->
-            <section class="card">
-                <h2>Payment Method</h2>
-
-                <label class="radio-card active">
+            <!-- <label class="radio-card active">
                     <input type="radio" name="payment" checked />
                     <div class="radio-content">
                         <div class="title">Credit / Debit Card</div>
@@ -93,82 +84,218 @@
                         <div class="title">Wallets</div>
                         <p class="muted">PayPal, Amazon Pay & more</p>
                     </div>
-                </label>
+                </label> -->
 
-                <label class="radio-card">
-                    <input type="radio" name="payment" />
-                    <div class="radio-content">
-                        <div class="title">Cash on Delivery</div>
-                    </div>
-                </label>
-            </section>
-
-            <button class="place-order">PLACE ORDER</button>
-        </div>
-
-        <!-- RIGHT SECTION -->
-        <aside class="checkout-right">
-            <div class="summary-card">
-
-                <h3>Product Details</h3>
-
-                <div class="product">
-                    <img src="https://picsum.photos/100/70" />
-                    <div>
-                        <p class="product-name">Manchester United Home Jersey 2024</p>
-                        <p class="muted">Size: L</p>
-                        <strong>₹2999.00</strong>
-                    </div>
-                    <span class="remove">Remove</span>
+            <label class="radio-card">
+                <input type="radio" name="payment" />
+                <div class="radio-content">
+                    <div class="title">Cash on Delivery</div>
                 </div>
+            </label>
+        </section>
 
-                <div class="product">
-                    <img src="https://picsum.photos/101/70" />
-                    <div>
-                        <p class="product-name">Real Madrid Away Jersey 2024</p>
-                        <p class="muted">Size: M</p>
-                        <strong>₹3299.00</strong>
-                    </div>
-                    <span class="remove">Remove</span>
-                </div>
-
-                <div class="divider"></div>
-
-                <p class="delivery">Estimated Delivery: <strong>Oct 15 - Oct 18</strong></p>
-
-                <div class="divider"></div>
-
-                <h3>Order Summary</h3>
-
-                <div class="row">
-                    <span>Subtotal (2 items)</span>
-                    <span>₹6298.00</span>
-                </div>
-                <div class="row">
-                    <span>Shipping</span>
-                    <span>₹99</span>
-                </div>
-                <div class="row">
-                    <span>Tax</span>
-                    <span>₹630</span>
-                </div>
-
-                <div class="row total">
-                    <span>Total</span>
-                    <span>₹7027.00</span>
-                </div>
-
-                <div class="promo">
-                    <input type="text" placeholder="SAVE20" />
-                    <button>APPLY</button>
-                </div>
-
-            </div>
-        </aside>
-
+        <button class="place-order">PLACE ORDER</button>
     </div>
 
-    <script src="script.js"></script>
-</body>
+    <!-- RIGHT SECTION -->
+    <aside class="checkout-right">
+        <div class="summary-card">
 
-</html>
+            <h3>Product Details</h3>
+
+            <% items.forEach((item)=>{%>
+
+                <div class="product">
+                    <div class="product-img">
+                        <img src="<%= item.image %>" />
+                    </div>
+                    <div>
+                        <p class="product-name">
+                            <%= item.name %>
+                        </p>
+                        <p class="muted">
+                            <%= item.size %>
+                        </p>
+                        <strong>₹<%= item.subtotal %>.00</strong>
+                    </div>
+                </div>
+
+                <% }) %>
+
+                    <div class="divider"></div>
+
+                    <p class="delivery">Estimated Delivery: <strong>Oct 15 - Oct 18</strong></p>
+
+                    <div class="divider"></div>
+
+                    <h3>Order Summary</h3>
+
+                    <div class="row">
+                        <span>Subtotal (<%= items.length %> items)</span>
+                        <span>₹<%= subtotal %>.00</span>
+                    </div>
+                    <div class="row">
+                        <span>Shipping</span>
+                        <span>₹50.00</span>
+                    </div>
+
+                    <div class="row total">
+                        <span>Total</span>
+                        <span>₹<%= total %>.00</span>
+                    </div>
+
+                    <!-- <div class="promo">
+                            <input type="text" placeholder="SAVE20" />
+                            <button>APPLY</button>
+                        </div> -->
+
+        </div>
+    </aside>
+
+</div>
+
+
+<!-- Add Address Modal -->
+<div class="modal-overlay" id="addAddressModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Add New Address</h3>
+            <button class="close-btn" onclick="closeAddAddressModal()">×</button>
+        </div>
+
+        <form id="addAddressForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name">
+                </div>
+
+                <div class="form-group">
+                    <label for="address_type">Address Type</label>
+                    <select name="address_type" id="address_type">
+                        <option value="Home">Home</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group full">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone_no">
+                </div>
+
+                <div class="form-group full">
+                    <label>Address Line</label>
+                    <input type="text" name="address_line">
+                </div>
+
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city">
+                </div>
+
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="state">
+                </div>
+
+                <div class="form-group">
+                    <label>ZIP Code</label>
+                    <input type="text" name="zip_code">
+                </div>
+
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" name="country" value="India">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" onclick="closeAddAddressModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    Save Address
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ===============================
+     EDIT ADDRESS MODAL
+================================ -->
+<div class="modal-overlay" id="editAddressModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Address</h3>
+            <button class="close-btn" onclick="closeEditAddressModal()">×</button>
+        </div>
+
+        <form id="editAddressForm">
+            <input type="hidden" name="address_id" id="edit_address_id" />
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" id="edit_full_name" />
+                </div>
+
+                <div class="form-group">
+                    <label>Address Type</label>
+                    <select name="address_type" id="edit_address_type">
+                        <option value="Home">Home</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group full">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone_no" id="edit_phone_no" />
+                </div>
+
+                <div class="form-group full">
+                    <label>Address Line</label>
+                    <input type="text" name="address_line" id="edit_address_line" />
+                </div>
+
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" id="edit_city" />
+                </div>
+
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="state" id="edit_state" />
+                </div>
+
+                <div class="form-group">
+                    <label>ZIP Code</label>
+                    <input type="text" name="zip_code" id="edit_zip_code" />
+                </div>
+
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" name="country" id="edit_country" />
+                </div>
+
+                <div class="form-group checkbox full">
+                    <input type="checkbox" id="edit_is_default" name="is_default" />
+                    <label for="edit_is_default">Set as default address</label>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" onclick="closeEditAddressModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary" id="edit-submit">
+                    Update Address
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
