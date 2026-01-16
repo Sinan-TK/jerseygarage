@@ -31,7 +31,7 @@
                 <% let isWishlisted=false; if (wishlist && wishlist.items && selectedVariant) { for (let item of
                   wishlist.items) { if ( item.variant_id.toString()===selectedVariant._id.toString() ) {
                   isWishlisted=true; break; } } } %>
-                  <button data-varient="<%= selectedVariant._id %>"
+                  <button data-variant="<%= selectedVariant._id %>"
                     class="wishlist-btn <%= isWishlisted ? `isWishlistedTrue` : `isWishlistedFalse` %>"
                     title="Add to Wishlist">
                     <i class="fa-regular fa-heart"></i>
@@ -61,7 +61,7 @@
                 </div>
 
                 <!-- ADD TO CART BUTTON -->
-                <button class="add-to-cart-btn">
+                <button data-variant="<%= selectedVariant._id %>" data-product="<%= product._id %>" class="add-to-cart-btn">
                   <i class="fa-solid fa-cart-shopping"></i>
                   Add to Cart
                 </button>

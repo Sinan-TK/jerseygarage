@@ -74,3 +74,49 @@ export const buyNowRes = Object.freeze({
     redirectToFrontend: "/user/checkout",
   },
 });
+
+export const addToCart = Object.freeze({
+  INVALID: {
+    code: 400,
+    message: "Invalid cart data",
+  },
+  NO_VARIANT: {
+    code: 404,
+    message: "Variant not available",
+  },
+  SUCCESS: {
+    code: 200,
+    message: "Item added to cart",
+  },
+});
+
+export const cartQuantity = Object.freeze({
+  INVALID: {
+    code: 400,
+    message: "Invalid quantity update request",
+  },
+  CART_NOT_FOUND: {
+    code: 404,
+    message: "Cart not found",
+  },
+  ITEM_NOT_FOUND: {
+    code: 404,
+    message: "Item not found in cart",
+  },
+  QUANTITY_ZERO: {
+    code: 400,
+    message: "Quantity can't be zero",
+  },
+});
+
+export const cartCheck = Object.freeze({
+  EMPTY_CART: {
+    code: 400,
+    message: "Your cart is empty",
+  },
+  SUCCESS: {
+    code: 200,
+    message: "All items are in stock. Proceed to checkout.",
+    redirectToFrontend: "/user/checkout",
+  },
+});

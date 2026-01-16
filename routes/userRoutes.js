@@ -41,9 +41,15 @@ router.post("/wishlist",userMiddleware.userNotFound,Userdetails,userController.a
 
 router.patch("/wishlist/:id",Userdetails,userController.removeWishlist);
 
+router.post("/add-to-cart",userMiddleware.userNotFound,userController.addToCart);
+
+router.patch("/cart",userController.cartQuantity);
+
 router.post("/buy-now",userController.buyNow);
 
-router.get("/checkout",userController.checkoutPage);
+router.post("/checkout",userController.proceedToCheckout);
+
+router.get("/checkout",userMiddleware.checkoutMiddleware,userController.checkoutPage);
 
 router.post("/logout",Userdetails, userController.userLogout);
 

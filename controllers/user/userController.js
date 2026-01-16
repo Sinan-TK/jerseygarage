@@ -7,23 +7,99 @@ import User from "../../models/userModel.js";
 import Address from "../../models/addressModel.js";
 import Wishlist from "../../models/wishlistModel.js";
 import Variant from "../../models/varientModel.js";
+import Cart from "../../models/cartModel.js";
+import Product from "../../models/productModel.js";
 import { ObjectId } from "mongodb";
-import { response } from "express";
 import { buildCheckoutItems } from "../../utils/buildCheckoutItems.js";
-// import send from "send";
 
 // ======================================================================
 // 1. CART PAGE RENDER
 // ======================================================================
-export const cartRender = (req, res) => {
+export const cartRender = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const cart = await Cart.findOne({ user_id });
+
+  const products = await buildCheckoutItems(cart.items);
+
+  const shippingCharge = 50;
+
+  const priceDetails = {
+    subtotal: cart.total_amount,
+    total: shippingCharge + cart.total_amount,
+  };
+
   res.render("user/pages/cart", {
     title: "Cart",
     pageCSS: "cart",
     showHeader: true,
     showFooter: true,
     pageJS: "cart.js",
+
+    products,
+    priceDetails,
   });
-};
+});
+// ======================================================================
+// 2. CART QUANTITY CHANGE
+// ======================================================================
+export const cartQuantity = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const { variant_id, value, quantity } = req.body;
+  const shippingCharge = 50;
+
+  if (!variant_id || !["plus", "minus"].includes(value)) {
+    return sendResponse(res, Responses.cartQuantity.INVALID);
+  }
+
+  const cart = await Cart.findOne({ user_id });
+
+  if (!cart) {
+    return sendResponse(res, Responses.cartQuantity.CART_NOT_FOUND);
+  }
+
+  const item = cart.items.find((i) => i.variant_id.toString() === variant_id);
+
+  if (!item) {
+    return sendResponse(res, Responses.cartQuantity.ITEM_NOT_FOUND);
+  }
+
+  if (value === "plus") {
+    item.quantity += 1;
+  }
+
+  if (value === "minus") {
+    if (item.quantity === 1 || parseInt(quantity) === 1) {
+      return sendResponse(res, Responses.cartQuantity.QUANTITY_ZERO);
+    } else {
+      item.quantity -= 1;
+    }
+  }
+
+  let total = 0;
+  let itemTotal = 0;
+  for (const cartItem of cart.items) {
+    const variant = await Variant.findById(cartItem.variant_id);
+    if (variant._id.toString() === variant_id) {
+      itemTotal = variant.base_price * cartItem.quantity;
+    }
+    total += variant.base_price * cartItem.quantity;
+  }
+
+  cart.total_amount = total;
+  await cart.save();
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Quantity changed successfully",
+    data: {
+      quantity: item?.quantity || 0,
+      itemTotal,
+      subtotal: cart.total_amount,
+      total: shippingCharge + cart.total_amount,
+    },
+  });
+});
 
 // ======================================================================
 // 2. PROFILE PAGE RENDER
@@ -69,7 +145,6 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
   });
 
   if (matchMail) {
-    console.log("working");
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_EXIST);
   }
 
@@ -316,17 +391,22 @@ export const checkoutPage = wrapAsync(async (req, res) => {
 
   if (req.session.buyNow) {
     items = [req.session.buyNow];
+    delete req.session.buyNow;
   } else {
-    items = []; //await Cart.find({ user_id: req.user.id });
+    const cart = await Cart.findOne({ user_id });
+
+    if (!cart || cart.items.length === 0) {
+      return res.redirect("/cart");
+    }
+
+    items = cart.items;
   }
 
   const checkoutItems = await buildCheckoutItems(items);
 
   const subtotal = checkoutItems.reduce((sum, item) => sum + item.subtotal, 0);
 
-  const total = subtotal+shippingCharge;
-
-  console.log(checkoutItems, subtotal);
+  const total = subtotal + shippingCharge;
 
   const addresses = await Address.find({ user_id })
     .sort({
@@ -346,6 +426,119 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     showHeader: true,
     showFooter: true,
   });
+});
+
+// ======================================================================
+// 6. ADD TO CART
+// ======================================================================
+export const addToCart = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const { product_id, variant_id, quantity } = req.body;
+
+  if (!variant_id || !quantity || quantity < 1) {
+    return sendResponse(res, Responses.addToCart.INVALID);
+  }
+
+  const variant = await Variant.findById(variant_id);
+
+  if (!variant || !variant.is_available) {
+    return sendResponse(res, Responses.addToCart.NO_VARIANT);
+  }
+
+  if (variant.stock < quantity) {
+    return sendResponse(res, {
+      code: 400,
+      message: `Only ${variant.stock} items left in stock`,
+    });
+  }
+
+  let cart = await Cart.findOne({ user_id });
+
+  if (!cart) {
+    cart = new Cart({ user_id, items: [] });
+  }
+
+  const existingItem = cart.items.find(
+    (item) => item.variant_id.toString() === variant_id
+  );
+
+  if (existingItem) {
+    const newQty = existingItem.quantity + quantity;
+
+    if (newQty > variant.stock) {
+      return sendResponse(res, {
+        code: 400,
+        message: `Only ${variant.stock} items left in stock`,
+      });
+    }
+
+    existingItem.quantity = newQty;
+  } else {
+    cart.items.push({ product_id, variant_id, quantity });
+  }
+
+  let total = 0;
+
+  for (const item of cart.items) {
+    const v = await Variant.findById(item.variant_id);
+    total += v.base_price * item.quantity;
+  }
+
+  cart.total_amount = total;
+  await cart.save();
+
+  return sendResponse(res, Responses.addToCart.SUCCESS);
+});
+// ======================================================================
+// 6. CHECKOUT RECHECKING THE CART PRODUCT BEFORE THE CHECKOUT
+// ======================================================================
+export const proceedToCheckout = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const cart = await Cart.findOne({ user_id });
+
+  if (!cart || cart.items.length === 0) {
+    return sendResponse(res, Responses.cartCheck.EMPTY_CART);
+  }
+
+  for (const item of cart.items) {
+    const variant = await Variant.findById(item.variant_id);
+
+    if (!variant || !variant.is_available) {
+      let productName = "This product";
+
+      if (variant?.product_id) {
+        const product = await Product.findById(variant.product_id).select(
+          "name"
+        );
+
+        if (product) productName = product.name;
+      }
+
+      return sendResponse(res, {
+        code: 400,
+        message: `${productName} is no longer available`,
+      });
+    }
+
+    if (variant.stock < item.quantity) {
+      const product = await Product.findById(variant.product_id).select("name");
+
+      return sendResponse(res, {
+        code: 400,
+        message: `Only ${variant.stock} item(s) left for ${
+          product?.name || "this product"
+        }`,
+      });
+    }
+  }
+
+  req.session.checkoutIntent = {
+    type: "cart",
+    createdAt: Date.now(),
+  };
+
+  return sendResponse(res, Responses.cartCheck.SUCCESS);
 });
 
 // ======================================================================

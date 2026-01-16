@@ -15,59 +15,41 @@
       </div>
 
       <!-- ITEM -->
-      <div class="cart-row">
-        <div class="product-info">
-          <img src="https://via.placeholder.com/90x60" alt="">
-          <div>
-            <p class="product-name">
-              MANCHESTER UNITED 2001/2002 AWAY KIT BECKHAM POLO
-            </p>
-            <p class="size">Size: L</p>
-            <button class="remove">🗑 Remove</button>
+      <%products.forEach((product)=>{ %>
+        <div class="cart-row">
+          <div class="product-info">
+            <img src="<%= product.image %>" alt="">
+            <div>
+              <p class="product-name">
+                <%= product.name %>
+              </p>
+              <p class="size">Size: <%= product.size %>
+              </p>
+              <button class="remove">Remove</button>
+            </div>
           </div>
-        </div>
 
-        <div class="price">₹599.00</div>
+          <div class="price">₹<%= product.unit_price %>.00</div>
 
-        <div class="qty">
-          <button>-</button>
-          <span>2</span>
-          <button>+</button>
-        </div>
-
-        <div class="subtotal">₹1198.00</div>
-      </div>
-
-      <!-- ITEM -->
-      <div class="cart-row">
-        <div class="product-info">
-          <img src="https://via.placeholder.com/90x60" alt="">
-          <div>
-            <p class="product-name">
-              REAL MADRID SPECIAL EDITION BLACK POLO SUBLIMATION
-            </p>
-            <p class="size">Size: M</p>
-            <button class="remove">🗑 Remove</button>
+          <div class="qty">
+            <button class="qty-minus">-</button>
+            <span data-variant="<%= product.variant_id %>" class="qty-value">
+              <%= product.quantity %>
+            </span>
+            <button class="qty-plus">+</button>
           </div>
+
+
+          <div class="subtotal">₹<%= product.subtotal %>.00</div>
         </div>
+        <% }) %>
 
-        <div class="price">₹699.00</div>
+          <p class="note">Shipping charge is calculated at checkout</p>
 
-        <div class="qty">
-          <button>-</button>
-          <span>1</span>
-          <button>+</button>
-        </div>
-
-        <div class="subtotal">₹699.00</div>
-      </div>
-
-      <p class="note">Shipping and taxes calculated at checkout</p>
-
-      <div class="cart-actions">
-        <button class="btn-outline">Continue Shopping</button>
-        <button class="btn-primary">Proceed to Checkout</button>
-      </div>
+          <div class="cart-actions">
+            <button class="btn-outline" id="continueShop">Continue Shopping</button>
+            <button class="btn-primary" id="checkoutBtn" >Proceed to Checkout</button>
+          </div>
 
     </div>
 
@@ -77,22 +59,18 @@
 
       <div class="summary-item">
         <span>Subtotal</span>
-        <span>₹1897.00</span>
+        <span id="subTotal" >₹<%= priceDetails.subtotal %>.00</span>
       </div>
       <div class="summary-item">
         <span>Shipping</span>
-        <span>₹99</span>
-      </div>
-      <div class="summary-item">
-        <span>Tax</span>
-        <span>₹190</span>
+        <span>₹50.00</span>
       </div>
 
       <hr>
 
       <div class="summary-total">
         <span>Total</span>
-        <span>₹2186.00</span>
+        <span id="total">₹<%= priceDetails.total %>.00</span>
       </div>
     </div>
 

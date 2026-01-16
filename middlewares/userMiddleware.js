@@ -11,9 +11,19 @@ import { sendResponse } from "../utils/sendResponse.js";
 
 export const userNotFound = (req, res, next) => {
   if (!req.session.user) {
-    return sendResponse(res,{
+    return sendResponse(res, {
       code: 401,
       message: "Login required",
+    });
+  }
+  next();
+};
+
+export const checkoutMiddleware = (req, res, next) => {
+  if (!req.session.checkoutIntent) {
+    return sendResponse(res, {
+      code: 400,
+      message: "No items to checkout",
     });
   }
   next();

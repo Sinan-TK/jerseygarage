@@ -165,3 +165,7 @@ wishlistBtn.addEventListener("click", async (e) => {
     toastr.error(error?.message, "Error!!");
   }
 });
+
+
+
+
