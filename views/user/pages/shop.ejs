@@ -134,7 +134,7 @@
                             <div class="product-item">
 
                                 <!-- WISHLIST -->
-                                <% if (selectedVariant) { %>
+                                <% if (selectedVariant && user) { %>
                                     <div class="product-actions">
                                         <button data-varient="<%= selectedVariant._id %>"
                                             class="wishlist-btn <%= isWishlisted ? 'isWishlistedTrue' : 'isWishlistedFalse' %>"
@@ -160,7 +160,6 @@
                                                     </p>
                                                     <% } %>
                                                     <p class="product-price-base">
-                                                        <!-- <%= priceVariant?.base_price ?? "N/A" %> -->
                                                         <% if(priceVariant){ %>
                                                             ₹<%= priceVariant?.base_price %>
                                                         <% }else{ %>

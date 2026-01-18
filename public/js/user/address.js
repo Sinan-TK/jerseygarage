@@ -1,3 +1,48 @@
+async function loadAddresses() {
+  const res = await axios.get("/user/address/data");
+  document.querySelector(".address-list").innerHTML = res.data.data.addresses
+    .map(renderAddress)
+    .join("");
+}
+
+function renderAddress(address) {
+  return `
+    <div class="address-card" data-id="${address._id}">
+    <div class="address-info">
+    <h4>${address.address_type}</h4>
+    
+    <p>${address.full_name}</p>
+    
+    <p>${address.address_line}</p>
+
+        <p>${address.city}, ${address.zip_code}</p>
+
+        <p>${address.phone_no}</p>
+        
+        <p>${address.country}</p>
+        </div>
+        
+        <div class="edit-delete">
+        <button
+        onclick="openEditAddressModal(this)"
+        data-address="${encodeURIComponent(JSON.stringify(address))}"
+        class="edit-link"
+        >
+        <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        
+        ${
+          address.is_default
+            ? `<p class="default-txt">Default</p>`
+            : `<button class="delete-link" data-id="${address._id}">
+            <i class="fa-solid fa-trash"></i>
+            </button>`
+        }
+        </div>
+        </div>
+        `;
+}
+loadAddresses();
 document
   .getElementById("addAddressForm")
   .addEventListener("submit", async (e) => {
@@ -20,18 +65,13 @@ document
       is_default: form.is_default.checked,
     };
 
-    console.log(formData);
-
     try {
       const res = await axios.post("/user/address", formData);
 
       if (res.data.success) {
         toastr.success(res.data.message, "Success");
-
-        setTimeout(() => {
-          closeAddAddressModal();
-          window.location.reload();
-        }, 2000);
+        closeAddAddressModal();
+        await loadAddresses();
       }
     } catch (err) {
       const error = err.response?.data;
@@ -60,25 +100,31 @@ function closeAddAddressModal() {
   modal.style.display = "none";
 }
 
-document.querySelectorAll(".delete-link").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const id = btn.dataset.id;
+document.querySelector(".address-list").addEventListener("click", async (e) => {
+  const deleteBtn = e.target.closest(".delete-link");
 
-    try {
-      const res = await axios.patch(`/user/address/${id}`);
+  if (!deleteBtn) return;
 
-      if (res.data.success) {
-        toastr.success(res.data.message, "Removed!!");
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-    } catch (err) {
-      const error = res.response?.data;
+  const id = deleteBtn.dataset.id;
 
-      toastr.error(error.message, "Error!!");
+  const addressCard = deleteBtn.closest(".address-card");
+
+  try {
+    const res = await axios.delete(`/user/address`, {
+      data: {
+        id,
+      },
+    });
+
+    if (res.data.success) {
+      addressCard.remove();
+      toastr.success(res.data.message, "Removed!!");
     }
-  });
+  } catch (err) {
+    const error = res.response?.data;
+
+    toastr.error(error.message, "Error!!");
+  }
 });
 
 function closeEditAddressModal() {
@@ -116,8 +162,6 @@ document
 
     const addressId = form.address_id.value;
 
-    console.log(addressId);
-
     const formData = {
       full_name: form.full_name.value.trim(),
       address_type: form.address_type.value.trim(),
@@ -130,7 +174,6 @@ document
       is_default: form.is_default.checked,
     };
 
-    // console.log(formData);
     try {
       const res = await axios.patch(
         `/user/address/edit/${addressId}`,
@@ -138,10 +181,10 @@ document
       );
       if (res.data.success) {
         toastr.success(res.data.message, "Success");
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        btn.innerHTML = "Update Address";
+        btn.disabled = false;
+        closeEditAddressModal();
+        loadAddresses();
       }
     } catch (err) {
       const error = err.response?.data;

@@ -36,8 +36,6 @@ addToCart.forEach((btn) => {
     const variant_id = btn.dataset.variant;
     const quantity = 1;
 
-    console.log(variant_id);
-
     try {
       const res = await axios.post("/user/add-to-cart", {
         product_id,
@@ -47,6 +45,7 @@ addToCart.forEach((btn) => {
 
       if (res.data.success) {
         toastr.success(res.data.message, "Success");
+        document.querySelector(".cart-count").innerText = `${res.data.data.items_count}`;
       }
     } catch (err) {
       const error = err.response?.data;

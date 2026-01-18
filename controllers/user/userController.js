@@ -60,12 +60,18 @@ export const cartQuantity = wrapAsync(async (req, res) => {
 
   const item = cart.items.find((i) => i.variant_id.toString() === variant_id);
 
+  const itemVariant = await Variant.findById(variant_id);
+
   if (!item) {
     return sendResponse(res, Responses.cartQuantity.ITEM_NOT_FOUND);
   }
 
   if (value === "plus") {
-    item.quantity += 1;
+    if (itemVariant.stock > item.quantity) {
+      item.quantity += 1;
+    }else{
+      return sendResponse(res,Responses.cartQuantity.STOCK_OUT)
+    }
   }
 
   if (value === "minus") {
@@ -169,22 +175,41 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 // ======================================================================
 // 4. ADDRESS PAGE RENDER
 // ======================================================================
-export const addressRender = wrapAsync(async (req, res) => {
-  const user_id = req.session.user.id;
+export const addressPageRender = wrapAsync(async (req, res) => {
+  // const user_id = req.session.user.id;
 
-  const addresses = await Address.find({ user_id })
-    .sort({ is_default: -1, createdAt: -1 })
-    .lean();
+  // const addresses = await Address.find({ user_id })
+  //   .sort({ is_default: -1, createdAt: -1 })
+  //   .lean();
 
   res.render("user/layouts/profilelayout", {
     title: "User Addresses",
-    addresses,
+    // addresses,
     pageCSS: "address",
     view: "address",
     profile: true,
     showHeader: true,
     showFooter: true,
     pageJS: "address.js",
+  });
+});
+// ======================================================================
+// 4. ADDRESS ADD
+// ======================================================================
+
+export const addressData = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const addresses = await Address.find({ user_id })
+    .sort({ is_default: -1, createdAt: -1 })
+    .lean();
+
+  return sendResponse(res, {
+    code: 200,
+    message: "data retrieved successfully",
+    data: {
+      addresses,
+    },
   });
 });
 
@@ -221,7 +246,7 @@ export const addAddress = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const removeAddress = wrapAsync(async (req, res) => {
-  const id = new ObjectId(req.params.id);
+  const { id } = req.body;
 
   await Address.findOneAndDelete({ _id: id });
 
@@ -484,10 +509,18 @@ export const addToCart = wrapAsync(async (req, res) => {
     total += v.base_price * item.quantity;
   }
 
+  const items_count = cart.items.length;
+
   cart.total_amount = total;
   await cart.save();
 
-  return sendResponse(res, Responses.addToCart.SUCCESS);
+  return sendResponse(res, {
+    code: 200,
+    message: "Item added to cart",
+    data: {
+      items_count,
+    },
+  });
 });
 // ======================================================================
 // 6. CHECKOUT RECHECKING THE CART PRODUCT BEFORE THE CHECKOUT
@@ -539,6 +572,68 @@ export const proceedToCheckout = wrapAsync(async (req, res) => {
   };
 
   return sendResponse(res, Responses.cartCheck.SUCCESS);
+});
+
+// ======================================================================
+// 6. CART ITEM REMOVE
+// ======================================================================
+export const deleteCartItem = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const { variant_id } = req.body;
+  const shippingCharge = 50;
+
+  if (!variant_id) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Variant ID is required",
+    });
+  }
+
+  const cart = await Cart.findOne({ user_id });
+
+  if (!cart) {
+    return sendResponse(res, {
+      code: 404,
+      message: "Cart not found",
+    });
+  }
+
+  // Check if item exists
+  const itemExists = cart.items.some(
+    (item) => item.variant_id.toString() === variant_id
+  );
+
+  if (!itemExists) {
+    return sendResponse(res, {
+      code: 404,
+      message: "Item not found in cart",
+    });
+  }
+
+  // Remove item
+  cart.items = cart.items.filter(
+    (item) => item.variant_id.toString() !== variant_id
+  );
+
+  // Recalculate total
+  let total = 0;
+  for (const item of cart.items) {
+    const variant = await Variant.findById(item.variant_id);
+    total += variant.base_price * item.quantity;
+  }
+
+  cart.total_amount = total;
+  await cart.save();
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Item removed from cart",
+    data: {
+      subtotal: cart.total_amount,
+      total: shippingCharge + cart.total_amount,
+      items_count: cart.items.length,
+    },
+  });
 });
 
 // ======================================================================

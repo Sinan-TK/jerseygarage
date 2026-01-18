@@ -1,6 +1,7 @@
 import express from "express";
 import * as authController from "../controllers/user/authController.js";
 import * as authMiddleware from "../middlewares/authMiddleware.js";
+import * as userMiddleware from "../middlewares/userMiddleware.js";
 import { sidebarData } from "../middlewares/sidebarMiddleware.js";
 import { userLayout } from "../middlewares/layoutMiddleware.js";
 import { checkBlockedUser } from "../middlewares/userBlockMiddleware.js";
@@ -13,6 +14,8 @@ router.use(userLayout);
 router.use(sidebarData);
 
 router.use(checkBlockedUser);
+
+router.use(userMiddleware.cartItemsCount);
 
 router.use(authMiddleware.profileIcon);
 

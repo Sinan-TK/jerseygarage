@@ -48,15 +48,18 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  border: none;
-  background: none;
+  padding: 0px 4px;
+  background-color: #000000;
+  border: 1px solid black;
+  border-radius: 5px;
   font-size: 18px;
   cursor: pointer;
   color: #9ca3af;
 }
 
 .remove-btn:hover {
-  color: #000;
+  /* color: #000000; */
+  background-color: #ffffff;
 }
 
 /* IMAGE */

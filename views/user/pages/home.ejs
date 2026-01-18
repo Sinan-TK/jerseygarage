@@ -27,45 +27,49 @@
               %>
 
               <!-- WISHLIST ICON -->
-              <div class="product-actions">
-                <% let isWishlisted=false; if (wishlist && wishlist.items && selectedVariant) { for (let item of
-                  wishlist.items) { if ( item.variant_id.toString()===selectedVariant._id.toString() ) {
-                  isWishlisted=true; break; } } } %>
-                  <button data-variant="<%= selectedVariant._id %>"
-                    class="wishlist-btn <%= isWishlisted ? `isWishlistedTrue` : `isWishlistedFalse` %>"
-                    title="Add to Wishlist">
-                    <i class="fa-regular fa-heart"></i>
-                  </button>
-              </div>
 
-              <img src="<%=product.images[0]%>" alt="<%=product.name%>">
-
-              <div class="product-details">
-                <p class="product-name">
-                  <%= product.name %>
-                </p>
-
-                <div class="price-section">
-                  <p class="product-price-normal">
-
-                    <% if (selectedVariant) { %>
-                      ₹<%= selectedVariant.normal_price %>
-                        <% } else { %>
-                          <span>Out of Stock</span>
-                          <% } %>
-                  </p>
-
-                  <p class="product-price-base">
-                    ₹<%= selectedVariant.base_price %>
-                  </p>
+              <% if(user){ %>
+                <div class="product-actions">
+                  <% let isWishlisted=false; if (wishlist && wishlist.items && selectedVariant) { for (let item of
+                    wishlist.items) { if ( item.variant_id.toString()===selectedVariant._id.toString() ) {
+                    isWishlisted=true; break; } } } %>
+                    <button data-variant="<%= selectedVariant._id %>"
+                      class="wishlist-btn <%= isWishlisted ? `isWishlistedTrue` : `isWishlistedFalse` %>"
+                      title="Add to Wishlist">
+                      <i class="fa-regular fa-heart"></i>
+                    </button>
                 </div>
+                <% } %>
 
-                <!-- ADD TO CART BUTTON -->
-                <button data-variant="<%= selectedVariant._id %>" data-product="<%= product._id %>" class="add-to-cart-btn">
-                  <i class="fa-solid fa-cart-shopping"></i>
-                  Add to Cart
-                </button>
-              </div>
+                  <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+
+                  <div class="product-details">
+                    <p class="product-name">
+                      <%= product.name %>
+                    </p>
+
+                    <div class="price-section">
+                      <p class="product-price-normal">
+
+                        <% if (selectedVariant) { %>
+                          ₹<%= selectedVariant.normal_price %>
+                            <% } else { %>
+                              <span>Out of Stock</span>
+                              <% } %>
+                      </p>
+
+                      <p class="product-price-base">
+                        ₹<%= selectedVariant.base_price %>
+                      </p>
+                    </div>
+
+                    <!-- ADD TO CART BUTTON -->
+                    <button data-variant="<%= selectedVariant._id %>" data-product="<%= product._id %>"
+                      class="add-to-cart-btn">
+                      <i class="fa-solid fa-cart-shopping"></i>
+                      Add to Cart
+                    </button>
+                  </div>
           </div>
 
         </a>

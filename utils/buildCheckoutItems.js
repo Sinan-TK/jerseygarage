@@ -25,7 +25,7 @@ export const buildCheckoutItems = async (items) => {
     }
 
     if (variant.stock < item.quantity) {
-      throw new Error(`Only ${variant.stock} items left`);
+      throw new Error(`${product.name} Only ${variant.stock} items left`);
     }
 
     checkoutItems.push({

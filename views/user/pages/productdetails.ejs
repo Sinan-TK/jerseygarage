@@ -6,13 +6,15 @@
         <!-- LEFT IMAGES -->
         <div class="product-images">
             <div class="img-zoom-container">
-                <div class="product-actions">
-                    <button class="wishlist-btn" title="Add to Wishlist">
-                        <i class="fa-regular fa-heart"></i>
-                    </button>
-                </div>
+                <% if(user){ %>
+                    <div class="product-actions">
+                        <button class="wishlist-btn" title="Add to Wishlist">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <%}%>
 
-                <img class="main-img" src="<%= product[0].images[0] %>" />
+                        <img class="main-img" src="<%= product[0].images[0] %>" />
             </div>
 
             <div class="thumbs">

@@ -4,49 +4,9 @@
         <h2>Saved Addresses</h2>
         <button class="btn-primary" onclick="openAddAddressModal()">Add New Address</button>
     </div>
-
-    <% if(addresses.length===0){%>
-        <div class="address-card">
-            <div class="address-info">
-                <h4>No address added yet</h4>
-            </div>
-        </div>
-        <%} else{%>
-            <% addresses.forEach((address)=>{ %>
-                <div class="address-card">
-                    <div class="address-info">
-                        <h4>
-                            <%= address.address_type%>
-                        </h4>
-                        <p>
-                            <%= address.full_name %>
-                        </p>
-                        <p>
-                            <%= address.address_line %>
-                        </p>
-                        <p>
-                            <%= address.city %>, <%= address.zip_code %>
-                        </p>
-                        <p>
-                            <%= address.phone_no %>
-                        </p>
-                        <p>
-                            <%= address.country %>
-                        </p>
-                    </div>
-                    <div class="edit-delete">
-                        <button onclick="openEditAddressModal(this)"
-                            data-address="<%- encodeURIComponent(JSON.stringify(address)) %>" class="edit-link"><i
-                                class="fa-solid fa-pen-to-square"></i></button>
-                        <% if(!address.is_default){ %>
-                            <button class="delete-link" data-id="<%= address._id %>"><i
-                                    class="fa-solid fa-trash"></i></button>
-                            <% }else{ %>
-                                <p class="default-txt">default</p>
-                                <%}%>
-                    </div>
-                </div>
-                <%})}%>
+    <div class="address-list">
+        
+    </div>
 </section>
 
 <!-- Add Address Modal -->
@@ -182,7 +142,7 @@
                 </div>
 
                 <div class="form-group checkbox full">
-                    <input type="checkbox" id="edit_is_default" name="is_default"/>
+                    <input type="checkbox" id="edit_is_default" name="is_default" />
                     <label for="edit_is_default">Set as default address</label>
                 </div>
             </div>

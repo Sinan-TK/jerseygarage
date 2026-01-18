@@ -2,77 +2,91 @@
 
   <h1 class="page-title">Your Cart</h1>
 
-  <div class="cart-wrapper">
+  <div class="cart-container">
+    <% if(products.length===0){ %>
+      <div class="empty-cart">
+        <i class="fa-solid fa-cart-shopping empty-icon"></i>
 
-    <!-- LEFT: CART ITEMS -->
-    <div class="cart-items">
-
-      <div class="cart-header">
-        <span>Product</span>
-        <span>Price</span>
-        <span>Quantity</span>
-        <span>Subtotal</span>
+        <h3>Your cart is empty</h3>
+        <a href="/shop">Continue Shopping</a>
       </div>
+      <% }else{ %>
+        <div class="cart-wrapper">
 
-      <!-- ITEM -->
-      <%products.forEach((product)=>{ %>
-        <div class="cart-row">
-          <div class="product-info">
-            <img src="<%= product.image %>" alt="">
-            <div>
-              <p class="product-name">
-                <%= product.name %>
-              </p>
-              <p class="size">Size: <%= product.size %>
-              </p>
-              <button class="remove">Remove</button>
+          <!-- LEFT: CART ITEMS -->
+          <div class="cart-items">
+
+            <div class="cart-header">
+              <span>Product</span>
+              <span>Price</span>
+              <span>Quantity</span>
+              <span>Subtotal</span>
+            </div>
+
+            <!-- ITEM -->
+            <%products.forEach((product)=>{ %>
+              <div class="cart-row" data-variant="<%= product.variant_id %>">
+                <div class="product-info">
+                  <a href="/product/<%= product.product_id %>">
+                    <img src="<%= product.image %>" alt="">
+                  </a>
+                  <div>
+                    <p class="product-name">
+                      <%= product.name %>
+                    </p>
+                    <p class="size">Size: <%= product.size %>
+                    </p>
+                    <button class="remove">Remove</button>
+                  </div>
+                </div>
+
+                <div class="price">₹<%= product.unit_price %>.00</div>
+
+                <div class="qty">
+                  <button class="qty-minus">-</button>
+                  <span data-variant="<%= product.variant_id %>" class="qty-value">
+                    <%= product.quantity %>
+                  </span>
+                  <button class="qty-plus">+</button>
+                </div>
+
+
+                <div class="subtotal">₹<%= product.subtotal %>.00</div>
+              </div>
+              <% }) %>
+
+                <p class="note">Shipping charge is calculated at checkout</p>
+
+                <div class="cart-actions">
+                  <button class="btn-outline" id="continueShop">Continue Shopping</button>
+                  <button class="btn-primary" id="checkoutBtn">Proceed to Checkout</button>
+                </div>
+
+          </div>
+
+          <!-- RIGHT: SUMMARY -->
+          <div class="order-summary">
+            <h3>Order Summary</h3>
+
+            <div class="summary-item">
+              <span>Subtotal</span>
+              <span id="subTotal">₹<%= priceDetails.subtotal %>.00</span>
+            </div>
+            <div class="summary-item">
+              <span>Shipping</span>
+              <span>₹50.00</span>
+            </div>
+
+            <hr>
+
+            <div class="summary-total">
+              <span>Total</span>
+              <span id="total">₹<%= priceDetails.total %>.00</span>
             </div>
           </div>
 
-          <div class="price">₹<%= product.unit_price %>.00</div>
 
-          <div class="qty">
-            <button class="qty-minus">-</button>
-            <span data-variant="<%= product.variant_id %>" class="qty-value">
-              <%= product.quantity %>
-            </span>
-            <button class="qty-plus">+</button>
-          </div>
-
-
-          <div class="subtotal">₹<%= product.subtotal %>.00</div>
         </div>
-        <% }) %>
-
-          <p class="note">Shipping charge is calculated at checkout</p>
-
-          <div class="cart-actions">
-            <button class="btn-outline" id="continueShop">Continue Shopping</button>
-            <button class="btn-primary" id="checkoutBtn" >Proceed to Checkout</button>
-          </div>
-
-    </div>
-
-    <!-- RIGHT: SUMMARY -->
-    <div class="order-summary">
-      <h3>Order Summary</h3>
-
-      <div class="summary-item">
-        <span>Subtotal</span>
-        <span id="subTotal" >₹<%= priceDetails.subtotal %>.00</span>
-      </div>
-      <div class="summary-item">
-        <span>Shipping</span>
-        <span>₹50.00</span>
-      </div>
-
-      <hr>
-
-      <div class="summary-total">
-        <span>Total</span>
-        <span id="total">₹<%= priceDetails.total %>.00</span>
-      </div>
-    </div>
-
+        <%}%>
   </div>
 </div>

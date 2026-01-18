@@ -21,7 +21,8 @@
   cursor: pointer;
   user-select: none;
   transition: transform 0.3s ease;
-  display: block; /* ✅ Always visible */
+  display: block;
+  /* ✅ Always visible */
 }
 
 .hamburger-icon:hover {
@@ -74,6 +75,39 @@
   display: flex;
   align-items: center;
 }
+
+.cart img {
+  width: 25px;
+  height: 25px;
+}
+
+.login {
+  display: inline-block;
+  padding: 5px 25px;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid #000000;
+  transition: all 0.3s ease;
+}
+
+.login:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.login:active {
+  transform: scale(0.96);
+}
+
+.login:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
 
 .search-text {
   font-size: 15px;
@@ -137,15 +171,19 @@
 /* ---------------------- SCROLLABLE CONTENT ---------------------- */
 .menu-container {
   flex: 1;
-  overflow-y: auto; /* ✅ Scrolls when content overflows */
+  overflow-y: auto;
+  /* ✅ Scrolls when content overflows */
   overflow-x: hidden;
   padding: 10px 25px 20px;
-  -webkit-overflow-scrolling: touch; /* Smooth mobile scrolling */
-  scrollbar-width: none; /* Hide scrollbar on Firefox */
+  -webkit-overflow-scrolling: touch;
+  /* Smooth mobile scrolling */
+  scrollbar-width: none;
+  /* Hide scrollbar on Firefox */
 }
 
 .menu-container::-webkit-scrollbar {
-  display: none; /* Hide scrollbar on Chrome/Safari */
+  display: none;
+  /* Hide scrollbar on Chrome/Safari */
 }
 
 /* ---------------------- MENU SECTION TITLE ---------------------- */
@@ -301,13 +339,16 @@ body.no-scroll {
 }
 
 @media (max-width: 768px) {
+
   .main-nav,
   .header-right {
-    display: none; /* hide right icons on smaller screens */
+    display: none;
+    /* hide right icons on smaller screens */
   }
 
   .hamburger-icon {
-    display: block; /* ✅ Always visible */
+    display: block;
+    /* ✅ Always visible */
   }
 
   .logo {

@@ -1,9 +1,10 @@
+const total = document.getElementById("total");
+const subTotal = document.getElementById("subTotal");
+
 document.querySelectorAll(".qty").forEach((qtyBox) => {
   const minusBtn = qtyBox.querySelector(".qty-minus");
   const plusBtn = qtyBox.querySelector(".qty-plus");
   const valueEl = qtyBox.querySelector(".qty-value");
-  const total = document.getElementById("total");
-  const subTotal = document.getElementById("subTotal");
 
   let quantity = parseInt(valueEl.innerText);
 
@@ -25,7 +26,6 @@ document.querySelectorAll(".qty").forEach((qtyBox) => {
         itemSubtotal.innerText = `₹${res.data.data.itemTotal}.00`;
         total.innerHTML = `₹${res.data.data.total}.00`;
         subTotal.innerHTML = `₹${res.data.data.subtotal}.00`;
-        // subtotal,total,subTotal
       }
     } catch (err) {
       const error = err.response?.data;
@@ -73,4 +73,41 @@ document.getElementById("checkoutBtn").addEventListener("click", async () => {
 
 document.getElementById("continueShop").addEventListener("click", () => {
   window.location.href = "/shop";
+});
+
+document.querySelectorAll(".remove").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const cartRow = btn.closest(".cart-row");
+    const variant_id = cartRow.dataset.variant;
+
+    console.log(variant_id);
+
+    try {
+      const res = await axios.delete("/user/cart/remove", {
+        data: { variant_id },
+      });
+
+      if (res.data.success) {
+        cartRow.remove();
+
+        subTotal.innerText = `₹${res.data.data.subtotal}.00`;
+        total.innerText = `₹${res.data.data.total}.00`;
+        if (res.data.data.items_count === 0) {
+          document.querySelector(".cart-container").innerHTML = `
+            <div class="empty-cart">
+            <i class="fa-solid fa-cart-shopping empty-icon"></i>
+            <h3>Your cart is empty</h3>
+            <a href="/shop">Continue Shopping</a>
+            </div>
+          `;
+        }
+        document.querySelector(".cart-count").innerText = `${res.data.data.items_count}`;
+      }
+    } catch (err) {
+      toastr.error(
+        err.response?.data?.message || "Unable to remove item",
+        "Error"
+      );
+    }
+  });
 });

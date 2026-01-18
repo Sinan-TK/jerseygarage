@@ -1,5 +1,7 @@
 import express from "express";
 import { sendResponse } from "../utils/sendResponse.js";
+import Cart from "../models/cartModel.js";
+import { wrapAsync } from "../utils/wrapAsync.js";
 // import { message } from "statuses";
 
 // const router = express.Router();
@@ -28,3 +30,19 @@ export const checkoutMiddleware = (req, res, next) => {
   }
   next();
 };
+
+export const cartItemsCount = wrapAsync(async (req, res, next) => {
+  res.locals.cartItemsCount = 0;
+
+  if (req.session.user) {
+    const user_id = req.session.user.id;
+
+    const cart = await Cart.findOne({ user_id }).select("items");
+
+    if (cart) {
+      res.locals.cartItemsCount = cart.items.length;
+    }
+  }
+
+  next();
+});

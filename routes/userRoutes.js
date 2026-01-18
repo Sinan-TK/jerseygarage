@@ -15,6 +15,8 @@ router.use(sidebarData);
 
 router.use(checkBlockedUser);
 
+router.use(userMiddleware.cartItemsCount);
+
 // router.use(Userdetails);
 
 router.use(authMiddleware.profileIcon);
@@ -25,11 +27,13 @@ router.patch("/profile/edit",Userdetails, userController.editPersonalInfo);
 
 // router.get("/email/otp-verify", userController.emailOtpPage);
 
-router.get("/address",Userdetails, userController.addressRender);
+router.get("/address",Userdetails, userController.addressPageRender);
+
+router.get("/address/data",Userdetails, userController.addressData);
 
 router.post("/address",Userdetails, userController.addAddress);
 
-router.patch("/address/:id",Userdetails,userController.removeAddress);
+router.delete("/address",Userdetails,userController.removeAddress);
 
 router.patch("/address/edit/:id",Userdetails,userController.editAddress)
 
@@ -50,6 +54,8 @@ router.post("/buy-now",userController.buyNow);
 router.post("/checkout",userController.proceedToCheckout);
 
 router.get("/checkout",userMiddleware.checkoutMiddleware,userController.checkoutPage);
+
+router.delete("/cart/remove",userController.deleteCartItem);
 
 router.post("/logout",Userdetails, userController.userLogout);
 

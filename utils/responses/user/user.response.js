@@ -84,10 +84,10 @@ export const addToCart = Object.freeze({
     code: 404,
     message: "Variant not available",
   },
-  SUCCESS: {
-    code: 200,
-    message: "Item added to cart",
-  },
+  // SUCCESS: {
+  //   code: 200,
+  //   message: "Item added to cart",
+  // },
 });
 
 export const cartQuantity = Object.freeze({
@@ -106,6 +106,10 @@ export const cartQuantity = Object.freeze({
   QUANTITY_ZERO: {
     code: 400,
     message: "Quantity can't be zero",
+  },
+  STOCK_OUT: {
+    code: 400,
+    message: "The stock is out!!",
   },
 });
 

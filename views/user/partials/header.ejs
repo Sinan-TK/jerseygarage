@@ -15,11 +15,20 @@
       <img src="/images/user/header/search-logo.png" alt="search" style="width: 20px; height: 20px;">
       <span class="search-text">Search</span>
     </a>
-    <a href="<%= user ? '/user/profile' : '/login' %>" class="account"><img src="/images/user/header/profile-logo.png" alt="profile" style="width: 22px; height: 21px;"></a>
-    <a href="<%= user ? '/user/cart' : '/login' %>" class="cart">
-      <img src="/images/user/header/cart-logo.png" alt="cart" style="width: 25px; height: 25px;">
-      <span class="cart-count">0</span>
-    </a>
+
+    <% if(user){ %>
+      <a href="/user/profile" class="account"><img src="/images/user/header/profile-logo.png" alt="profile"
+          style="width: 22px; height: 21px;"></a>
+      <a href="/user/cart" class="cart">
+        <img src="/images/user/header/cart-logo.png" alt="cart">
+        <span class="cart-count">
+          <%= cartItemsCount %>
+        </span>
+      </a>
+      <% }else{ %>
+        <a class="login" href="/login">LogIn</a>
+        <% } %>
+
   </div>
 
   <!-- Sidebar -->
@@ -31,20 +40,33 @@
 
     <div class="menu-container">
       <div class="section-title">Menu</div>
-      <a href="/" class="menu-item"><span class="icon"><img src="/images/user/header/home-logo.png" alt="home" style="width: 25px;"></span> Home</a>
-      <a href="/shop" class="menu-item"><span class="icon"><img src="/images/user/header/shop-logo.png" alt="shop" style="width: 27px;"></span> Shop</a>
-      <a href="#" class="menu-item"><span class="icon"><img src="/images/user/header/wishlist-logo.png" alt="wishlist" style="width: 27px ;"></span> Wishlist</a>
-      <a href="#" class="menu-item"><span class="icon"><img src="/images/user/header/about-logo.png" alt="about" style="width: 27px ;"></span> About</a>
+      <a href="/" class="menu-item"><span class="icon"><img src="/images/user/header/home-logo.png" alt="home"
+            style="width: 25px;"></span> Home</a>
+      <a href="/shop" class="menu-item"><span class="icon"><img src="/images/user/header/shop-logo.png" alt="shop"
+            style="width: 27px;"></span> Shop</a>
+      <% if(user){ %>
+        <a href="/user/wishlist" class="menu-item"><span class="icon"><img src="/images/user/header/wishlist-logo.png" alt="wishlist"
+              style="width: 27px ;"></span> Wishlist</a>
+        <% } %>
+          <a href="#" class="menu-item"><span class="icon"><img src="/images/user/header/about-logo.png" alt="about"
+                style="width: 27px ;"></span> About</a>
 
-      <div class="section-title">Categories</div>
-      <% sideBarCategories.forEach((cat)=>{ %>
-      <a href="http://localhost:3000/shop?category=<%= cat.name %>" class="category-item"><%= cat.name %> <span>›</span></a>
-      <% }) %>
+          <div class="section-title">Categories</div>
+          <% sideBarCategories.forEach((cat)=>{ %>
+            <a href="http://localhost:3000/shop?category=<%= cat.name %>" class="category-item">
+              <%= cat.name %> <span>›</span>
+            </a>
+            <% }) %>
     </div>
 
     <div class="sidebar-footer">
-      <a href="<%= user ? '/user/profile' : '/login' %>" class="sidebar-footer-btn account-btn"> Account</a>
-      <a href="<%= user ? '/user/profile' : '/login' %>" class="sidebar-footer-btn cart-btn"> Cart</a>
+      <% if(user){ %>
+        <a href="/user/profile" class="sidebar-footer-btn account-btn"> Account</a>
+        <a href="/user/cart" class="sidebar-footer-btn cart-btn"> Cart</a>
+        <% }else{ %>
+          <a href="/login" class="sidebar-footer-btn account-btn"> Login</a>
+          <a href="/signup" class="sidebar-footer-btn cart-btn"> SignUp</a>
+          <% } %>
     </div>
   </div>
 </header>

@@ -16,7 +16,7 @@
       <div class="wishlist-grid">
 
         <!-- CARD -->
-        <% products.forEach((product)=>{%>
+        <% products.forEach((product)=>{ %>
           <a href="/product/<%= product.variant_id.product_id._id %>">
             <div class="wishlist-card">
               <button class="remove-btn" data-item="<%= product.variant_id._id %>">×</button>
@@ -33,7 +33,7 @@
                 </p>
               </div>
 
-              <button class="cart-btn">Add to Cart</button>
+              <button data-variant="<%= product.variant_id._id %>" data-product="<%= product.variant_id.product_id._id %>"  class="cart-btn add-to-cart-btn">Add to Cart</button>
             </div>
           </a>
           <%})%>
