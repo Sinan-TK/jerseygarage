@@ -1,10 +1,112 @@
-// dropdown logic (only for Categories and Teams now)
-function toggleDD(id) {
-  document.getElementById(id).classList.toggle("open");
+window.loadFilter = async function (page = 1) {
+  const category = getSelectedValue("categories");
+  const team = getSelectedValue("team");
+  const size = getSelectedValue("size");
+  const minRange = document.getElementById("minRange").value;
+  const maxRange = document.getElementById("maxRange").value;
+
+  const res = await axios.get(`/shop/data`, {
+    params: { category, team, size, minRange, maxRange, sort, page },
+  });
+
+  const user = res.data.data.user;
+  const products = res.data.data.products;
+  const wishlist = res.data.data.wishlist;
+
+  document.querySelector(".shop-grid").innerHTML = products
+    .map((product) => loadProducts(product, user, wishlist))
+    .join("");
+
+  document.querySelector(".pagination").innerHTML = pagination(
+    res.data.data.pagination
+  );
+};
+
+function loadProducts(product, user, wishlist) {
+  const variant = product.variants[0];
+  let wishlisted = false;
+  if (user && wishlist && variant) {
+    wishlisted = wishlist.items.some(
+      (item) => item.variant_id.toString() === variant._id.toString()
+    );
+  }
+
+  return `
+    <div class="product-item">
+    ${
+      user
+        ? `
+  <div class="product-actions">
+    <button
+      data-variant="${variant._id}"
+      class="wishlist-btn ${
+        wishlisted ? `isWishlistedTrue` : `isWishlistedFalse`
+      }"
+      title="Add to Wishlist">
+      <i class="fa-regular fa-heart"></i>
+    </button>
+  </div>
+`
+        : ""
+    }
+            <a href="/product">
+                <img src="${product.images[0]}" alt="${product.name}">
+
+                <div class="product-details">
+                    <p class="product-name">
+                        ${product.name}
+                    </p>
+
+                    <div class="price-section">
+                        <p class="product-price-normal">
+                            ₹${variant.normal_price}
+                        </p>
+                        <p class="product-price-base">
+                                ₹${variant.base_price}
+                        </p>
+                    </div>
+
+                    <button class="add-to-cart-btn">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        Add to Cart
+                    </button>
+                </div>
+            </a>
+    </div>
+        `;
 }
 
-// Ensure Categories and Teams are closed on load
+function pagination(data) {
+  const backward = data.currentPage > 1 ? true : false;
+  const forward = data.currentPage < data.totalPages ? true : false;
+  return `${
+    backward
+      ? `<button onclick="loadFilter(${
+          data.currentPage - 1
+        })" class="arrow-btn">
+      <i class="fa-solid fa-chevron-left"></i>
+  </button>`
+      : ""
+  }
+
+  <span class="current-page-display">
+      ${data.currentPage}
+  </span>
+    ${
+      forward
+        ? `<button onclick="loadFilter(${
+            data.currentPage + 1
+          })" class="arrow-btn">
+      <i class="fa-solid fa-chevron-right"></i>
+  </button>`
+        : ""
+    }`;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  loadFilter();
+
+  // Ensure Categories and Teams are closed on load
   const dropdowns = ["catDD", "teamDD"];
   dropdowns.forEach((id) => {
     const element = document.getElementById(id);
@@ -14,56 +116,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-document.querySelector(".btn-clear").addEventListener("click", () => {
-  const options = ["categories", "team", "size"];
-
-  options.forEach((name) => {
-    document.querySelectorAll(`input[name="${name}"]`).forEach((cb) => {
-      cb.checked = false;
-    });
-  });
-
-  document.getElementById("minRange").value = 0;
-  document.getElementById("maxRange").value = 2000;
-  updatePrice();
-});
-
-// double slider price logic
-const minRange = document.getElementById("minRange");
-const maxRange = document.getElementById("maxRange");
-const priceDisplay = document.getElementById("priceDisplay");
-const rangeGap = 100; // Minimum gap between handles
-
-function updatePrice() {
-  let minVal = parseInt(minRange.value);
-  let maxVal = parseInt(maxRange.value);
-
-  // Ensure min slider is not greater than max slider, maintaining gap
-  if (minVal >= maxVal - rangeGap) {
-    minVal = maxVal - rangeGap;
-    if (minVal < minRange.min) minVal = parseInt(minRange.min);
-    minRange.value = minVal;
-  }
-
-  // Ensure max slider is not less than min slider, maintaining gap
-  if (maxVal <= minVal + rangeGap) {
-    maxVal = minVal + rangeGap;
-    if (maxVal > maxRange.max) maxVal = parseInt(maxRange.max);
-    maxRange.value = maxVal;
-  }
-
-  priceDisplay.textContent = `₹${minRange.value} - ₹${maxRange.value}`;
+function toggleDD(id) {
+  document.getElementById(id).classList.toggle("open");
 }
-
-// Initial call to set the display text
-updatePrice();
-
-minRange.addEventListener("input", updatePrice);
-maxRange.addEventListener("input", updatePrice);
 
 const sortDropdown = document.getElementById("sortDropdown");
 const selected = sortDropdown.querySelector(".dropdown-selected");
 const options = sortDropdown.querySelectorAll(".dropdown-options li");
+
+let sort = "all";
 
 // Toggle dropdown
 selected.addEventListener("click", (e) => {
@@ -74,103 +135,48 @@ selected.addEventListener("click", (e) => {
 // Select option
 options.forEach((option) => {
   option.addEventListener("click", () => {
+    sort = option.dataset.value;
     selected.innerHTML = `${option.textContent} <i class="fa-solid fa-caret-down"></i>`;
     selected.dataset.value = option.dataset.value;
     sortDropdown.classList.remove("active");
+    loadFilter();
   });
 });
-
-// Close on outside click
-document.addEventListener("click", () => {
-  sortDropdown.classList.remove("active");
-});
-
-function getCheckedValue(name) {
-  const checked = document.querySelector(`input[name="${name}"]:checked`);
-  return checked ? checked.value : null;
-}
 
 document.querySelector(".btn-apply").addEventListener("click", () => {
-  const category = getCheckedValue("categories") || "";
-  const team = getCheckedValue("team") || "";
-  const size = getCheckedValue("size") || "";
-  // const sort = document.querySelector(".dropdown-selected").value||"";
-  const minRange = document.getElementById("minRange").value;
-  const maxRange = document.getElementById("maxRange").value;
-
-  const page = document.querySelector(".current-page-display").innerHTML.trim();
-
-  // fill hidden inputs
-  document.getElementById("f-category").value = category;
-  document.getElementById("f-team").value = team;
-  document.getElementById("f-size").value = size;
-  document.getElementById("f-minRange").value = minRange;
-  document.getElementById("f-maxRange").value = maxRange;
-  document.getElementById("f-sort").value = selected.dataset.value || "";
-  document.getElementById("f-page").value = page;
-
-  console.log(page);
-
-  // submit form (GET → page reload → EJS re-render)
-  document.getElementById("filterForm").submit();
+  loadFilter();
 });
 
-options.forEach((option) => {
-  option.addEventListener("click", () => {
-    // update UI
-    selected.innerHTML = `${option.textContent} <i class="fa-solid fa-caret-down"></i>`;
-    selected.dataset.value = option.dataset.value;
+function getSelectedValue(item) {
+  const selected = document.querySelector(`input[name="${item}"]:checked`);
+  return selected ? selected.value : "";
+}
 
-    // set hidden input
-    document.getElementById("f-sort").value = option.dataset.value;
-    document.getElementById("f-category").value =
-      getCheckedValue("categories") || "";
-    document.getElementById("f-team").value = getCheckedValue("team") || "";
-    document.getElementById("f-size").value = getCheckedValue("size") || "";
-    document.getElementById("f-minRange").value =
-      document.getElementById("minRange").value;
-    document.getElementById("f-maxRange").value =
-      document.getElementById("maxRange").value;
+const minRange = document.getElementById("minRange");
+const maxRange = document.getElementById("maxRange");
+const priceDisplay = document.getElementById("priceDisplay");
 
-    // close dropdown
-    sortDropdown.classList.remove("active");
+const MIN_GAP = 100;
 
-    document.getElementById("filterForm").submit();
-  });
+// initial values
+minRange.value = 0;
+maxRange.value = 2000;
+priceDisplay.textContent = `₹${minRange.value} - ₹${maxRange.value}`;
+
+minRange.addEventListener("input", () => {
+  if (Number(maxRange.value) - Number(minRange.value) < MIN_GAP) {
+    minRange.value = Number(maxRange.value) - MIN_GAP;
+  }
+  updatePrice();
 });
 
-// document.querySelectorAll(".product-item").forEach((item) => {
-//   item.addEventListener("click", () => {
-//     console.log(item.dataset.id);
-//   });
-// });
-
-const wishlistBtn = document.querySelectorAll(".wishlist-btn");
-
-wishlistBtn.forEach((btn) => {
-  btn.addEventListener("click", async (e) => {
-    e.preventDefault(); // stops link navigation
-    e.stopPropagation(); // stops bubbling
-
-    const variantId = btn.dataset.varient;
-
-    console.log(variantId);
-
-    try {
-      const res = await axios.post(`/user/wishlist`, { variantId });
-
-      if (res.data.data) {
-        toastr.success(res.data.message, "Added!!");
-        btn.classList.replace("isWishlistedFalse", "isWishlistedTrue");
-      } else {
-        toastr.success(res.data.message, "Removed!!");
-        btn.classList.replace("isWishlistedTrue", "isWishlistedFalse");
-      }
-    } catch (err) {
-      const error = err.response?.data;
-
-      toastr.error(error?.message, "Error!!");
-    }
-  });
+maxRange.addEventListener("input", () => {
+  if (Number(maxRange.value) - Number(minRange.value) < MIN_GAP) {
+    maxRange.value = Number(minRange.value) + MIN_GAP;
+  }
+  updatePrice();
 });
 
+function updatePrice() {
+  priceDisplay.textContent = `₹${minRange.value} - ₹${maxRange.value}`;
+}

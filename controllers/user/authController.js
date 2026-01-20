@@ -367,6 +367,25 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const renderShopPage = wrapAsync(async (req, res) => {
+  const categories = await Category.find({}, { _id: 1, name: 1 });
+  const teamNames = await Product.find({ is_active: true }).select("teamName");
+
+  return res.render("user/pages/shop", {
+    title: "Shop",
+    pageCSS: "shop",
+    showFooter: true,
+    showHeader: true,
+    categories,
+    teamNames,
+    pageJS: "shop.js",
+  });
+});
+
+// ======================================================================
+// 16.SHOP PAGE
+// ======================================================================
+
+export const shopPageProducts = wrapAsync(async (req, res) => {
   const { category, team, size, minRange, maxRange, sort, page } = req.query;
 
   const currentPage = parseInt(page) || 1;
@@ -477,27 +496,32 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     wishlist = await Wishlist.findOne({ user_id }).select("items").lean();
   }
 
-  res.render("user/pages/shop", {
-    title: "Shop",
-    pageCSS: "shop",
-    showFooter: true,
-    showHeader: true,
-    pageJS: "",
+  // res.render("user/pages/shop", {
+  return sendResponse(res, {
+    code: 200,
+    message: "Filter products rendered",
 
-    products,
-    categories,
-    teamNames,
-    wishlist,
+    data: {
+      products,
+      user: Boolean(req.session.user),
+      wishlist,
+      pagination: {
+        currentPage,
+        totalPages,
+      },
+    },
+    // categories,
+    // teamNames,
 
-    selectedCategory: category || "",
-    selectedTeam: team || "",
-    selectedSize: size || "",
-    minRange: minRange || 0,
-    maxRange: maxRange || 2000,
-    selectedSort: sort || "",
+    // selectedCategory: category || "",
+    // selectedTeam: team || "",
+    // selectedSize: size || "",
+    // minRange: minRange || 0,
+    // maxRange: maxRange || 2000,
+    // selectedSort: sort || "",
 
-    currentPage,
-    totalPages,
+    // currentPage,
+    // totalPages,
   });
 });
 // ======================================================================

@@ -57,13 +57,10 @@
                   timeOut: 5000,
                 };
               </script>
-              <% if(typeof profile !=undefined){%>
-                <script src="/js/user/profilelayout.js"></script>
-                <% } %>
 
-                  <% if (pageJS) { %>
-                    <script src="/js/user/<%= pageJS %>"></script>
-                    <% } %>
+              <% if (pageJS) { %>
+                <script src="/js/user/<%= pageJS %>" defer></script>
+                <% } %>
 
 
 </body>
