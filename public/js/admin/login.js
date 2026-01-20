@@ -32,3 +32,14 @@ async function loginVerification() {
     }, 3000);
   }
 }
+
+const pwInput = document.getElementById("pw");
+const togglePw = document.getElementById("togglePw");
+
+togglePw.addEventListener("click", () => {
+  const isPassword = pwInput.type === "password";
+
+  pwInput.type = isPassword ? "text" : "password";
+  togglePw.classList.toggle("fa-eye");
+  togglePw.classList.toggle("fa-eye-slash");
+});
