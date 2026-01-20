@@ -367,7 +367,10 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const renderShopPage = wrapAsync(async (req, res) => {
-  const categories = await Category.find({}, { _id: 1, name: 1 });
+  const categories = await Category.find(
+    { is_active: true },
+    { _id: 1, name: 1 }
+  );
   const teamNames = await Product.find({ is_active: true }).select("teamName");
 
   return res.render("user/pages/shop", {

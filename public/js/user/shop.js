@@ -13,14 +13,27 @@ window.loadFilter = async function (page = 1) {
   const products = res.data.data.products;
   const wishlist = res.data.data.wishlist;
 
-  document.querySelector(".shop-grid").innerHTML = products
-    .map((product) => loadProducts(product, user, wishlist))
-    .join("");
+  if (products.length === 0) {
+    document.querySelector(".shop-body").innerHTML = noProducts();
+  } else {
+    document.querySelector(".shop-grid").innerHTML = products
+      .map((product) => loadProducts(product, user, wishlist))
+      .join("");
 
-  document.querySelector(".pagination").innerHTML = pagination(
-    res.data.data.pagination
-  );
+    document.querySelector(".pagination").innerHTML = pagination(
+      res.data.data.pagination
+    );
+  }
 };
+
+function noProducts() {
+  return `
+    <div class="no-products">
+      <h2>No Products Found</h2>
+      <p>Try adjusting your filters or search criteria.</p>
+    </div>
+  `;
+}
 
 function loadProducts(product, user, wishlist) {
   const variant = product.variants[0];
@@ -49,7 +62,7 @@ function loadProducts(product, user, wishlist) {
 `
         : ""
     }
-            <a href="/product">
+            <a href="/product/${product._id}">
                 <img src="${product.images[0]}" alt="${product.name}">
 
                 <div class="product-details">

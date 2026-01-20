@@ -183,11 +183,30 @@ input[type=range]::-webkit-slider-thumb {
 /* ===========================================
         PRODUCT GRID & CARDS
         =========================================== */
-/* .shop-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-} */
+.no-products {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border: 1px dashed #ddd;
+    border-radius: 12px;
+    background: #fafafa;
+    padding: 40px;
+}
+
+.no-products h2 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.no-products p {
+    font-size: 14px;
+    color: #777;
+}
+
 
 
 .shop-grid {
