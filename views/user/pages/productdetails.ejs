@@ -6,15 +6,7 @@
         <!-- LEFT IMAGES -->
         <div class="product-images">
             <div class="img-zoom-container">
-                <% if(user){ %>
-                    <div class="product-actions">
-                        <button class="wishlist-btn" title="Add to Wishlist">
-                            <i class="fa-regular fa-heart"></i>
-                        </button>
-                    </div>
-                    <%}%>
-
-                        <img class="main-img" src="<%= product[0].images[0] %>" />
+                <img class="main-img" src="<%= product[0].images[0] %>" />
             </div>
 
             <div class="thumbs">
@@ -113,13 +105,14 @@
 
             </div>
 
-            <button data-product-id="<%= product[0]._id %>" class="cart-btn">
-                Add to Cart
+            <button data-product-id="<%= product[0]._id %>" class="wish-btn">
+                <i class="fa-regular fa-heart"></i> Add to Wishlist
             </button>
 
-            <button data-product-id="<%= product[0]._id %>" class="buy-btn">
-                Buy Now
+            <button data-product-id="<%= product[0]._id %>" class="cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i> Add to Cart
             </button>
+
 
             <div class="meta">
                 <p><strong>Category:</strong>

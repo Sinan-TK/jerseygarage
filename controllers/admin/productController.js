@@ -1,8 +1,8 @@
 import Product from "../../models/productModel.js";
 import Category from "../../models/categoryModel.js";
 import Variant from "../../models/varientModel.js";
-import { wrapAsync } from "../../utils/wrapAsync.js";
-import { sendResponse } from "../../utils/sendResponse.js";
+import wrapAsync from "../../utils/wrapAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
 import cloudinary from "../../config/cloudinary.js";
 import upload from "../../middlewares/multer.js";
 import { paginate } from "../../utils/pagination.js";

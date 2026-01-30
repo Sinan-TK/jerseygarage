@@ -1,0 +1,182 @@
+.order-details-container {
+    padding: 20px;
+}
+
+/* Breadcrumb */
+
+.breadcrumb {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 15px;
+}
+
+.breadcrumb .divider {
+    margin: 0 6px;
+}
+
+.breadcrumb .active {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Header */
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.order-header h2 {
+    margin: 0;
+}
+
+.order-header p {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.order-badge {
+    background: #e0edff;
+    color: #2563eb;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Layout */
+
+.order-layout {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr;
+    gap: 20px;
+}
+
+/* Cards */
+
+.card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Items Table */
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table th,
+.items-table td {
+    padding: 12px 8px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.items-table th {
+    color: #6b7280;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.product-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-box img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.product-name {
+    font-weight: 500;
+}
+
+.product-size {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Financials */
+
+.finance-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.finance-row.discount {
+    color: #16a34a;
+}
+
+.finance-row.total {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Right */
+
+.order-right select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.order-right label {
+    font-size: 13px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.btn-primary {
+    width: 100%;
+    background: #111827;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.customer-name {
+    font-weight: 600;
+}
+
+.payment-logo {
+    max-width: 120px;
+}
+
+/* Responsive */
+
+@media(max-width: 900px) {
+
+    .order-layout {
+        grid-template-columns: 1fr;
+    }
+
+}

@@ -67,7 +67,11 @@ document.getElementById("checkoutBtn").addEventListener("click", async () => {
     }
   } catch (err) {
     const error = err.response?.data;
-    toastr.error(error.message, "Error!!");
+    if (error?.data) {
+      toastr.warning(error.message, "Warning!!");
+    } else {
+      toastr.error(error.message, "Error!!");
+    }
   }
 });
 
@@ -93,7 +97,7 @@ document.querySelectorAll(".remove").forEach((btn) => {
         subTotal.innerText = `₹${res.data.data.subtotal}.00`;
         total.innerText = `₹${res.data.data.total}.00`;
         if (res.data.data.items_count === 0) {
-          document.querySelector(".cart-container").innerHTML = `
+          document.querySelector(".cart-page").innerHTML = `
             <div class="empty-cart">
             <i class="fa-solid fa-cart-shopping empty-icon"></i>
             <h3>Your cart is empty</h3>
@@ -101,12 +105,13 @@ document.querySelectorAll(".remove").forEach((btn) => {
             </div>
           `;
         }
-        document.querySelector(".cart-count").innerText = `${res.data.data.items_count}`;
+        document.querySelector(".cart-count").innerText =
+          `${res.data.data.items_count}`;
       }
     } catch (err) {
       toastr.error(
         err.response?.data?.message || "Unable to remove item",
-        "Error"
+        "Error",
       );
     }
   });

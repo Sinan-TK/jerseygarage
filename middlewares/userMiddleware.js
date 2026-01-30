@@ -1,7 +1,7 @@
 import express from "express";
-import { sendResponse } from "../utils/sendResponse.js";
+import sendResponse from "../utils/sendResponse.js";
 import Cart from "../models/cartModel.js";
-import { wrapAsync } from "../utils/wrapAsync.js";
+import wrapAsync from "../utils/wrapAsync.js";
 // import { message } from "statuses";
 
 // const router = express.Router();
@@ -13,20 +13,14 @@ import { wrapAsync } from "../utils/wrapAsync.js";
 
 export const userNotFound = (req, res, next) => {
   if (!req.session.user) {
-    return sendResponse(res, {
-      code: 401,
-      message: "Login required",
-    });
+    return res.redirect("/");
   }
   next();
 };
 
 export const checkoutMiddleware = (req, res, next) => {
   if (!req.session.checkoutIntent) {
-    return sendResponse(res, {
-      code: 400,
-      message: "No items to checkout",
-    });
+    return res.redirect("/user/cart");
   }
   next();
 };

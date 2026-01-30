@@ -29,8 +29,8 @@
                     <div class="dropdown-content">
                         <% teamNames.forEach( i => { %>
                             <label>
-                                <input type="radio" name="team" value="<%= i.teamName %>">
-                                <%= i.teamName %>
+                                <input type="radio" name="team" value="<%= i._id %>">
+                                <%= i._id %>
                             </label>
                             <% }) %>
                     </div>
@@ -91,6 +91,7 @@
 
                 <!-- GRID -->
                  <div class="shop-body">
+                </div>
                 <div class="shop-grid">
 
 
@@ -99,7 +100,6 @@
                 <!-- PAGINATION -->
                 <div class="pagination">
                 </div>
-                 </div>
 
 
             </div>

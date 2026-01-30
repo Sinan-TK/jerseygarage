@@ -8,8 +8,8 @@ import Wishlist from "../../models/wishlistModel.js";
 import sendOTP from "../../utils/sendOtp.js";
 import { generateOtp } from "../../utils/GenerateOtp.js";
 import * as Responses from "../../utils/responses/user/auth.responses.js";
-import { sendResponse } from "../../utils/sendResponse.js";
-import { wrapAsync } from "../../utils/wrapAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
+import wrapAsync from "../../utils/wrapAsync.js";
 import * as userValidators from "../../validators/userValidators.js";
 import { paginate } from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
@@ -371,7 +371,11 @@ export const renderShopPage = wrapAsync(async (req, res) => {
     { is_active: true },
     { _id: 1, name: 1 }
   );
-  const teamNames = await Product.find({ is_active: true }).select("teamName");
+
+  const teamNames = await Product.aggregate([
+    { $match: { is_active: true } },
+    { $group: { _id: "$teamName" } },
+  ]);
 
   return res.render("user/pages/shop", {
     title: "Shop",
@@ -415,16 +419,13 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
     productIds = variants.map((v) => v.product_id);
 
     if (!productIds.length) {
-      return res.render("user/pages/shop", {
-        title: "Shop",
-        pageCSS: "shop",
-        showFooter: true,
-        showHeader: true,
-        pageJS: "",
-        categories: await Category.find({}, { _id: 1, name: 1 }),
-        products: [],
-        currentPage,
-        totalPages: 0,
+      return sendResponse(res, {
+        code: 200,
+        message: "Filter products rendered(0 products)",
+
+        data: {
+          products: [],
+        },
       });
     }
   }
@@ -489,9 +490,6 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
     { $limit: limit },
   ]);
 
-  const categories = await Category.find({}, { _id: 1, name: 1 });
-  const teamNames = await Product.find().select("teamName");
-
   let wishlist = null;
 
   if (req.session.user) {
@@ -499,7 +497,6 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
     wishlist = await Wishlist.findOne({ user_id }).select("items").lean();
   }
 
-  // res.render("user/pages/shop", {
   return sendResponse(res, {
     code: 200,
     message: "Filter products rendered",
@@ -513,18 +510,6 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
         totalPages,
       },
     },
-    // categories,
-    // teamNames,
-
-    // selectedCategory: category || "",
-    // selectedTeam: team || "",
-    // selectedSize: size || "",
-    // minRange: minRange || 0,
-    // maxRange: maxRange || 2000,
-    // selectedSort: sort || "",
-
-    // currentPage,
-    // totalPages,
   });
 });
 // ======================================================================

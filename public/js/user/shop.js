@@ -15,7 +15,10 @@ window.loadFilter = async function (page = 1) {
 
   if (products.length === 0) {
     document.querySelector(".shop-body").innerHTML = noProducts();
+    document.querySelector(".shop-grid").innerHTML = "";
+    document.querySelector(".pagination").innerHTML = "";
   } else {
+    document.querySelector(".shop-body").innerHTML = "";
     document.querySelector(".shop-grid").innerHTML = products
       .map((product) => loadProducts(product, user, wishlist))
       .join("");

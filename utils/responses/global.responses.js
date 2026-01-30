@@ -1,4 +1,4 @@
-export const globalResponses = Object.freeze({
+export default  Object.freeze({
   SERVER_ERROR: {
     code: 500,
     message: "Something went wrong. Please try again later!",

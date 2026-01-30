@@ -1,5 +1,5 @@
-import { sendResponse } from "../utils/sendResponse.js";
-import { globalResponses } from "../utils/responses/global.responses.js";
+import sendResponse from "../utils/sendResponse.js";
+import globalResponses from "../utils/responses/global.responses.js";
 
 export const errorHandler = (err, req, res, next) => {
   console.error("-----|| Error Handler:", err);

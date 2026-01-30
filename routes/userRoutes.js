@@ -17,7 +17,7 @@ router.use(checkBlockedUser);
 
 router.use(userMiddleware.cartItemsCount);
 
-// router.use(Userdetails);
+router.use(userMiddleware.userNotFound);
 
 router.use(authMiddleware.profileIcon);
 
@@ -49,13 +49,15 @@ router.post("/add-to-cart",userMiddleware.userNotFound,userController.addToCart)
 
 router.patch("/cart",userController.cartQuantity);
 
-router.post("/buy-now",userController.buyNow);
+// router.post("/buy-now",userController.buyNow);
 
 router.post("/checkout",userController.proceedToCheckout);
 
 router.get("/checkout",userMiddleware.checkoutMiddleware,userController.checkoutPage);
 
 router.delete("/cart/remove",userController.deleteCartItem);
+
+router.get("/payment/success",userController.paymentSuccess);
 
 router.post("/logout",Userdetails, userController.userLogout);
 

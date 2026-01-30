@@ -1,0 +1,134 @@
+<!-- Order Details Section -->
+
+<div class="order-details-container">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <span>Orders</span>
+        <span class="divider">/</span>
+        <span class="active">ORD-20260127-NR40HX</span>
+    </div>
+
+    <!-- Header -->
+    <div class="order-header">
+        <div>
+            <h2>Order #ORD-20260127-NR40HX</h2>
+            <p>Placed on Jan. 27, 2026, 4:02 p.m.</p>
+        </div>
+
+        <span class="order-badge">Draft</span>
+    </div>
+
+    <!-- Layout -->
+    <div class="order-layout">
+
+        <!-- Left Section -->
+        <div class="order-left">
+
+            <!-- Order Items -->
+            <div class="card">
+                <h3>Order Items</h3>
+
+                <table class="items-table">
+
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                            <th>Return Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="orderItems">
+                        <!-- JS Inject -->
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- Financials -->
+            <div class="card">
+                <h3>Order Financials</h3>
+
+                <div class="finance-row">
+                    <span>Subtotal</span>
+                    <span id="subTotal">₹0.00</span>
+                </div>
+
+                <div class="finance-row">
+                    <span>Shipping</span>
+                    <span id="shipping">₹0.00</span>
+                </div>
+
+                <div class="finance-row discount">
+                    <span>Discount</span>
+                    <span id="discount">₹0.00</span>
+                </div>
+
+                <hr>
+
+                <div class="finance-row total">
+                    <span>Grand Total</span>
+                    <span id="grandTotal">₹0.00</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Section -->
+        <div class="order-right">
+
+            <!-- Manage -->
+            <div class="card">
+                <h3>Manage Order</h3>
+
+                <label>Order Status</label>
+                <select id="orderStatus">
+                    <option>Pending</option>
+                    <option>Processing</option>
+                    <option>Delivered</option>
+                    <option>Cancelled</option>
+                </select>
+
+                <label>Payment Status</label>
+                <select id="paymentStatus">
+                    <option>Pending</option>
+                    <option>Paid</option>
+                    <option>Failed</option>
+                </select>
+
+                <button class="btn-primary" id="updateStatus">Update Status</button>
+            </div>
+
+            <!-- Customer -->
+            <div class="card">
+                <h3>Customer</h3>
+
+                <p class="customer-name">std</p>
+                <p>student@example.com</p>
+            </div>
+
+            <!-- Payment -->
+            <div class="card">
+                <h3>Payment Method</h3>
+
+                <img src="/images/razorpay.png" alt="Razorpay" class="payment-logo">
+            </div>
+
+            <!-- Address -->
+            <div class="card">
+                <h3>Shipping Address</h3>
+
+                <p>John Ready</p>
+                <p>John Redy Home</p>
+                <p>Caroabal - 987876</p>
+                <p>Canada</p>
+                <p>Phone: 08976765454</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,93 @@
+<div class="orders-container">
+
+    <!-- Header -->
+    <div class="orders-header">
+        <h2>Orders</h2>
+        <p>Track and manage customer orders</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+
+        <input type="text" id="searchOrder" placeholder="ID (ORD-02102025-)">
+
+        <select id="statusFilter">
+            <option value="all">All</option>
+            <option value="draft">Draft</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Confirmed</option>
+            <option value="draft">Out for delivery</option>
+            <option value="draft">Delivered</option>
+            <option value="draft">Cancelled</option>
+            <option value="draft">Returned</option>
+            <option value="draft">Return Approved</option>
+            <option value="draft">Return Requested</option>
+            <option value="draft">Return Rejected</option>
+            <option value="draft">Partially Returned</option>
+            <option value="draft">Partially Cancelled</option>
+            <option value="draft">Return Cancelled</option>
+            <option value="draft">Failed</option>
+        </select>
+
+        <select id="paymentFilter">
+            <option value="all">All</option>
+            <option value="razorpay">Pending</option>
+            <option value="cod">Paid</option>
+            <option value="cod">Failed</option>
+        </select>
+
+        <input type="date" id="fromDate">
+        <input type="date" id="toDate">
+
+        <button class="btn-apply" id="applyFilter"><i class="fa-solid fa-filter"></i> Apply</button>
+        <button class="btn-clear" id="clearFilter" onclick="clearFilter()">Clear</button>
+
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Update At</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Items</th>
+                    <th>Payment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="orderTableBody">
+                <!-- JS will load rows -->
+            </tbody>
+
+        </table>
+
+    </div>
+
+    
+    <!-- Pagination -->
+    <div class="pagination">
+
+        <!-- LEFT ARROW: show ONLY if NOT first page -->
+            <a href="/admin/orders?page=1" class="arrow-btn">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+
+                <!-- CURRENT PAGE NUMBER -->
+                <span class="current-page-display">
+                    1
+                </span>
+
+                <!-- RIGHT ARROW: show ONLY if NOT last page -->
+                    <a href="/admin/orders?page=1" class="arrow-btn">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+    </div>
+</div>

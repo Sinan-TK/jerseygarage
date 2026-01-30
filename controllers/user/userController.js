@@ -1,7 +1,7 @@
-import { wrapAsync } from "../../utils/wrapAsync.js";
+import wrapAsync from "../../utils/wrapAsync.js";
 import { personalInfo } from "../../validators/userValidators.js";
 import * as Responses from "../../utils/responses/user/user.response.js";
-import { sendResponse } from "../../utils/sendResponse.js";
+import sendResponse from "../../utils/sendResponse.js";
 import addressValidators from "../../validators/addressValidators.js";
 import User from "../../models/userModel.js";
 import Address from "../../models/addressModel.js";
@@ -20,7 +20,9 @@ export const cartRender = wrapAsync(async (req, res) => {
 
   const cart = await Cart.findOne({ user_id });
 
-  const products = await buildCheckoutItems(cart.items);
+  const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
+
+  console.log(warning);
 
   const shippingCharge = 50;
 
@@ -36,7 +38,8 @@ export const cartRender = wrapAsync(async (req, res) => {
     showFooter: true,
     pageJS: "cart.js",
 
-    products,
+    products: checkoutItems,
+    warning,
     priceDetails,
   });
 });
@@ -69,8 +72,8 @@ export const cartQuantity = wrapAsync(async (req, res) => {
   if (value === "plus") {
     if (itemVariant.stock > item.quantity) {
       item.quantity += 1;
-    }else{
-      return sendResponse(res,Responses.cartQuantity.STOCK_OUT)
+    } else {
+      return sendResponse(res, Responses.cartQuantity.STOCK_OUT);
     }
   }
 
@@ -142,7 +145,7 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
   const result = await User.findByIdAndUpdate(
     user._id,
     { $set: { full_name: fullName, phone_no: phoneNo } },
-    { new: true }
+    { new: true },
   );
 
   const matchMail = await User.findOne({
@@ -283,7 +286,7 @@ export const editAddress = wrapAsync(async (req, res) => {
         ...value,
         user_id,
       },
-    }
+    },
   );
 
   if (result.matchedCount === 0) {
@@ -346,7 +349,7 @@ export const addWishlist = wrapAsync(async (req, res) => {
   if (exists) {
     await Wishlist.updateOne(
       { user_id },
-      { $pull: { items: { variant_id: variant_Id } } }
+      { $pull: { items: { variant_id: variant_Id } } },
     );
 
     return sendResponse(res, Responses.addWishlist.ALREADY_EXIST);
@@ -355,7 +358,7 @@ export const addWishlist = wrapAsync(async (req, res) => {
   await Wishlist.findOneAndUpdate(
     { user_id },
     { $addToSet: { items: { variant_id: variant_Id } } },
-    { upsert: true }
+    { upsert: true },
   );
 
   return sendResponse(res, Responses.addWishlist.PRODUCT_ADDED);
@@ -375,35 +378,11 @@ export const removeWishlist = wrapAsync(async (req, res) => {
       $pull: {
         items: { variant_id: id },
       },
-    }
+    },
   );
 
   return sendResponse(res, Responses.removeWishlist.REMOVED);
 });
-
-// ======================================================================
-// 6. BUY NOW
-// ======================================================================
-
-export const buyNow = (req, res) => {
-  const { product_id, variant_id, quantity } = req.body;
-
-  if (!req.session.user) {
-    return sendResponse(res, Responses.buyNowRes.NO_USER);
-  }
-
-  if (!product_id || quantity < 1 || !variant_id) {
-    return sendResponse(res, Responses.buyNowRes.INVALID);
-  }
-
-  req.session.buyNow = {
-    product_id,
-    variant_id,
-    quantity,
-  };
-
-  return sendResponse(res, Responses.buyNowRes.SUCCESS);
-};
 
 // ======================================================================
 // 6. CHECKOUT PAGE
@@ -414,20 +393,15 @@ export const checkoutPage = wrapAsync(async (req, res) => {
   let items = [];
   const shippingCharge = 50;
 
-  if (req.session.buyNow) {
-    items = [req.session.buyNow];
-    delete req.session.buyNow;
-  } else {
-    const cart = await Cart.findOne({ user_id });
+  const cart = await Cart.findOne({ user_id });
 
-    if (!cart || cart.items.length === 0) {
-      return res.redirect("/cart");
-    }
-
-    items = cart.items;
+  if (!cart || cart.items.length === 0) {
+    return res.redirect("/user/cart");
   }
 
-  const checkoutItems = await buildCheckoutItems(items);
+  items = cart.items;
+
+  const { checkoutItems, warning } = await buildCheckoutItems(items);
 
   const subtotal = checkoutItems.reduce((sum, item) => sum + item.subtotal, 0);
 
@@ -448,6 +422,7 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     addresses,
     subtotal,
     total,
+    warning,
     showHeader: true,
     showFooter: true,
   });
@@ -484,7 +459,7 @@ export const addToCart = wrapAsync(async (req, res) => {
   }
 
   const existingItem = cart.items.find(
-    (item) => item.variant_id.toString() === variant_id
+    (item) => item.variant_id.toString() === variant_id,
   );
 
   if (existingItem) {
@@ -533,37 +508,14 @@ export const proceedToCheckout = wrapAsync(async (req, res) => {
   if (!cart || cart.items.length === 0) {
     return sendResponse(res, Responses.cartCheck.EMPTY_CART);
   }
+  const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
 
-  for (const item of cart.items) {
-    const variant = await Variant.findById(item.variant_id);
-
-    if (!variant || !variant.is_available) {
-      let productName = "This product";
-
-      if (variant?.product_id) {
-        const product = await Product.findById(variant.product_id).select(
-          "name"
-        );
-
-        if (product) productName = product.name;
-      }
-
-      return sendResponse(res, {
-        code: 400,
-        message: `${productName} is no longer available`,
-      });
-    }
-
-    if (variant.stock < item.quantity) {
-      const product = await Product.findById(variant.product_id).select("name");
-
-      return sendResponse(res, {
-        code: 400,
-        message: `Only ${variant.stock} item(s) left for ${
-          product?.name || "this product"
-        }`,
-      });
-    }
+  if (warning.length > 0) {
+    return sendResponse(res, {
+      code: 409,
+      message: warning.join(""),
+      data: { warn: true },
+    });
   }
 
   req.session.checkoutIntent = {
@@ -600,7 +552,7 @@ export const deleteCartItem = wrapAsync(async (req, res) => {
 
   // Check if item exists
   const itemExists = cart.items.some(
-    (item) => item.variant_id.toString() === variant_id
+    (item) => item.variant_id.toString() === variant_id,
   );
 
   if (!itemExists) {
@@ -612,7 +564,7 @@ export const deleteCartItem = wrapAsync(async (req, res) => {
 
   // Remove item
   cart.items = cart.items.filter(
-    (item) => item.variant_id.toString() !== variant_id
+    (item) => item.variant_id.toString() !== variant_id,
   );
 
   // Recalculate total
@@ -650,3 +602,26 @@ export const userLogout = (req, res) => {
     return res.redirect("/");
   });
 };
+
+export const paymentSuccess = (req, res) => {
+  res.render("user/pages/paymentsuccess", {
+    title: "Payment Success",
+    pageJS: "paymentsuccess.js",
+    pageCSS: "paymentsuccess",
+    showFooter: false,
+    Popper: true,
+    showHeader: false,
+  });
+};
+
+// res.render("user/pages/checkout", {
+//   pageCSS: "checkout",
+//   pageJS: "checkout.js",
+//   title: "Checkout Page",
+//   items: checkoutItems,
+//   addresses,
+//   subtotal,
+//   total,
+//   showHeader: true,
+//   showFooter: true,
+// });

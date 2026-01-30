@@ -1,31 +1,32 @@
 import Product from "../models/productModel.js";
 import Variant from "../models/varientModel.js";
+import sendResponse from "./sendResponse.js";
+import * as Responses from "../utils/responses/user/user.response.js";
 
 export const buildCheckoutItems = async (items) => {
   const checkoutItems = [];
+  const warning = [];
 
   for (const item of items) {
     const product = await Product.findOne({
       _id: item.product_id,
-      is_active: true,
     });
 
-    if (!product) {
-      throw new Error("Product not available");
+    if (!product.is_active) {
+      warning.push(` ${product.name} not available.`);
     }
 
     const variant = await Variant.findOne({
       _id: item.variant_id,
       product_id: product._id,
-      is_available: true,
     });
 
-    if (!variant) {
-      throw new Error("Variant not available");
+    if (!variant.is_available && product.is_active) {
+      warning.push(` ${product.name} not available.`);
     }
 
-    if (variant.stock < item.quantity) {
-      throw new Error(`${product.name} Only ${variant.stock} items left`);
+    if (variant.stock < item.quantity && variant.is_available) {
+      warning.push(`${product.name} Only ${variant.stock} items left`);
     }
 
     checkoutItems.push({
@@ -43,5 +44,5 @@ export const buildCheckoutItems = async (items) => {
     });
   }
 
-  return checkoutItems;
+  return { checkoutItems, warning };
 };

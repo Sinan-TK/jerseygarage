@@ -1,4 +1,4 @@
-export const sendResponse = (
+export default (
   res,
   {
     code = 200,

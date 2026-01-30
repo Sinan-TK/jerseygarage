@@ -97,25 +97,26 @@
 
 /* BUTTONS */
 .cart-btn,
-.buy-btn {
+.wish-btn {
     width: 100%;
     padding: 14px;
     margin-bottom: 12px;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
 }
 
 .cart-btn {
-    background: #1f2937;
+    background: #000000;
     color: #fff;
-    border: none;
+    border: 2px solid black;
 }
 
-.buy-btn {
-    background: #111;
-    color: #fff;
-    border: none;
+.wish-btn {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid black;
 }
 
 /* META */
@@ -394,7 +395,7 @@
     }
 
     .cart-btn,
-    .buy-btn {
+    .wish-btn {
         padding: 12px;
         font-size: 14px;
     }
@@ -446,7 +447,7 @@
     .product-info .features,
     .product-info .sizes,
     .product-info .cart-btn,
-    .product-info .buy-btn,
+    .product-info .wish-btn,
     .product-info .meta {
         order: 1;
     }

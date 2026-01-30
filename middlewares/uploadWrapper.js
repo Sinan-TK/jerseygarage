@@ -1,4 +1,4 @@
-import { sendResponse } from "../utils/sendResponse.js";
+import sendResponse from "../utils/sendResponse.js";
 import upload from "./multer.js";
 
 export const uploadImages = (req, res, next) => {

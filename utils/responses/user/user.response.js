@@ -124,3 +124,4 @@ export const cartCheck = Object.freeze({
     redirectToFrontend: "/user/checkout",
   },
 });
+

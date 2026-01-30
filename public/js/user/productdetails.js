@@ -102,40 +102,40 @@ qtyInput.addEventListener("input", () => {
   }
 });
 
-const buyBtn = document.querySelector(".buy-btn");
+// const buyBtn = document.querySelector(".buy-btn");
 
-buyBtn.addEventListener("click", async () => {
-  const product_id = buyBtn.dataset.productId;
-  const quantity = document.getElementById("quantity").value.trim();
+// buyBtn.addEventListener("click", async () => {
+//   const product_id = buyBtn.dataset.productId;
+//   const quantity = document.getElementById("quantity").value.trim();
 
-  let variant_id = null;
+//   let variant_id = null;
 
-  sizeButtons.forEach((size) => {
-    if (size.classList.contains("active")) {
-      variant_id = size.dataset.variantId;
-    }
-  });
+//   sizeButtons.forEach((size) => {
+//     if (size.classList.contains("active")) {
+//       variant_id = size.dataset.variantId;
+//     }
+//   });
 
-  console.log(product_id, variant_id, quantity);
+//   console.log(product_id, variant_id, quantity);
 
-  try {
-    const res = await axios.post("/user/buy-now", {
-      product_id,
-      variant_id,
-      quantity,
-    });
+//   try {
+//     const res = await axios.post("/user/buy-now", {
+//       product_id,
+//       variant_id,
+//       quantity,
+//     });
 
-    if (res.data.success) {
-      window.location.href = res.data.redirect;
-    }
-  } catch (err) {
-    const error = err.response?.data;
+//     if (res.data.success) {
+//       window.location.href = res.data.redirect;
+//     }
+//   } catch (err) {
+//     const error = err.response?.data;
 
-    toastr.error(error?.message, "Error!!");
-  }
-});
+//     toastr.error(error?.message, "Error!!");
+//   }
+// });
 
-const wishlistBtn = document.querySelector(".wishlist-btn");
+const wishlistBtn = document.querySelector(".wish-btn");
 
 wishlistBtn.addEventListener("click", async (e) => {
   e.preventDefault(); // stops link navigation
@@ -163,9 +163,11 @@ wishlistBtn.addEventListener("click", async (e) => {
     const error = err.response?.data;
 
     toastr.error(error?.message, "Error!!");
+
+    if (error.redirect) {
+      setTimeout(() => {
+        window.location.href = error.redirect;
+      }, 1000);
+    }
   }
 });
-
-
-
-

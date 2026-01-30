@@ -1,7 +1,7 @@
 import Category from "../../models/categoryModel.js";
 import Product from "../../models/productModel.js";
-import { wrapAsync } from "../../utils/wrapAsync.js";
-import { sendResponse } from "../../utils/sendResponse.js";
+import wrapAsync from "../../utils/wrapAsync.js";
+import sendResponse from "../../utils/sendResponse.js";
 import { categorySchema } from "../../validators/categoryValidator.js";
 import { paginate } from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";

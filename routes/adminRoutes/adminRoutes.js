@@ -5,6 +5,7 @@ import upload from "../../middlewares/multer.js";
 import { adminLayout } from "../../middlewares/layoutMiddleware.js";
 import adminUserRoutes from "../adminRoutes/userRoutes.js";
 import categoryRoutes from "../adminRoutes/categoryRoutes.js";
+import orderRoutes from "../adminRoutes/orderRoutes.js";
 import productRoutes from "../adminRoutes/productRoutes.js";
 
 const router = express.Router();
@@ -26,12 +27,13 @@ router.use('/categories',categoryRoutes);
 
 router.use('/products',productRoutes);
 
+router.use("/orders",orderRoutes);
+
 
 
 
 router.get("/offers",adminController.featureNotAvailable);
 
-router.get("/orders",adminController.featureNotAvailable);
 
 router.get("/payments",adminController.featureNotAvailable);
 
