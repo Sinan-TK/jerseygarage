@@ -22,8 +22,6 @@ export const cartRender = wrapAsync(async (req, res) => {
 
   const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
 
-  console.log(warning);
-
   const shippingCharge = 50;
 
   const priceDetails = {

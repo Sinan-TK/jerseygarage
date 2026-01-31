@@ -13,6 +13,14 @@ import wrapAsync from "../utils/wrapAsync.js";
 
 export const userNotFound = (req, res, next) => {
   if (!req.session.user) {
+    if (req.xhr || req.headers.accept?.includes("json")) {
+      return sendResponse(res, {
+        code: 401,
+        message: "Please login first",
+        redirectToFrontend: "/login",
+      });
+    }
+
     return res.redirect("/");
   }
   next();

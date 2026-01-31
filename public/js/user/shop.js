@@ -1,7 +1,9 @@
 window.loadFilter = async function (page = 1) {
-  const category = getSelectedValue("categories");
-  const team = getSelectedValue("team");
-  const size = getSelectedValue("size");
+  const params = new URLSearchParams(window.location.search);
+
+  const category = getSelectedValue("categories") || params.get("category");
+  const team = getSelectedValue("team") || params.get("team");
+  const size = getSelectedValue("size") || params.get("size");
   const minRange = document.getElementById("minRange").value;
   const maxRange = document.getElementById("maxRange").value;
 
@@ -24,7 +26,7 @@ window.loadFilter = async function (page = 1) {
       .join("");
 
     document.querySelector(".pagination").innerHTML = pagination(
-      res.data.data.pagination
+      res.data.data.pagination,
     );
   }
 };
@@ -43,7 +45,7 @@ function loadProducts(product, user, wishlist) {
   let wishlisted = false;
   if (user && wishlist && variant) {
     wishlisted = wishlist.items.some(
-      (item) => item.variant_id.toString() === variant._id.toString()
+      (item) => item.variant_id.toString() === variant._id.toString(),
     );
   }
 
@@ -82,7 +84,7 @@ function loadProducts(product, user, wishlist) {
                         </p>
                     </div>
 
-                    <button class="add-to-cart-btn">
+                    <button class="add-to-cart-btn" data-variant="${variant._id}" data-product="${product._id}">
                         <i class="fa-solid fa-cart-shopping"></i>
                         Add to Cart
                     </button>
@@ -196,3 +198,40 @@ maxRange.addEventListener("input", () => {
 function updatePrice() {
   priceDisplay.textContent = `₹${minRange.value} - ₹${maxRange.value}`;
 }
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".add-to-cart-btn");
+
+  if (!btn) return; // Not add-to-cart
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const product_id = btn.dataset.product;
+  const variant_id = btn.dataset.variant;
+  const quantity = 1;
+
+  try {
+    const res = await axios.post("/user/add-to-cart", {
+      product_id,
+      variant_id,
+      quantity,
+    });
+
+    if (res.data.success) {
+      toastr.success(res.data.message, "Success");
+
+      document.querySelector(".cart-count").innerText =
+        res.data.data.items_count;
+    }
+  } catch (err) {
+    const error = err.response?.data;
+    toastr.error(error?.message || "Something went wrong", "Failed");
+
+    setTimeout(() => {
+      if (error?.redirect) {
+        window.location.href = error.redirect;
+      }
+    }, 1000);
+  }
+});
