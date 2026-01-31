@@ -41,15 +41,13 @@ router.get("/cart",Userdetails, userController.cartRender);
 
 router.get("/wishlist",Userdetails, userController.wishlistRender);
 
-router.post("/wishlist",userMiddleware.userNotFound,Userdetails,userController.addWishlist);
+router.post("/wishlist",Userdetails,userController.addWishlist);
 
 router.patch("/wishlist/:id",Userdetails,userController.removeWishlist);
 
-router.post("/add-to-cart",userMiddleware.userNotFound,userController.addToCart);
+router.post("/add-to-cart",userController.addToCart);
 
 router.patch("/cart",userController.cartQuantity);
-
-// router.post("/buy-now",userController.buyNow);
 
 router.post("/checkout",userController.proceedToCheckout);
 
