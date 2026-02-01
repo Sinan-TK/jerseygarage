@@ -1,4 +1,5 @@
 async function registerData() {
+  const email = document.getElementById("email").value.trim();
   const fullName = document.getElementById("fullname").value.trim();
   const password = document.getElementById("password").value.trim();
   const confirmPassword = document
@@ -7,10 +8,9 @@ async function registerData() {
   const errorBox = document.getElementById("registerError");
   const errorText = document.getElementById("registerErrorText");
 
-  console.log(fullName, password, confirmPassword);
-
   try {
-    const res = await axios.post("/register", {
+    const res = await axios.post("/signup", {
+      email,
       fullName,
       password,
       confirmPassword,
@@ -32,3 +32,25 @@ async function registerData() {
     errorText.innerText = error.message || "Something went wrong!";
   }
 }
+
+const passwordInput = document.getElementById("password");
+const togglePassword = document.getElementById("togglePassword");
+
+togglePassword.addEventListener("click", () => {
+  const isPassword = passwordInput.type === "password";
+
+  passwordInput.type = isPassword ? "text" : "password";
+  togglePassword.classList.toggle("fa-eye");
+  togglePassword.classList.toggle("fa-eye-slash");
+});
+
+const confirmPasswordInput = document.getElementById("confirm-password");
+const confirmTogglePassword = document.getElementById("confirmTogglePassword");
+
+confirmTogglePassword.addEventListener("click", () => {
+  const isPassword = confirmPasswordInput.type === "password";
+
+  confirmPasswordInput.type = isPassword ? "text" : "password";
+  confirmTogglePassword.classList.toggle("fa-eye");
+  confirmTogglePassword.classList.toggle("fa-eye-slash");
+});

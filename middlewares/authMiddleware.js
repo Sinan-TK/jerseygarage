@@ -25,6 +25,7 @@ export const noMailFound = (req, res, next) => {
   if (!req.session.tempEmail) {
     return res.redirect("/");
   }
+
   next();
 };
 

@@ -37,7 +37,7 @@ export const emailVerification = async (email) => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    return { error: Responses.signupUserEmail.USER_FOUND };
+    return { error: Responses.registerLogic.USER_FOUND };
   }
 
   await generateOtp(email, "signup", "SignUp OTP. ");

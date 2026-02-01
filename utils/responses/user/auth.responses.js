@@ -18,18 +18,6 @@ export const loginUser = Object.freeze({
   },
 });
 
-export const signupUserEmail = Object.freeze({
-  USER_FOUND: {
-    code: 409,
-    message: "Email already registered!",
-  },
-  EMAIL_OK: {
-    code: 200,
-    message: "OTP sended successfully!",
-    redirectToFrontend: "/verify-otp",
-  },
-});
-
 export const otpVerify = Object.freeze({
   DATA_NOT_FOUND: {
     code: 409,
@@ -46,8 +34,8 @@ export const otpVerify = Object.freeze({
   },
   REGISTER: {
     code: 200,
-    message: "OTP verified successfully!",
-    redirectToFrontend: "/register",
+    message: "Account created successfully!",
+    redirectToFrontend: "/login",
   },
   NEWPASSWORD: {
     code: 200,
@@ -68,14 +56,18 @@ export const resendOtp = Object.freeze({
 });
 
 export const registerLogic = Object.freeze({
+  USER_FOUND: {
+    code: 409,
+    message: "Email already registered!",
+  },
   DATA_NOT_FOUND: {
     code: 409,
     message: "Session expired. Please try again!",
   },
   ACCOUNT_CREATED: {
     code: 200,
-    message: "Account Created Successfully!",
-    redirectToFrontend: "/login",
+    message: "OTP sended successfully!",
+    redirectToFrontend: "/verify-otp",
   },
 });
 

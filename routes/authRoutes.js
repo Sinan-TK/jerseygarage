@@ -29,11 +29,11 @@ router.post('/login',authMiddleware.isLoggedIn,authController.userVerification);
 
 router.get('/signup',authMiddleware.isLoggedIn,authMiddleware.isMailFound,authController.signUpPage);
 
-router.post('/signup',authMiddleware.isLoggedIn, authController.getEmail);
+router.post('/signup',authMiddleware.isLoggedIn, authController.signupVerification);
 
-router.get('/register',authMiddleware.isLoggedIn,authMiddleware.isMailFound, authController.renderSignupDetails);
+// router.get('/register',authMiddleware.isLoggedIn,authMiddleware.isMailFound, authController.renderSignupDetails);
 
-router.post('/register',authMiddleware.isLoggedIn,authController.saveSignupDetails);
+// router.post('/register',authMiddleware.isLoggedIn,authController.saveSignupDetails);
 
 router.get('/forgotpassword',authMiddleware.isLoggedIn ,authController.renderForgetPasswordPage);
 

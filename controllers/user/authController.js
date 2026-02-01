@@ -77,43 +77,43 @@ export const userVerification = wrapAsync(async (req, res) => {
 // 4. SIGNUP PAGE (EMAIL PAGE)
 // ======================================================================
 
-export const signUpPage = wrapAsync((req, res) => {
-  res.render("user/pages/signup", {
-    title: "Email SignUp",
-    pageCSS: "signup",
-    showHeader: true,
-    showFooter: true,
-    pageJS: "signup.js",
-  });
-});
+// export const signUpPage = wrapAsync((req, res) => {
+//   res.render("user/pages/signup", {
+//     title: "Email SignUp",
+//     pageCSS: "signup",
+//     showHeader: true,
+//     showFooter: true,
+//     pageJS: "signup.js",
+//   });
+// });
 
 // ======================================================================
 // 5. USER SUBMITS EMAIL (SIGNUP) → GENERATE OTP
 // ======================================================================
 
-export const getEmail = wrapAsync(async (req, res) => {
-  const { error } = userValidators.userMailSchema.validate(req.body);
+// export const getEmail = wrapAsync(async (req, res) => {
+//   const { error } = userValidators.userMailSchema.validate(req.body);
 
-  if (error) {
-    return sendResponse(res, {
-      code: 400,
-      message: error.details[0].message,
-    });
-  }
+//   if (error) {
+//     return sendResponse(res, {
+//       code: 400,
+//       message: error.details[0].message,
+//     });
+//   }
 
-  const { email } = req.body;
+//   const { email } = req.body;
 
-  const result = await authService.emailVerification(email);
+// const result = await authService.emailVerification(email);
 
-  if (result?.error) {
-    return sendResponse(res, result.error);
-  }
+//   if (result?.error) {
+//     return sendResponse(res, result.error);
+//   }
 
-  req.session.tempEmail = result.data.email;
-  req.session.otpPurpose = result.data.purpose;
+//   req.session.tempEmail = result.data.email;
+//   req.session.otpPurpose = result.data.purpose;
 
-  return sendResponse(res, Responses.signupUserEmail.EMAIL_OK);
-});
+//   return sendResponse(res, Responses.signupUserEmail.EMAIL_OK);
+// });
 
 // ======================================================================
 // 6. RENDER OTP PAGE
@@ -134,7 +134,7 @@ export const renderOtpPage = wrapAsync((req, res) => {
 // ======================================================================
 
 export const otpVerification = wrapAsync(async (req, res) => {
-  const email = req.session.tempEmail;
+  const email = req.session.tempEmail || req.session.userData?.email;
   const purpose = req.session.otpPurpose;
 
   if (!email || !purpose) {
@@ -159,6 +159,21 @@ export const otpVerification = wrapAsync(async (req, res) => {
   }
 
   if (purpose === "signup") {
+    const userData = req.session.userData;
+    const email = req.session.tempEmail;
+
+    const newUser = new User({
+      full_name: userData.fullName,
+      email,
+      password_hash: userData.password,
+    });
+
+    await newUser.save();
+
+    delete req.session.userData;
+    delete req.session.otpPurpose;
+    delete req.session.tempEmail;
+
     return sendResponse(res, Responses.otpVerify.REGISTER);
   }
   return sendResponse(res, Responses.otpVerify.NEWPASSWORD);
@@ -185,7 +200,7 @@ export const resendOtp = wrapAsync(async (req, res) => {
 // 9. SHOW REGISTER PAGE
 // ======================================================================
 
-export const renderSignupDetails = wrapAsync((req, res) => {
+export const signUpPage = wrapAsync((req, res) => {
   res.render("user/pages/register", {
     title: "Register",
     pageCSS: "register",
@@ -199,11 +214,7 @@ export const renderSignupDetails = wrapAsync((req, res) => {
 // 10. SAVE NEW USER (FINAL REGISTER PAGE)
 // ======================================================================
 
-export const saveSignupDetails = wrapAsync(async (req, res) => {
-  const email = req.session.tempEmail;
-
-  if (!email) return sendResponse(res, Responses.registerLogic.DATA_NOT_FOUND);
-
+export const signupVerification = wrapAsync(async (req, res) => {
   const { error } = userValidators.registerSchema.validate(req.body);
 
   if (error) {
@@ -213,18 +224,20 @@ export const saveSignupDetails = wrapAsync(async (req, res) => {
     });
   }
 
-  const { fullName, password, confirmPassword } = req.body;
+  const { email, fullName, password, confirmPassword } = req.body;
 
-  const newUser = new User({
-    full_name: fullName,
-    email,
-    password_hash: password,
-  });
+  const result = await authService.emailVerification(email);
 
-  await newUser.save();
+  if (result?.error) {
+    return sendResponse(res, result.error);
+  }
 
-  delete req.session.tempEmail;
-  delete req.session.otpPurpose;
+  req.session.userData = {
+    fullName,
+    password,
+  };
+  req.session.tempEmail = email;
+  req.session.otpPurpose = result.data.purpose;
 
   return sendResponse(res, Responses.registerLogic.ACCOUNT_CREATED);
 });
@@ -234,9 +247,9 @@ export const saveSignupDetails = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const renderForgetPasswordPage = wrapAsync((req, res) => {
-  res.render("user/pages/signup", {
+  res.render("user/pages/forgotpassword", {
     title: "Forget Password",
-    pageCSS: "signup",
+    pageCSS: "forgotpassword",
     showHeader: true,
     showFooter: true,
     pageJS: "forgotpassword.js",
@@ -369,7 +382,7 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 export const renderShopPage = wrapAsync(async (req, res) => {
   const categories = await Category.find(
     { is_active: true },
-    { _id: 1, name: 1 }
+    { _id: 1, name: 1 },
   );
 
   const teamNames = await Product.aggregate([
@@ -434,7 +447,7 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
 
   if (category) {
     const categoryDoc = await Category.findOne({ name: category }).select(
-      "_id"
+      "_id",
     );
     if (categoryDoc) filter.category = categoryDoc._id;
   }

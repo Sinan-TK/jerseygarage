@@ -2,44 +2,54 @@
   <section class="register-card">
     <h3 class="card-heading">Register</h3>
 
-    
-      <!-- ERROR MESSAGE -->
-      <div class="error-box" id="registerError" style="display: none;">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span id="registerErrorText">
-        </span>
+
+    <!-- ERROR MESSAGE -->
+    <div class="error-box" id="registerError" style="display: none;">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span id="registerErrorText">
+      </span>
+    </div>
+
+    <div class="register-form">
+      <div class="form-group">
+        <label for="email">Email <span>*</span></label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" />
       </div>
 
-        <div class="register-form">
-          <!-- Full Name -->
-          <div class="form-group">
-            <label for="fullname">Full name <span>*</span></label>
-            <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" />
-          </div>
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="fullname">Full name <span>*</span></label>
+        <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" />
+      </div>
 
-          <!-- Password -->
-          <div class="form-group">
-            <label for="password">Password <span>*</span></label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" />
-          </div>
-
-          <!-- Confirm Password -->
-          <div class="form-group">
-            <label for="confirm-password">Confirm password <span>*</span></label>
-            <input type="password" id="confirm-password" name="confirmPassword" placeholder="Confirm your password" />
-          </div>
-
-          <!-- Privacy Policy -->
-          <p class="privacy">privacy policy</p>
-
-          <!-- Register Button -->
-          <button type="button" onclick="registerData()" class="register-btn">Confirm</button>
-
-          <!-- Already Have Account -->
-          <p class="login-text">
-            Already have an account?
-            <a href="/login">Login here</a>
-          </p>
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password <span>*</span></label>
+        <div class="password-wrapper">
+          <input type="password" id="password" name="password" placeholder="Enter your password" />
+          <i id="togglePassword" class="fa-solid fa-eye"></i>
         </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="password">Password <span>*</span></label>
+        <div class="password-wrapper">
+          <input type="password" id="confirm-password" name="confirmPassword" placeholder="Enter your password" />
+          <i id="confirmTogglePassword" class="fa-solid fa-eye"></i>
+        </div>
+
+        <!-- Privacy Policy -->
+        <p class="privacy">privacy policy</p>
+
+        <!-- Register Button -->
+        <button type="button" onclick="registerData()" class="register-btn">Confirm</button>
+
+        <!-- Already Have Account -->
+        <p class="login-text">
+          Already have an account?
+          <a href="/login">Login here</a>
+        </p>
+      </div>
   </section>
 </main>

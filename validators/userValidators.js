@@ -12,13 +12,6 @@ export const userSchema = Joi.object({
   }),
 });
 
-export const userMailSchema = Joi.object({
-  email: Joi.string().email().required().messages({
-    "string.empty": "Email is required!",
-    "string.email": "Enter a valid email address!",
-  }),
-});
-
 export const otpSchema = Joi.object({
   otpValue: Joi.string().min(6).required().messages({
     "string.empty": "Please enter the OTP!",
@@ -27,6 +20,10 @@ export const otpSchema = Joi.object({
 });
 
 export const registerSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    "string.empty": "Email is required!",
+    "string.email": "Enter a valid email address!",
+  }),
   fullName: Joi.string().required().messages({
     "string.empty": "Please enter the full name!",
   }),
@@ -79,10 +76,10 @@ export const personalInfo = Joi.object({
     "string.email": "Enter a valid email!",
   }),
   phoneNo: Joi.string()
-  .pattern(/^[6-9]\d{9}$/)
-  .optional()
-  .allow("")
-  .messages({
-    "string.pattern.base": "Invalid phone number"
-  })
+    .pattern(/^[6-9]\d{9}$/)
+    .optional()
+    .allow("")
+    .messages({
+      "string.pattern.base": "Invalid phone number",
+    }),
 });
