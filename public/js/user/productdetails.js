@@ -102,39 +102,6 @@ qtyInput.addEventListener("input", () => {
   }
 });
 
-// const buyBtn = document.querySelector(".buy-btn");
-
-// buyBtn.addEventListener("click", async () => {
-//   const product_id = buyBtn.dataset.productId;
-//   const quantity = document.getElementById("quantity").value.trim();
-
-//   let variant_id = null;
-
-//   sizeButtons.forEach((size) => {
-//     if (size.classList.contains("active")) {
-//       variant_id = size.dataset.variantId;
-//     }
-//   });
-
-//   console.log(product_id, variant_id, quantity);
-
-//   try {
-//     const res = await axios.post("/user/buy-now", {
-//       product_id,
-//       variant_id,
-//       quantity,
-//     });
-
-//     if (res.data.success) {
-//       window.location.href = res.data.redirect;
-//     }
-//   } catch (err) {
-//     const error = err.response?.data;
-
-//     toastr.error(error?.message, "Error!!");
-//   }
-// });
-
 const wishlistBtn = document.querySelector(".wish-btn");
 
 wishlistBtn.addEventListener("click", async (e) => {
@@ -169,5 +136,87 @@ wishlistBtn.addEventListener("click", async (e) => {
         window.location.href = error.redirect;
       }, 1000);
     }
+  }
+});
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".add-to-cart-btn");
+
+  if (!btn) return; // Not add-to-cart
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const product_id = btn.dataset.product;
+  const variant_id = btn.dataset.variant;
+  const quantity = 1;
+
+  console.log(product_id, variant_id, quantity);
+
+  try {
+    const res = await axios.post("/user/add-to-cart", {
+      product_id,
+      variant_id,
+      quantity,
+    });
+
+    if (res.data.success) {
+      toastr.success(res.data.message, "Success");
+
+      document.querySelector(".cart-count").innerText =
+        res.data.data.items_count;
+    }
+  } catch (err) {
+    const error = err.response?.data;
+    toastr.error(error?.message || "Something went wrong", "Failed");
+
+    setTimeout(() => {
+      if (error?.redirect) {
+        window.location.href = error.redirect;
+      }
+    }, 1000);
+  }
+});
+
+const cartBtn = document.getElementById("cartBtn");
+
+cartBtn.addEventListener("click", async () => {
+  const product_id = cartBtn.dataset.product;
+  // const variant_id = cartBtn.dataset.variant;
+
+  let variant_id = null;
+
+  sizeButtons.forEach((size) => {
+    if (size.classList.contains("active")) {
+      variant_id = size.dataset.variantId;
+    }
+  });
+
+  const quantity = document.getElementById("quantity").value.trim();
+
+  console.log(product_id, variant_id, quantity);
+
+  try {
+    const res = await axios.post("/user/add-to-cart", {
+      product_id,
+      variant_id,
+      quantity,
+    });
+
+    if (res.data.success) {
+      toastr.success(res.data.message, "Success");
+
+      document.querySelector(".cart-count").innerText =
+        res.data.data.items_count;
+    }
+  } catch (err) {
+    const error = err.response?.data;
+    toastr.error(error?.message || "Something went wrong", "Failed");
+
+    setTimeout(() => {
+      if (error?.redirect) {
+        window.location.href = error.redirect;
+      }
+    }, 1000);
   }
 });

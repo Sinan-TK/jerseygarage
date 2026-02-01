@@ -557,6 +557,7 @@ export const productDetailPage = wrapAsync(async (req, res) => {
       $match: {
         category: new ObjectId(product[0].category),
         _id: { $ne: new ObjectId(id) },
+        is_active: true,
       },
     },
     {
@@ -583,6 +584,7 @@ export const productDetailPage = wrapAsync(async (req, res) => {
               ...finalRelatedProducts.map((p) => p._id),
             ],
           },
+          is_active: true,
         },
       },
       { $sample: { size: remaining } },

@@ -440,7 +440,11 @@ export const addToCart = wrapAsync(async (req, res) => {
   const variant = await Variant.findById(variant_id);
 
   if (!variant || !variant.is_available) {
-    return sendResponse(res, Responses.addToCart.NO_VARIANT);
+    let size = "This";
+    return sendResponse(res, {
+      code: 404,
+      message: `${variant.size} is not available`,
+    });
   }
 
   if (variant.stock < quantity) {

@@ -80,10 +80,10 @@ export const addToCart = Object.freeze({
     code: 400,
     message: "Invalid cart data",
   },
-  NO_VARIANT: {
-    code: 404,
-    message: "Variant not available",
-  },
+  // NO_VARIANT: {
+  //   code: 404,
+  //   message: "Variant not available",
+  // },
   // SUCCESS: {
   //   code: 200,
   //   message: "Item added to cart",
