@@ -1,5 +1,5 @@
 import wrapAsync from "../../utils/wrapAsync.js";
-
+import Order from "../../models/orderModel.js";
 
 export const orderPageRender = wrapAsync((req, res) => {
   res.render("admin/pages/orders", {

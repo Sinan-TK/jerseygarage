@@ -29,7 +29,6 @@ const addressSchema = new mongoose.Schema(
     address_line: {
       type: String,
       trim: true,
-      default: "",
     },
 
     city: {

@@ -12,7 +12,7 @@
 
             <% addresses.forEach((address)=>{ %>
                 <label class="radio-card <%= address.is_default ? 'active':'' %>">
-                    <input type="radio" name="address" <%=address.is_default ? 'checked' :'' %>/>
+                    <input type="radio" name="address" value="<%= address._id %>" <%=address.is_default ? 'checked' :'' %>/>
                     <div class="radio-content">
 
                         <div class="title">
@@ -87,7 +87,7 @@
                 </label> -->
 
             <label class="radio-card">
-                <input type="radio" name="payment" />
+                <input type="radio" name="payment" value="COD" />
                 <div class="radio-content">
                     <div class="title">Cash on Delivery</div>
                 </div>

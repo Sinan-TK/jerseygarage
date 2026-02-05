@@ -9,6 +9,8 @@ import Wishlist from "../../models/wishlistModel.js";
 import Variant from "../../models/varientModel.js";
 import Cart from "../../models/cartModel.js";
 import Product from "../../models/productModel.js";
+import { generateOrderId } from "../../utils/generateOrderId.js";
+import Order from "../../models/orderModel.js";
 import { ObjectId } from "mongodb";
 import { buildCheckoutItems } from "../../utils/buildCheckoutItems.js";
 
@@ -19,6 +21,18 @@ export const cartRender = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
   const cart = await Cart.findOne({ user_id });
+
+  if (!cart || cart.length) {
+    return res.render("user/pages/cart", {
+      title: "Cart",
+      pageCSS: "cart",
+      showHeader: true,
+      showFooter: true,
+      pageJS: "cart.js",
+
+      products: [],
+    });
+  }
 
   const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
 
@@ -605,25 +619,187 @@ export const userLogout = (req, res) => {
   });
 };
 
-export const paymentSuccess = (req, res) => {
+// ======================================================================
+// 6. PAYMENT SUCCESS
+// ======================================================================
+
+export const paymentSuccess = wrapAsync(async (req, res) => {
+  const orderId = req.session.orderId;
+  const user_id = req.session.user.id;
+
+  console.log(orderId);
+
+  const order = await Order.findOne({
+    _id: orderId,
+    user_id,
+  }).select("orderId createdAt totalPrice");
+
+  const user = await User.findById(user_id).select("email");
+
+  const details = {
+    time: new Date(order.createdAt).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }),
+    orderId: order.orderId,
+    total: order.totalPrice,
+    email: user.email,
+  };
+
   res.render("user/pages/paymentsuccess", {
     title: "Payment Success",
     pageJS: "paymentsuccess.js",
     pageCSS: "paymentsuccess",
+    details,
     showFooter: false,
-    Popper: true,
     showHeader: false,
   });
-};
+});
 
-// res.render("user/pages/checkout", {
-//   pageCSS: "checkout",
-//   pageJS: "checkout.js",
-//   title: "Checkout Page",
-//   items: checkoutItems,
-//   addresses,
-//   subtotal,
-//   total,
-//   showHeader: true,
-//   showFooter: true,
-// });
+// ======================================================================
+// 6. PLACE ORDER
+// ======================================================================
+
+export const placeOrder = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const { addressId, paymentMethod, paymentResult } = req.body;
+
+  if (!addressId) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Shipping address is required",
+    });
+  }
+
+  if (!paymentMethod) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Payment method is required",
+    });
+  }
+
+  const cart = await Cart.findOne({ user_id });
+
+  if (!cart || cart.items.length === 0) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Your cart is empty",
+    });
+  }
+
+  const address = await Address.findOne({
+    _id: addressId,
+    user_id,
+  });
+
+  if (!address) {
+    return sendResponse(res, {
+      code: 404,
+      message: "Shipping address not found",
+    });
+  }
+
+  const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
+
+  if (warning.length > 0) {
+    return sendResponse(res, {
+      code: 409,
+      message: "Some items are unavailable",
+      data: { warning },
+    });
+  }
+
+  if (!checkoutItems.length) {
+    return sendResponse(res, {
+      code: 400,
+      message: "No valid items in cart",
+    });
+  }
+
+  const itemsPrice = checkoutItems.reduce(
+    (sum, item) => sum + item.subtotal,
+    0,
+  );
+
+  const shippingCharge = 50;
+
+  const totalPrice = itemsPrice + shippingCharge;
+
+  let paymentStatus = "Pending";
+  let paidAt = null;
+
+  // Online payment
+  if (paymentMethod !== "COD") {
+    if (!paymentResult?.id) {
+      return sendResponse(res, {
+        code: 400,
+        message: "Payment verification failed",
+      });
+    }
+
+    //  In real apps → verify with gateway here
+
+    paymentStatus = "Paid";
+    paidAt = Date.now();
+  }
+
+  const products = checkoutItems.map((item) => {
+    return {
+      name: item.name,
+      product_id: item.product_id,
+      size: item.size,
+      quantity: item.quantity,
+      price: item.unit_price,
+      subtotal: item.subtotal,
+    };
+  });
+
+  const orderId = await generateOrderId();
+
+  const order = await Order.create({
+    orderId,
+
+    user_id,
+
+    products,
+
+    shippingAddress: {
+      full_name: address.full_name,
+      phone_no: address.phone_no,
+      address_line: address.address_line,
+      city: address.city,
+      state: address.state,
+      zip_code: address.zip_code,
+      country: address.country,
+    },
+
+    paymentMethod,
+    paymentStatus,
+    paidAt,
+
+    itemsPrice,
+    shippingCharge,
+    totalPrice,
+
+    orderStatus: "Placed",
+  });
+
+  for (const item of checkoutItems) {
+    await Variant.updateOne(
+      { _id: item.variant_id },
+      { $inc: { stock: -item.quantity } },
+    );
+  }
+
+  await Cart.deleteOne({ user_id });
+
+  req.session.orderId = order._id;
+
+  return sendResponse(res, {
+    code: 201,
+    message: "Order placed successfully",
+    redirectToFrontend: "/user/payment/success",
+  });
+});

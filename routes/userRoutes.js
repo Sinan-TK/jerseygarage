@@ -53,6 +53,8 @@ router.post("/checkout",userController.proceedToCheckout);
 
 router.get("/checkout",userMiddleware.checkoutMiddleware,userController.checkoutPage);
 
+router.post("/place-order",userController.placeOrder);
+
 router.delete("/cart/remove",userController.deleteCartItem);
 
 router.get("/payment/success",userController.paymentSuccess);

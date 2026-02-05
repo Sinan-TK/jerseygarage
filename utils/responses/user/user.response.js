@@ -125,3 +125,14 @@ export const cartCheck = Object.freeze({
   },
 });
 
+export const placeOrder = Object.freeze({
+  EMPTY_CART: {
+    code: 400,
+    message: "Your cart is empty",
+  },
+  SUCCESS: {
+    code: 200,
+    message: "All items are in stock. Proceed to checkout.",
+    redirectToFrontend: "/user/checkout",
+  },
+});

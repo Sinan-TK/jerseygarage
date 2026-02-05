@@ -1,17 +1,14 @@
 // Toggle active radio cards
-document.querySelectorAll(".radio-card").forEach(card => {
+document.querySelectorAll(".radio-card").forEach((card) => {
   card.addEventListener("click", () => {
     const name = card.querySelector("input").name;
-    document.querySelectorAll(`input[name="${name}"]`)
-      .forEach(i => i.closest(".radio-card").classList.remove("active"));
+    document
+      .querySelectorAll(`input[name="${name}"]`)
+      .forEach((i) => i.closest(".radio-card").classList.remove("active"));
     card.classList.add("active");
     card.querySelector("input").checked = true;
   });
 });
-
-
-
-
 
 document
   .getElementById("addAddressForm")
@@ -57,7 +54,7 @@ document
   });
 
 function openAddAddressModal() {
-    console.log("running");
+  console.log("running");
   document.getElementById("addAddressModal").style.display = "flex";
 }
 
@@ -126,7 +123,7 @@ document
     try {
       const res = await axios.patch(
         `/user/address/edit/${addressId}`,
-        formData
+        formData,
       );
       if (res.data.success) {
         toastr.success(res.data.message, "Success");
@@ -144,3 +141,38 @@ document
       btn.disabled = false;
     }
   });
+
+document.querySelector(".place-order").addEventListener("click", async () => {
+  console.log("working");
+
+  const addressId = selectedValue("address");
+
+  const paymentMethod = selectedValue("payment");
+
+  try {
+    const res = await axios.post("/user/place-order", {
+      addressId,
+      paymentMethod,
+    });
+
+    console.log(res);
+
+    if (res.data.data?.waring) {
+      toastr.waring(res.data.data.waring, "warning");
+    }
+
+    if (res.data.success) {
+      toastr.success(res.data.message, "Success");
+      setTimeout(() => {
+        window.location.href = res.data.redirect;
+      }, 1000);
+    }
+  } catch (err) {
+    const error = err.response?.data;
+    toastr.error(error?.message || "Something went wrong", "Failed");
+  }
+});
+
+function selectedValue(name) {
+  return document.querySelector(`input[name="${name}"]:checked`).value;
+}

@@ -14,7 +14,7 @@ async function loginUser() {
         if (res.data.redirect) {
           window.location.href = res.data.redirect;
         }
-      }, 2000);
+      }, 500);
     }
   } catch (err) {
     const error = err.response?.data;
