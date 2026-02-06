@@ -11,6 +11,10 @@ export const personalInfoEdit = Object.freeze({
     code: 409,
     message: "An account with this email already exists.",
   },
+  // INFO_EDITED: {
+  //   code: 200,
+  //   message: "Personal Info edited",
+  // },
   EMAIL_CHANGE: {
     code: 200,
     message: "Email change",

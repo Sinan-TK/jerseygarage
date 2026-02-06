@@ -25,10 +25,15 @@
 }
 
 .edit-btn {
-  background: none;
+  background: black;
   border: none;
-  color: #2563eb;
+  flex: 1;
+  align-items: center;
+  padding: 5px 20px;
+  color: #ffffff;
   font-size: 14px;
+  border: 1px solid black;
+  border-radius: 5px;
   cursor: pointer;
 }
 

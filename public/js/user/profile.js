@@ -1,5 +1,4 @@
 document.querySelector(".edit-btn").addEventListener("click", () => {
-  console.log("working");
   document.querySelector(".edit-btn").style.display = "none";
   document.querySelector(".edit-submit").style.display = "flex";
   document.querySelector(".edit-cancel").style.display = "flex";
@@ -13,7 +12,9 @@ document.querySelector(".edit-btn").addEventListener("click", () => {
   const phoneNoP = document.getElementById("phone_no");
   const phoneNo = phoneNoP.textContent.trim();
 
-  console.log(fullName, email, phoneNo);
+  // const fullNameP = document.createElement("p");
+  // fullName.id = "full_name";
+  // fullName.innerText = "name";
 
   const inputName = document.createElement("input");
   inputName.type = "text";
@@ -55,6 +56,30 @@ async function editSubmit() {
         openOtpModal();
       } else {
         toastr.success(res.data.message, "Edited");
+
+        document.querySelector(".edit-btn").style.display = "flex";
+        document.querySelector(".edit-submit").style.display = "none";
+        document.querySelector(".edit-cancel").style.display = "none";
+
+        const editedData = res.data.data;
+
+        const inputName = document.getElementById("fullName");
+        const fullNameP = document.createElement("p");
+        fullNameP.id = "full_name";
+        fullNameP.innerText = editedData.full_name;
+        inputName.replaceWith(fullNameP);
+
+        const inputMail = document.getElementById("email");
+        const emailP = document.createElement("p");
+        emailP.id = "email";
+        emailP.innerText = editedData.email;
+        inputMail.replaceWith(emailP);
+
+        const inputPhone = document.getElementById("phoneNo");
+        const phoneNoP = document.createElement("p");
+        phoneNoP.id = "phone_no";
+        phoneNoP.innerText = editedData.phone_no;
+        inputPhone.replaceWith(phoneNoP);
       }
     }
   } catch (err) {
@@ -62,7 +87,7 @@ async function editSubmit() {
 
     console.log(error);
 
-    toastr.error(error.message, "Failed");
+    toastr.error(error?.message || "Something went wrong!!", "Failed");
   }
 }
 

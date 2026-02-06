@@ -171,7 +171,13 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_EXIST);
   }
 
-  if (user.email != email) {
+  if (user.email === email) {
+    return sendResponse(res, {
+      code: 200,
+    message: "Personal Info edited",
+      data: result ,
+    });
+  } else {
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_CHANGE);
   }
 });
@@ -180,15 +186,9 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 // 4. EMAIL OTP VERIFICATION PAGE RENDER
 // ======================================================================
 export const editPassword = wrapAsync(async (req, res) => {
-
   const user_id = req.session.user.id;
 
-  const {
-    currentPassword,
-    newPassword,
-    confirmPassword,
-  } = req.body;
-
+  const { currentPassword, newPassword, confirmPassword } = req.body;
 
   if (!currentPassword || !newPassword || !confirmPassword) {
     return sendResponse(res, {
@@ -265,7 +265,6 @@ export const editPassword = wrapAsync(async (req, res) => {
     message: "Password updated successfully",
   });
 });
-
 
 // ======================================================================
 // 4. ADDRESS PAGE RENDER
