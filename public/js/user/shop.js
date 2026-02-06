@@ -1,4 +1,4 @@
-window.loadFilter = async function (page = 1) {
+window.loadFilter = async function (page = 1, search = "") {
   const params = new URLSearchParams(window.location.search);
 
   const category = getSelectedValue("categories") || params.get("category");
@@ -8,7 +8,7 @@ window.loadFilter = async function (page = 1) {
   const maxRange = document.getElementById("maxRange").value;
 
   const res = await axios.get(`/shop/data`, {
-    params: { category, team, size, minRange, maxRange, sort, page },
+    params: { category, team, size, minRange, maxRange, sort, page, search },
   });
 
   const user = res.data.data.user;
@@ -199,39 +199,49 @@ function updatePrice() {
   priceDisplay.textContent = `₹${minRange.value} - ₹${maxRange.value}`;
 }
 
-  document.addEventListener("click", async (e) => {
-    const btn = e.target.closest(".add-to-cart-btn");
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".add-to-cart-btn");
 
-    if (!btn) return; // Not add-to-cart
+  if (!btn) return; // Not add-to-cart
 
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 
-    const product_id = btn.dataset.product;
-    const variant_id = btn.dataset.variant;
-    const quantity = 1;
+  const product_id = btn.dataset.product;
+  const variant_id = btn.dataset.variant;
+  const quantity = 1;
 
-    try {
-      const res = await axios.post("/user/add-to-cart", {
-        product_id,
-        variant_id,
-        quantity,
-      });
+  try {
+    const res = await axios.post("/user/add-to-cart", {
+      product_id,
+      variant_id,
+      quantity,
+    });
 
-      if (res.data.success) {
-        toastr.success(res.data.message, "Success");
+    if (res.data.success) {
+      toastr.success(res.data.message, "Success");
 
-        document.querySelector(".cart-count").innerText =
-          res.data.data.items_count;
-      }
-    } catch (err) {
-      const error = err.response?.data;
-      toastr.error(error?.message || "Something went wrong", "Failed");
-
-      setTimeout(() => {
-        if (error?.redirect) {
-          window.location.href = error.redirect;
-        }
-      }, 1000);
+      document.querySelector(".cart-count").innerText =
+        res.data.data.items_count;
     }
-  });
+  } catch (err) {
+    const error = err.response?.data;
+    toastr.error(error?.message || "Something went wrong", "Failed");
+
+    setTimeout(() => {
+      if (error?.redirect) {
+        window.location.href = error.redirect;
+      }
+    }, 1000);
+  }
+});
+
+document.getElementById("search-apply").addEventListener("click", () => {
+  const search = document.getElementById("search").value;
+  loadFilter(1, search);
+});
+
+document.querySelector(".clear-btn").addEventListener("click", () => {
+  document.getElementById("search").value = "";
+  loadFilter(1, "");
+});

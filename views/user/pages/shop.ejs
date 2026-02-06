@@ -27,7 +27,7 @@
                         Teams <i class="fa-solid fa-angle-down"></i>
                     </button>
                     <div class="dropdown-content">
-                        <% teamNames.forEach( i => { %>
+                        <% teamNames.forEach( i=> { %>
                             <label>
                                 <input type="radio" name="team" value="<%= i._id %>">
                                 <%= i._id %>
@@ -72,6 +72,12 @@
                 <h1 class="page-title">Shop Jerseys</h1>
                 <p class="page-subtitle">Discover your perfect jersey</p>
 
+                <div class="search-bar">
+                    <input type="text" id="search" placeholder="Search...">
+                    <button class="apply-btn" id="search-apply">Apply</button>
+                    <button class="clear-btn">Clear</button>
+                </div>
+
                 <!-- SORT -->
                 <div class="div-custom-dropdown">
                     <div class="custom-dropdown" id="sortDropdown">
@@ -89,8 +95,10 @@
                     </div>
                 </div>
 
+
+
                 <!-- GRID -->
-                 <div class="shop-body">
+                <div class="shop-body">
                 </div>
                 <div class="shop-grid">
 

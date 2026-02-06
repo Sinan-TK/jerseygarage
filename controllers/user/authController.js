@@ -364,7 +364,8 @@ export const renderShopPage = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const shopPageProducts = wrapAsync(async (req, res) => {
-  const { category, team, size, minRange, maxRange, sort, page } = req.query;
+  const { category, team, size, minRange, maxRange, sort, page, search } =
+    req.query;
 
   const currentPage = parseInt(page) || 1;
   const limit = 6;
@@ -402,6 +403,13 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
   }
 
   const filter = { is_active: true };
+
+  if (search) {
+    filter.name = {
+      $regex: search,
+      $options: "i",
+    };
+  }
 
   if (category) {
     const categoryDoc = await Category.findOne({ name: category }).select(
