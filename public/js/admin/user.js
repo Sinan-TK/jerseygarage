@@ -62,21 +62,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const res = await axios.patch(
-        `/admin/users/${selectedAction}/${selectedUserId}`
+        `/admin/users/${selectedAction}/${selectedUserId}`,
       );
 
       if (res.data.success) {
-        console.log(res.data)
+        console.log(res.data);
         console.log(res.data.data.is_blocked);
         if (res.data.data.is_blocked) {
           const statusEl = document.querySelector(
-            `[data-id="${selectedUserId}"]`
+            `[data-id="${selectedUserId}"]`,
           );
           statusEl.textContent = "Blocked";
           statusEl.classList.replace("active", "inactive");
 
           const row = document.querySelector(
-            `tr[data-userid="${selectedUserId}"]`
+            `tr[data-userid="${selectedUserId}"]`,
           );
           row.dataset.status = "blocked";
           selectedAction = "unblock";
@@ -86,17 +86,16 @@ document.addEventListener("DOMContentLoaded", () => {
           icon.classList.add("unblock");
           icon.classList.replace("fa-ban", "fa-unlock");
 
-          toastr.error(res.data.message,"Status");
-
+          toastr.error(res.data.message, "Status");
         } else {
           const statusEl = document.querySelector(
-            `[data-id="${selectedUserId}"]`
+            `[data-id="${selectedUserId}"]`,
           );
           statusEl.textContent = "Active";
           statusEl.classList.replace("inactive", "active");
 
           const row = document.querySelector(
-            `tr[data-userid="${selectedUserId}"]`
+            `tr[data-userid="${selectedUserId}"]`,
           );
           row.dataset.status = "active";
           selectedAction = "block";
@@ -106,15 +105,15 @@ document.addEventListener("DOMContentLoaded", () => {
           icon.classList.remove("unblock");
           icon.classList.replace("fa-unlock", "fa-ban");
 
-          toastr.success(res.data.message,"Status");
-
+          toastr.success(res.data.message, "Status");
         }
       } else {
-        toastr.error("Something went wrong!","error");
+        toastr.error("Something went wrong!", "error");
       }
     } catch (err) {
-      console.error(err);
-      toastr.error("Server error");
+      const error = err.response?.data;
+      console.log(error);
+      toastr.error(error?.message || "Something went wrong", "Failed");
     }
 
     modal.style.display = "none";

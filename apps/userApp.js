@@ -8,10 +8,6 @@ import userRoutes from "../routes/userRoutes.js";
 
 const userApp = express();
 
-userApp.use(nocache());
-
-userApp.use(express.json());
-userApp.use(express.urlencoded({ extended: true }));
 
 userApp.use(
   session({

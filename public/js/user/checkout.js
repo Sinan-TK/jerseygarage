@@ -143,8 +143,6 @@ document
   });
 
 document.querySelector(".place-order").addEventListener("click", async () => {
-  console.log("working");
-
   const addressId = selectedValue("address");
 
   const paymentMethod = selectedValue("payment");
@@ -169,10 +167,11 @@ document.querySelector(".place-order").addEventListener("click", async () => {
     }
   } catch (err) {
     const error = err.response?.data;
+    console.log(error);
     toastr.error(error?.message || "Something went wrong", "Failed");
   }
 });
 
 function selectedValue(name) {
-  return document.querySelector(`input[name="${name}"]:checked`).value;
+  return document.querySelector(`input[name="${name}"]:checked`)?.value || "";
 }

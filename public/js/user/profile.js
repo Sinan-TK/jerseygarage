@@ -120,10 +120,83 @@ async function submitOtp(e) {
   console.log("OTP:", otp);
 
   try {
-
     const res = await axios.post("/user/profile/mail", { otp });
-
   } catch (err) {
     console.log(err);
   }
 }
+
+/* =========================
+   OPEN / CLOSE
+========================= */
+
+function openPasswordModal() {
+  document.getElementById("passwordModal").style.display = "flex";
+}
+
+function closePasswordModal() {
+  document.getElementById("passwordModal").style.display = "none";
+
+  // Reset form
+  document.getElementById("passwordForm").reset();
+}
+
+/* =========================
+   SUBMIT HANDLER
+========================= */
+
+document
+  .getElementById("passwordForm")
+  ?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const currentPassword = document.getElementById("currentPassword").value;
+
+    const newPassword = document.getElementById("newPassword").value;
+
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    /* ===== VALIDATION ===== */
+
+    // if (newPassword.length < 6) {
+    //   alert("Password must be at least 6 characters");
+    //   return;
+    // }
+
+    // if (newPassword !== confirmPassword) {
+    //   alert("Passwords do not match");
+    //   return;
+    // }
+
+    /* ===== PAYLOAD ===== */
+
+    const payload = {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    };
+
+    console.log(payload);
+
+    try {
+      const res = await axios.patch("/user/profile/change-password", payload);
+
+      toastr.suucess(res.data.message || "Password updated", "success");
+
+      closePasswordModal();
+    } catch (err) {
+      const error = err.response?.data;
+
+      toastr.error(error?.message || "Failed to update password", "error");
+    }
+  });
+
+/* =========================
+   CLOSE ON OUTSIDE CLICK
+========================= */
+
+document.getElementById("passwordModal")?.addEventListener("click", (e) => {
+  if (e.target.id === "passwordModal") {
+    closePasswordModal();
+  }
+});

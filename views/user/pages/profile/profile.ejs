@@ -40,7 +40,7 @@
                 </p>
             </div>
 
-            <div class="info-item">
+            <div class="info-item" onclick="openPasswordModal()">
                 <span>Password</span>
                 <p>************ <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
                 </p>
@@ -96,4 +96,62 @@
 
     <button class="otp-close" onclick="closeOtpModal()">×</button>
   </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="passwordModal">
+
+  <div class="modal-box">
+
+    <h3>Change Password</h3>
+
+    <form id="passwordForm">
+
+      <!-- Current Password -->
+      <div class="form-group">
+        <label>Current Password</label>
+        <input
+          type="password"
+          id="currentPassword"
+          placeholder="Enter current password"
+        />
+      </div>
+
+      <!-- New Password -->
+      <div class="form-group">
+        <label>New Password</label>
+        <input
+          type="password"
+          id="newPassword"
+          placeholder="Enter new password"
+        />
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Re-enter new password"
+        />
+      </div>
+
+      <!-- Buttons -->
+      <div class="modal-actions">
+
+        <button type="button" class="btn-cancel" onclick="closePasswordModal()">
+          Cancel
+        </button>
+
+        <button type="submit" class="btn-save">
+          Update Password
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
 </div>

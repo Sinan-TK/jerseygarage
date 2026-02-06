@@ -6,10 +6,6 @@ import adminRoutes from "../routes/adminRoutes/adminRoutes.js";
 
 const adminApp = express();
 
-adminApp.use(nocache());
-adminApp.use(express.json());
-adminApp.use(express.urlencoded({ extended: true }));
-
 // ADMIN SESSION
 adminApp.use(
   session({

@@ -13,6 +13,8 @@ import { generateOrderId } from "../../utils/generateOrderId.js";
 import Order from "../../models/orderModel.js";
 import { ObjectId } from "mongodb";
 import { buildCheckoutItems } from "../../utils/buildCheckoutItems.js";
+import generateInvoice from "../../utils/generateInvoice.js";
+import bcrypt from "bcrypt";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -177,15 +179,93 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 // ======================================================================
 // 4. EMAIL OTP VERIFICATION PAGE RENDER
 // ======================================================================
-// export const emailOtpPage = (req, res) => {
-//   res.render("user/pages/otp-verify", {
-//     title: "OTP Verification",
-//     pageCSS: "otp-verify",
-//     showHeader: true,
-//     showFooter: true,
-//     pageJS: "otp-verify.js",
-//   });
-// };
+export const editPassword = wrapAsync(async (req, res) => {
+
+  const user_id = req.session.user.id;
+
+  const {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  } = req.body;
+
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return sendResponse(res, {
+      code: 400,
+      message: "All fields are required",
+    });
+  }
+
+  if (newPassword.length < 6) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Password must be at least 6 characters",
+    });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return sendResponse(res, {
+      code: 400,
+      message: "New passwords do not match",
+    });
+  }
+
+  /* =========================
+     FIND USER
+  ========================= */
+
+  const user = await User.findById(user_id);
+
+  if (!user) {
+    return sendResponse(res, {
+      code: 404,
+      message: "User not found",
+    });
+  }
+
+  /* =========================
+     VERIFY CURRENT PASSWORD
+  ========================= */
+
+  const isMatch = await user.comparePassword(currentPassword);
+
+  if (!isMatch) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Current password is incorrect",
+    });
+  }
+
+  /* =========================
+     UPDATE PASSWORD
+  ========================= */
+
+  // Prevent same password reuse (optional but good)
+  const isSame = await user.comparePassword(newPassword);
+
+  if (isSame) {
+    return sendResponse(res, {
+      code: 400,
+      message: "New password must be different",
+    });
+  }
+
+  // Set new password (will be hashed in pre-save hook)
+  user.password = newPassword;
+
+  await user.save();
+
+  /* =========================
+     RESPONSE
+  ========================= */
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Password updated successfully",
+  });
+});
+
 
 // ======================================================================
 // 4. ADDRESS PAGE RENDER
@@ -199,7 +279,6 @@ export const addressPageRender = wrapAsync(async (req, res) => {
 
   res.render("user/layouts/profilelayout", {
     title: "User Addresses",
-    // addresses,
     pageCSS: "address",
     view: "address",
     profile: true,
@@ -623,11 +702,9 @@ export const userLogout = (req, res) => {
 // 6. PAYMENT SUCCESS
 // ======================================================================
 
-export const paymentSuccess = wrapAsync(async (req, res) => {
+export const orderSuccess = wrapAsync(async (req, res) => {
   const orderId = req.session.orderId;
   const user_id = req.session.user.id;
-
-  console.log(orderId);
 
   const order = await Order.findOne({
     _id: orderId,
@@ -642,6 +719,7 @@ export const paymentSuccess = wrapAsync(async (req, res) => {
       month: "long",
       year: "numeric",
     }),
+    id: order._id,
     orderId: order.orderId,
     total: order.totalPrice,
     email: user.email,
@@ -753,6 +831,9 @@ export const placeOrder = wrapAsync(async (req, res) => {
       quantity: item.quantity,
       price: item.unit_price,
       subtotal: item.subtotal,
+      image: item.image,
+      variant_id: item.variant_id,
+      subtotal: item.subtotal,
     };
   });
 
@@ -800,6 +881,306 @@ export const placeOrder = wrapAsync(async (req, res) => {
   return sendResponse(res, {
     code: 201,
     message: "Order placed successfully",
-    redirectToFrontend: "/user/payment/success",
+    redirectToFrontend: "/user/order/success",
   });
 });
+
+// ======================================================================
+// 6. ORDER LISTING PAGE
+// ======================================================================
+
+export const orderListingPage = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const orders = await Order.find({ user_id })
+    .select("orderId createdAt products totalPrice orderStatus")
+    .sort({ createdAt: -1 });
+
+  res.render("user/layouts/profilelayout", {
+    title: "User orders",
+    pageCSS: "order",
+    view: "order",
+    profile: true,
+    showHeader: true,
+    orders,
+    showFooter: true,
+    pageJS: "",
+  });
+});
+
+// ======================================================================
+// 6. ORDER DETAILS PAGE
+// ======================================================================
+
+export const orderDetailsPage = wrapAsync(async (req, res) => {
+  const id = req.params.id;
+
+  const order = await Order.findById(id);
+
+  res.render("user/pages/orderDetails", {
+    title: "Order details",
+    pageCSS: "orderDetails",
+    profile: true,
+    order,
+    showHeader: true,
+    showFooter: true,
+    pageJS: "orderDetails.js",
+  });
+});
+
+// ======================================================================
+// 6. DOWNLOAD INVOICE
+// ======================================================================
+
+export const downloadInvoice = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const orderId = req.params.orderId;
+
+  // Get order
+  const order = await Order.findOne({
+    orderId,
+    user_id,
+  });
+
+  if (!order) {
+    return res.status(404).json({
+      message: "Order not found",
+    });
+  }
+
+  generateInvoice(order, res);
+});
+
+export const orderCancelReturn = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const { orderId, action, reason, items = [] } = req.body;
+
+  console.log(req.body);
+
+  /* =========================
+     BASIC VALIDATION
+  ========================= */
+  if (!reason) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Please enter the reason",
+    });
+  }
+
+  if (
+    (action === "partial-cancel" || action === "partial-return") &&
+    items.length === 0
+  ) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Please select the item",
+    });
+  }
+
+  if (!orderId || !action) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Missing required fields",
+    });
+  }
+
+  /* =========================
+     FETCH ORDER
+  ========================= */
+
+  const order = await Order.findOne({
+    orderId,
+    user_id,
+  });
+
+  if (!order) {
+    return sendResponse(res, {
+      code: 404,
+      message: "Order not found",
+    });
+  }
+
+  const isDelivered = order.orderStatus === "Delivered";
+
+  /* =========================
+     ACTION VALIDATION
+  ========================= */
+
+  // Cancel only before delivery
+  if (action.includes("cancel") && isDelivered) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Delivered orders cannot be cancelled",
+    });
+  }
+
+  // Return only after delivery
+  if (action.includes("return") && !isDelivered) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Order not delivered yet",
+    });
+  }
+
+  /* =========================
+     NORMALIZE ACTION
+  ========================= */
+
+  let finalAction = action;
+
+  if (action === "partial-cancel" && items.length === order.products.length) {
+    finalAction = "full-cancel";
+  }
+
+  if (action === "partial-return" && items.length === order.products.length) {
+    finalAction = "full-return";
+  }
+
+  /* =========================
+     PROCESS CANCEL
+  ========================= */
+
+  if (finalAction.includes("cancel")) {
+    await handleCancel(order, finalAction, items, reason);
+
+    await order.save();
+
+    return sendResponse(res, {
+      code: 200,
+      message: "Order cancelled successfully",
+    });
+  }
+
+  /* =========================
+     PROCESS RETURN
+  ========================= */
+
+  if (finalAction.includes("return")) {
+    await handleReturn(order, finalAction, items, reason);
+
+    await order.save();
+
+    return sendResponse(res, {
+      code: 200,
+      message: "Return request submitted",
+    });
+  }
+
+  /* ========================= */
+
+  return sendResponse(res, {
+    code: 400,
+    message: "Invalid action",
+  });
+});
+
+/* =================================
+   HANDLE CANCEL (AUTO)
+================================= */
+
+const handleCancel = async (order, action, items, reason) => {
+  let refund = 0;
+  let cancelledCount = 0;
+
+  const historyItems = [];
+
+  for (const item of order.products) {
+    if (item.status !== "Active") continue;
+
+    // Partial cancel
+    if (action === "partial-cancel" && !items.includes(item._id.toString())) {
+      continue;
+    }
+
+    item.status = "Cancelled";
+    item.requestStatus = "Approved";
+    item.statusChangedAt = new Date();
+
+    refund += item.price * item.quantity;
+    cancelledCount++;
+
+    historyItems.push(item._id);
+
+    // Restore stock
+    await Variant.findByIdAndUpdate(item.variant_id, {
+      $inc: { stock: item.quantity },
+    });
+  }
+
+  /* Update order status */
+
+  if (cancelledCount === order.products.length) {
+    order.orderStatus = "Cancelled";
+  } else if (cancelledCount > 0) {
+    order.orderStatus = "Partially-Cancelled";
+  }
+
+  /* Save history */
+
+  order.cancelHistory.push({
+    items: historyItems,
+    reason,
+    status: "Approved",
+  });
+
+  /* Refund */
+
+  await processRefund(order, refund);
+};
+
+/* =================================
+   HANDLE RETURN (REQUEST)
+================================= */
+
+const handleReturn = async (order, action, items, reason) => {
+  let returnCount = 0;
+
+  const historyItems = [];
+
+  for (const item of order.products) {
+    if (item.status !== "Active") continue;
+
+    // Partial return
+    if (action === "partial-return" && !items.includes(item._id.toString())) {
+      continue;
+    }
+
+    item.requestStatus = "Pending";
+    item.statusChangedAt = new Date();
+
+    returnCount++;
+
+    historyItems.push(item._id);
+  }
+
+  /* Update order status (pending return) */
+
+  if (returnCount === order.products.length) {
+    order.orderStatus = "Returned";
+  } else if (returnCount > 0) {
+    order.orderStatus = "PartiallyReturned";
+  }
+
+  /* Save history */
+
+  order.returnHistory.push({
+    items: historyItems,
+    reason,
+    status: "Pending",
+  });
+};
+
+/* =================================
+   REFUND HANDLER
+================================= */
+
+const processRefund = async (order, amount) => {
+  if (order.paymentStatus !== "Paid") return;
+
+  order.refundAmount += amount;
+
+  order.paymentStatus = "Refunded";
+
+  // Payment gateway refund integration later
+};

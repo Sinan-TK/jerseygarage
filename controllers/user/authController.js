@@ -74,48 +74,6 @@ export const userVerification = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. SIGNUP PAGE (EMAIL PAGE)
-// ======================================================================
-
-// export const signUpPage = wrapAsync((req, res) => {
-//   res.render("user/pages/signup", {
-//     title: "Email SignUp",
-//     pageCSS: "signup",
-//     showHeader: true,
-//     showFooter: true,
-//     pageJS: "signup.js",
-//   });
-// });
-
-// ======================================================================
-// 5. USER SUBMITS EMAIL (SIGNUP) → GENERATE OTP
-// ======================================================================
-
-// export const getEmail = wrapAsync(async (req, res) => {
-//   const { error } = userValidators.userMailSchema.validate(req.body);
-
-//   if (error) {
-//     return sendResponse(res, {
-//       code: 400,
-//       message: error.details[0].message,
-//     });
-//   }
-
-//   const { email } = req.body;
-
-// const result = await authService.emailVerification(email);
-
-//   if (result?.error) {
-//     return sendResponse(res, result.error);
-//   }
-
-//   req.session.tempEmail = result.data.email;
-//   req.session.otpPurpose = result.data.purpose;
-
-//   return sendResponse(res, Responses.signupUserEmail.EMAIL_OK);
-// });
-
-// ======================================================================
 // 6. RENDER OTP PAGE
 // ======================================================================
 

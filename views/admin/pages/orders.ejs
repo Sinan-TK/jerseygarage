@@ -13,9 +13,9 @@
 
         <select id="statusFilter">
             <option value="all">All</option>
-            <option value="draft">Draft</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Confirmed</option>
+            <!-- <option value="draft">Draft</option> -->
+            <option value="Placed">Placed</option>
+            <option value="Confirmed">Confirmed</option>
             <option value="draft">Out for delivery</option>
             <option value="draft">Delivered</option>
             <option value="draft">Cancelled</option>
@@ -23,9 +23,8 @@
             <option value="draft">Return Approved</option>
             <option value="draft">Return Requested</option>
             <option value="draft">Return Rejected</option>
-            <option value="draft">Partially Returned</option>
-            <option value="draft">Partially Cancelled</option>
-            <option value="draft">Return Cancelled</option>
+            <option value="Partially-Cancelled">Partially Cancelled</option>
+            <!-- <option value="draft">Partially Cancelled</option> -->
             <option value="draft">Failed</option>
         </select>
 
@@ -39,7 +38,7 @@
         <input type="date" id="fromDate">
         <input type="date" id="toDate">
 
-        <button class="btn-apply" id="applyFilter"><i class="fa-solid fa-filter"></i> Apply</button>
+        <button class="btn-apply" id="applyFilter" onclick="loadFilter()"><i class="fa-solid fa-filter"></i> Apply</button>
         <button class="btn-clear" id="clearFilter" onclick="clearFilter()">Clear</button>
 
     </div>
@@ -75,19 +74,5 @@
     <!-- Pagination -->
     <div class="pagination">
 
-        <!-- LEFT ARROW: show ONLY if NOT first page -->
-            <a href="/admin/orders?page=1" class="arrow-btn">
-                <i class="fa-solid fa-chevron-left"></i>
-            </a>
-
-                <!-- CURRENT PAGE NUMBER -->
-                <span class="current-page-display">
-                    1
-                </span>
-
-                <!-- RIGHT ARROW: show ONLY if NOT last page -->
-                    <a href="/admin/orders?page=1" class="arrow-btn">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
     </div>
 </div>

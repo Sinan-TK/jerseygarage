@@ -1,0 +1,260 @@
+<div class="order-details-container">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+
+        <a href="/">Home</a>
+        <span>/</span>
+
+        <a href="/user/profile">Profile</a>
+        <span>/</span>
+
+        <a href="/user/orders">Orders</a>
+        <span>/</span>
+
+        <span class="current">
+            <%= order.orderId %>
+        </span>
+
+    </div>
+
+    <!-- Header -->
+    <div class="order-header">
+        <div>
+            <h2>Order Details</h2>
+            <p class="order-meta">
+                <%= order.orderId %> • Placed on <%= new Date(order.createdAt).toLocaleDateString("en-US", {
+                        month: "long" , day: "2-digit" , year: "numeric" , }) %>
+            </p>
+        </div>
+
+        <a href="/user/orders/invoice/<%= encodeURIComponent(order.orderId) %>" class="invoice-btn">
+            <i class="fa-solid fa-download"></i> Download Invoice
+        </a>
+    </div>
+
+
+    <!-- Status Timeline -->
+    <div class="card">
+        <h3 data-status="<%= order.orderStatus %>" id="orderstatus">Order Status</h3>
+
+        <% if(order.orderStatus==="Cancelled" ){ %>
+
+            <div class="order-cancelled-box">
+
+                <div class="cancel-icon">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <h2>Order Cancelled</h2>
+
+                <p class="cancel-text">
+                    This order has been cancelled successfully.
+                </p>
+
+
+            </div>
+
+
+            <% }else{%>
+                <div class="timeline">
+
+                    <div class="step">
+                        <div class="circle">✔</div>
+                        <p>Placed</p>
+                        <span>Jan 20</span>
+                    </div>
+
+                    <div class="line">
+                        <span class="progress"></span>
+                    </div>
+
+
+                    <div class="step">
+                        <div class="circle"><i class="fa-solid fa-box"></i></div>
+                        <p>Packed</p>
+                        <span>Jan 21</span>
+                    </div>
+
+                    <div class="line">
+                        <span class="progress"></span>
+                    </div>
+
+
+                    <div class="step">
+                        <div class="circle"><i class="fa-solid fa-truck"></i></div>
+                        <p>Shipped</p>
+                        <span>Jan 22</span>
+                    </div>
+
+                    <div class="line">
+                        <span class="progress"></span>
+                    </div>
+
+
+                    <!-- NEW STAGE -->
+                    <div class="step">
+                        <div class="circle"><i class="fa-solid fa-map-pin"></i></div>
+                        <p>Out for Delivery</p>
+                        <span>Jan 24</span>
+                    </div>
+
+                    <div class="line">
+                        <span class="progress"></span>
+                    </div>
+
+
+                    <div class="step">
+                        <div class="circle">✔</div>
+                        <p>Delivered</p>
+                        <span>Jan 25</span>
+                    </div>
+
+                </div>
+                <% } %>
+    </div>
+
+
+    <!-- Order Items -->
+    <div class="card">
+        <h3>Order Items</h3>
+
+        <% order.products.forEach((product)=>{ %>
+
+            <div class="item">
+                <img src="<%= product.image %>" />
+                <div class="item-info">
+                    <h4>₹<%= product.name %>
+                    </h4>
+                    <p>Size: <%= product.size %> • Qty: <%= product.quantity %>
+                    </p>
+                    <strong>
+                        ₹<%= product.price %>
+                    </strong>
+                </div>
+                <span class="item-status status-<%= product.status %>">
+                    <%= product.status %>
+                </span>
+
+            </div>
+
+            <% }) %>
+
+    </div>
+
+    <!-- Order Summary -->
+    <div class="card">
+        <h3>Order Summary</h3>
+
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <span>₹<%= order.itemsPrice %>.00</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Shipping</span>
+            <span>₹<%= order.shippingCharge %>.00</span>
+        </div>
+
+        <div class="summary-row total">
+            <span>Total</span>
+            <span>₹<%= order.totalPrice %>.00</span>
+        </div>
+    </div>
+
+    <!-- Address -->
+    <div class="card">
+        <h3>Shipping Address</h3>
+
+        <p><strong>
+                <%= order.shippingAddress.full_name %>
+            </strong></p>
+        <p>
+            <%= order.shippingAddress.address_line %>
+        </p>
+        <p>
+            <%= order.shippingAddress.country %>, <%= order.shippingAddress.state %>, <%= order.shippingAddress.city %>,
+                        <%= order.shippingAddress.zip_code %>
+        </p>
+        <p>+91 <%= order.shippingAddress.phone_no %>
+        </p>
+    </div>
+
+    <!-- Payment -->
+    <div class="card payment-box">
+
+        <div>
+            <h3>Payment Method</h3>
+            <p>
+                <%= order.paymentMethod==="COD" ? "Cash On Delivery" : order.paymentMethod %>
+            </p>
+        </div>
+
+        <% if(order.orderStatus !== "Cancelled"){ %>
+        <div class="cancel-box">
+            <button class="cancel-btn" id="openOrderModal">
+                <%= order.orderStatus==="Delivered" ? "Return" : "Cancel" %> Order
+            </button>
+        </div>
+        <% } %>
+
+    </div>
+
+</div>
+
+<!-- Order Action Modal -->
+<div class="modal-overlay" id="orderModal" data-order-id="<%= order.orderId %>"
+    data-order-status="<%= order.orderStatus %>" data-products='<%- JSON.stringify(order.products) %>'>
+
+
+    <div class="modal-box">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h3 id="modalTitle">Order Action</h3>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+
+            <!-- Action Type -->
+            <div class="modal-section">
+                <label>Action</label>
+
+                <select id="actionType" onchange="handleActionChange()">
+                    <!-- Will be set dynamically -->
+                </select>
+            </div>
+
+            <!-- Item Selection -->
+            <div class="modal-section" id="itemSelection" style="display: none;">
+                <label>Select Items</label>
+
+                <div class="item-list" id="itemList">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+
+            <!-- Reason -->
+            <div class="modal-section">
+                <label>Reason</label>
+
+                <textarea id="actionReason" placeholder="Enter reason..."></textarea>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal()">
+                Close
+            </button>
+
+            <button class="btn-danger" onclick="submitAction()">
+                Submit
+            </button>
+        </div>
+
+    </div>
+
+</div>

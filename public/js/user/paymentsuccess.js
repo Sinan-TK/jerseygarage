@@ -3,5 +3,6 @@ document.getElementById("shop").addEventListener("click", () => {
 });
 
 document.getElementById("orderDetails").addEventListener("click", () => {
-  location.href = "/shop";
+  const id = document.querySelector(".order-info").dataset.id;
+  location.href = `/user/orders/${id}`;
 });

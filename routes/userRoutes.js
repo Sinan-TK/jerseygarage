@@ -21,44 +21,56 @@ router.use(userMiddleware.userNotFound);
 
 router.use(authMiddleware.profileIcon);
 
-router.get("/profile",Userdetails, userController.profileRender);
+router.get("/profile", Userdetails, userController.profileRender);
 
-router.patch("/profile/edit",Userdetails, userController.editPersonalInfo);
+router.patch("/profile/edit", Userdetails, userController.editPersonalInfo);
 
-// router.get("/email/otp-verify", userController.emailOtpPage);
+router.patch("/profile/change-password", userController.editPassword);
 
-router.get("/address",Userdetails, userController.addressPageRender);
+router.get("/address", Userdetails, userController.addressPageRender);
 
-router.get("/address/data",Userdetails, userController.addressData);
+router.get("/address/data", Userdetails, userController.addressData);
 
-router.post("/address",Userdetails, userController.addAddress);
+router.post("/address", Userdetails, userController.addAddress);
 
-router.delete("/address",Userdetails,userController.removeAddress);
+router.delete("/address", Userdetails, userController.removeAddress);
 
-router.patch("/address/edit/:id",Userdetails,userController.editAddress)
+router.patch("/address/edit/:id", Userdetails, userController.editAddress);
 
-router.get("/cart",Userdetails, userController.cartRender);
+router.get("/cart", Userdetails, userController.cartRender);
 
-router.get("/wishlist",Userdetails, userController.wishlistRender);
+router.get("/wishlist", Userdetails, userController.wishlistRender);
 
-router.post("/wishlist",Userdetails,userController.addWishlist);
+router.post("/wishlist", Userdetails, userController.addWishlist);
 
-router.patch("/wishlist/:id",Userdetails,userController.removeWishlist);
+router.patch("/wishlist/:id", Userdetails, userController.removeWishlist);
 
-router.post("/add-to-cart",userController.addToCart);
+router.post("/add-to-cart", userController.addToCart);
 
-router.patch("/cart",userController.cartQuantity);
+router.patch("/cart", userController.cartQuantity);
 
-router.post("/checkout",userController.proceedToCheckout);
+router.post("/checkout", userController.proceedToCheckout);
 
-router.get("/checkout",userMiddleware.checkoutMiddleware,userController.checkoutPage);
+router.get(
+  "/checkout",
+  userMiddleware.checkoutMiddleware,
+  userController.checkoutPage,
+);
 
-router.post("/place-order",userController.placeOrder);
+router.post("/place-order", userController.placeOrder);
 
-router.delete("/cart/remove",userController.deleteCartItem);
+router.delete("/cart/remove", userController.deleteCartItem);
 
-router.get("/payment/success",userController.paymentSuccess);
+router.get("/order/success", userController.orderSuccess);
 
-router.post("/logout",Userdetails, userController.userLogout);
+router.get("/orders", Userdetails, userController.orderListingPage);
+
+router.get("/orders/:id", userController.orderDetailsPage);
+
+router.get("/orders/invoice/:orderId", userController.downloadInvoice);
+
+router.patch("/orders/order-action", userController.orderCancelReturn);
+
+router.post("/logout", Userdetails, userController.userLogout);
 
 export default router;

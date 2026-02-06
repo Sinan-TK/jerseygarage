@@ -6,17 +6,25 @@
     <div class="breadcrumb">
         <span>Orders</span>
         <span class="divider">/</span>
-        <span class="active">ORD-20260127-NR40HX</span>
+        <span class="active">
+            <%= order.orderId %>
+        </span>
     </div>
 
     <!-- Header -->
     <div class="order-header">
         <div>
-            <h2>Order #ORD-20260127-NR40HX</h2>
-            <p>Placed on Jan. 27, 2026, 4:02 p.m.</p>
+            <h2>Order <%= order.orderId %>
+            </h2>
+            <p>Placed on <%= new Date(order.createdAt).toLocaleString("en-US", { month: "short" , day: "2-digit" ,
+                    year: "numeric" , hour: "numeric" , minute: "2-digit" , hour12: true }).replace("AM", "a.m."
+                    ).replace("PM", "p.m." ) %>
+            </p>
         </div>
 
-        <span class="order-badge">Draft</span>
+        <span class="order-badge status-<%= order.orderStatus %>">
+            <%= order.orderStatus %>
+        </span>
     </div>
 
     <!-- Layout -->
@@ -36,12 +44,39 @@
                             <th>Product</th>
                             <th>Unit Price</th>
                             <th>Total</th>
-                            <th>Return Action</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
 
                     <tbody id="orderItems">
-                        <!-- JS Inject -->
+                        <% order.products.forEach((product)=>{ %>
+                            <tr>
+
+                                <td>
+                                    <div class="product-box">
+                                        <img src="<%= product.image %>">
+                                        <div>
+                                            <div class="product-name">
+                                                <%= product.name %>
+                                            </div>
+                                            <div class="product-size">Size: <%= product.size %> | Qty: <%=
+                                                        product.quantity %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>₹<%= product.price %> × <%= product.quantity %>
+                                </td>
+                                <td>₹<%= product.subtotal %>
+                                </td>
+                                <td><span class="order-badge">
+                                        <%= product.status %>
+                                    </span></td>
+                            </tr>
+
+                            <% }) %>
+
                     </tbody>
 
                 </table>
@@ -53,12 +88,12 @@
 
                 <div class="finance-row">
                     <span>Subtotal</span>
-                    <span id="subTotal">₹0.00</span>
+                    <span id="subTotal">₹<%= order.itemsPrice %>.00</span>
                 </div>
 
                 <div class="finance-row">
                     <span>Shipping</span>
-                    <span id="shipping">₹0.00</span>
+                    <span id="shipping">₹<%= order.shippingCharge %>.00</span>
                 </div>
 
                 <div class="finance-row discount">
@@ -70,7 +105,7 @@
 
                 <div class="finance-row total">
                     <span>Grand Total</span>
-                    <span id="grandTotal">₹0.00</span>
+                    <span id="grandTotal">₹<%= order.totalPrice %>.00</span>
                 </div>
             </div>
 
@@ -85,46 +120,65 @@
 
                 <label>Order Status</label>
                 <select id="orderStatus">
-                    <option>Pending</option>
-                    <option>Processing</option>
-                    <option>Delivered</option>
-                    <option>Cancelled</option>
+                    <option value="Placed" <%=order.orderStatus==="Placed" ? "selected" :"" %> >Placed</option>
+                    <option value="Confirmed" <%=order.orderStatus==="Confirmed" ? "selected" :"" %> >Confirmed</option>
+                    <option value="Packed" <%=order.orderStatus==="Packed" ? "selected" :"" %> >Packed</option>
+                    <option value="Shipped" <%=order.orderStatus==="Shipped" ? "selected" :"" %> >Shipped</option>
+                    <option value="OutForDelivery" <%=order.orderStatus==="OutForDelivery" ? "selected" :"" %> >Out for delivery</option>
+                    <option value="Delivered" <%=order.orderStatus==="Delivered" ? "selected" :"" %> >Delivered</option>
+                    <option value="Cancelled" <%=order.orderStatus==="Cancelled" ? "selected" :"" %> >Cancelled</option>
+                    <option value="Returned" <%=order.orderStatus==="Returned" ? "selected" :"" %> >Returned</option>
                 </select>
 
                 <label>Payment Status</label>
                 <select id="paymentStatus">
-                    <option>Pending</option>
-                    <option>Paid</option>
-                    <option>Failed</option>
+                    <option <%=order.paymentStatus==="Pending" ? "selected" :"" %> >Pending</option>
+                    <option <%=order.paymentStatus==="Paid" ? "selected" :"" %> >Paid</option>
+                    <option <%=order.paymentStatus==="Failed" ? "selected" :"" %> >Failed</option>
                 </select>
 
-                <button class="btn-primary" id="updateStatus">Update Status</button>
+                <button class="btn-primary" data-order-id="<%= order._id %>" id="updateStatus">Update Status</button>
             </div>
 
             <!-- Customer -->
             <div class="card">
                 <h3>Customer</h3>
 
-                <p class="customer-name">std</p>
-                <p>student@example.com</p>
+                <p class="customer-name">
+                    <%=order.user_id.full_name%>
+                </p>
+                <p>
+                    <%=order.user_id.email%>
+                </p>
             </div>
 
             <!-- Payment -->
             <div class="card">
                 <h3>Payment Method</h3>
 
-                <img src="/images/razorpay.png" alt="Razorpay" class="payment-logo">
+                <h5>
+                    <%= order.paymentMethod==="COD" ?"Cash On Delivery": order.paymentMethod %>
+                </h5>
             </div>
 
             <!-- Address -->
             <div class="card">
                 <h3>Shipping Address</h3>
 
-                <p>John Ready</p>
-                <p>John Redy Home</p>
-                <p>Caroabal - 987876</p>
-                <p>Canada</p>
-                <p>Phone: 08976765454</p>
+                <p>
+                    <%= order.shippingAddress.full_name %>
+                </p>
+                <p>
+                    <%= order.shippingAddress.address_line %>
+                </p>
+                <p>
+                    <%= order.shippingAddress.city %> - <%= order.shippingAddress.zip_code %>
+                </p>
+                <p>
+                    <%= order.shippingAddress.country %>, <%= order.shippingAddress.state %>
+                </p>
+                <p>Phone: <%= order.shippingAddress.phone_no %>
+                </p>
             </div>
 
         </div>

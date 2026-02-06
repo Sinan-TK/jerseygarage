@@ -1,78 +1,43 @@
-const orders = [
-  {
-    id: "#ORD-20260127-SZHSPT",
-    customer: "John Ready",
-    date: "2026-01-27 15:36",
-    update: "2026-01-27 15:36",
-    status: "draft",
-    total: "₹7247.10",
-    items: 1,
-    payment: "razorpay"
-  },
-  {
-    id: "#ORD-20260127-75C5RK",
-    customer: "Nithin Raj",
-    date: "2026-01-27 14:09",
-    update: "2026-01-27 14:09",
-    status: "pending",
-    total: "₹1019.10",
-    items: 1,
-    payment: "razorpay"
-  },
-  {
-    id: "#ORD-20260127-YBTNOV",
-    customer: "Nithin Raj",
-    date: "2026-01-27 14:32",
-    update: "2026-01-27 14:32",
-    status: "completed",
-    total: "₹2134.20",
-    items: 2,
-    payment: "cod"
-  }
-];
-
 const tableBody = document.getElementById("orderTableBody");
 
 /* Render Orders */
 
 function renderOrders(data) {
-
   tableBody.innerHTML = "";
 
-  data.forEach(order => {
-
+  data.orders.forEach((order) => {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-      <td>${order.id}</td>
-      <td>${order.customer}</td>
-      <td>${formatDate(order.date)}</td>
-      <td>${formatDate(order.update)}</td>
+      <td>${order.orderId}</td>
+      <td>${order.user_id.full_name}</td>
+      <td>${formatDate(order.createdAt)}</td>
+      <td>${formatDate(order.updatedAt)}</td>
 
       <td>
-        <span class="status status-${order.status}">
-          ${capitalize(order.status)}
+        <span class="status status-${order.orderStatus}">
+          ${capitalize(order.orderStatus)}
         </span>
       </td>
 
-      <td>${order.total}</td>
-      <td>${order.items}</td>
+      <td>₹${order.totalPrice}</td>
+      <td>${order.products.length}</td>
 
       <td>
         <span class="payment">
-          ${order.payment.toUpperCase()}
+          ${order.paymentMethod.toUpperCase()}
         </span>
       </td>
 
       <td>
-        <a href="#" class="action-link">View Details</a>
+        <a href="/admin/orders/details/${order._id}" class="action-link">View Details</a>
       </td>
     `;
 
     tableBody.appendChild(row);
-
   });
 
+  document.querySelector(".pagination").innerHTML = pagination(data.pagination);
 }
 
 /* Helpers */
@@ -82,64 +47,87 @@ function capitalize(text) {
 }
 
 function formatDate(dateStr) {
-
   const date = new Date(dateStr);
 
   return date.toLocaleString("en-IN", {
     dateStyle: "medium",
-    timeStyle: "short"
+    timeStyle: "short",
   });
 }
 
 /* Filters */
-
-document.getElementById("applyFilter").addEventListener("click", () => {
-
+async function loadFilter(page) {
   const search = document.getElementById("searchOrder").value.toLowerCase();
   const status = document.getElementById("statusFilter").value;
   const payment = document.getElementById("paymentFilter").value;
+  const fromDate = document.getElementById("fromDate").value;
+  const toDate = document.getElementById("toDate").value;
 
-  let filtered = orders.filter(order => {
+  {
+    try {
+      const res = await axios.get("/admin/orders/data", {
+        params: {
+          search,
+          status,
+          payment,
+          fromDate,
+          toDate,
+          page,
+        },
+      });
 
-    let match = true;
-
-    if (search && !order.id.toLowerCase().includes(search)) {
-      match = false;
+      renderOrders(res.data.data);
+    } catch (err) {
+      
+      const error = err.response?.data;
+      console.log(error);
+      toastr.error(error?.message || "Something went wrong", "Failed");
     }
-
-    if (status !== "all" && order.status !== status) {
-      match = false;
-    }
-
-    if (payment !== "all" && order.payment !== payment) {
-      match = false;
-    }
-
-    return match;
-
-  });
-
-  renderOrders(filtered);
-
-});
-
-/* Clear */
-
-document.getElementById("clearFilter").addEventListener("click", () => {
-
-  document.getElementById("searchOrder").value = "";
-  document.getElementById("statusFilter").value = "all";
-  document.getElementById("paymentFilter").value = "all";
-
-  renderOrders(orders);
-
-});
-
-/* Initial Load */
-
-renderOrders(orders);
+  }
+}
 
 
-function clearFilter(){
-    window.location.href = "/admin/orders";
+function clearFilter() {
+  window.location.href = "/admin/orders";
+}
+
+async function loadOrders() {
+  try {
+    const res = await axios.get("/admin/orders/data");
+
+    console.log(res.data.data.orders);
+
+    renderOrders(res.data.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+loadOrders();
+
+function pagination(data) {
+  const backward = data.currentPage > 1 ? true : false;
+  const forward = data.currentPage < data.totalPages ? true : false;
+  return `${
+    backward
+      ? `<button onclick="loadFilter(${
+          data.currentPage - 1
+        })" class="arrow-btn">
+      <i class="fa-solid fa-chevron-left"></i>
+  </button>`
+      : ""
+  }
+
+  <span class="current-page-display">
+      ${data.currentPage}
+  </span>
+    ${
+      forward
+        ? `<button onclick="loadFilter(${
+            data.currentPage + 1
+          })" class="arrow-btn">
+      <i class="fa-solid fa-chevron-right"></i>
+  </button>`
+        : ""
+    }`;
 }
