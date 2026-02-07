@@ -1,5 +1,6 @@
 import wrapAsync from "../../utils/wrapAsync.js";
-import { personalInfo } from "../../validators/userValidators.js";
+// import { personalInfo } from "../../validators/userValidators.js";
+import * as userValidators from "../../validators/userValidators.js";
 import * as Responses from "../../utils/responses/user/user.response.js";
 import sendResponse from "../../utils/sendResponse.js";
 import addressValidators from "../../validators/addressValidators.js";
@@ -143,7 +144,7 @@ export const profileRender = (req, res) => {
 // 3. EDIT PERSONAL INFORMATION
 // ======================================================================
 export const editPersonalInfo = wrapAsync(async (req, res) => {
-  const { error } = personalInfo.validate(req.body);
+  const { error } = userValidators.personalInfo.validate(req.body);
 
   if (error) {
     return sendResponse(res, {
@@ -174,8 +175,8 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
   if (user.email === email) {
     return sendResponse(res, {
       code: 200,
-    message: "Personal Info edited",
-      data: result ,
+      message: "Personal Info edited",
+      data: result,
     });
   } else {
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_CHANGE);
@@ -188,32 +189,16 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 export const editPassword = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
+  const { error } = userValidators.newPassword.validate(req.body);
+
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
+  }
+
   const { currentPassword, newPassword, confirmPassword } = req.body;
-
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    return sendResponse(res, {
-      code: 400,
-      message: "All fields are required",
-    });
-  }
-
-  if (newPassword.length < 6) {
-    return sendResponse(res, {
-      code: 400,
-      message: "Password must be at least 6 characters",
-    });
-  }
-
-  if (newPassword !== confirmPassword) {
-    return sendResponse(res, {
-      code: 400,
-      message: "New passwords do not match",
-    });
-  }
-
-  /* =========================
-     FIND USER
-  ========================= */
 
   const user = await User.findById(user_id);
 
@@ -224,10 +209,6 @@ export const editPassword = wrapAsync(async (req, res) => {
     });
   }
 
-  /* =========================
-     VERIFY CURRENT PASSWORD
-  ========================= */
-
   const isMatch = await user.comparePassword(currentPassword);
 
   if (!isMatch) {
@@ -237,11 +218,6 @@ export const editPassword = wrapAsync(async (req, res) => {
     });
   }
 
-  /* =========================
-     UPDATE PASSWORD
-  ========================= */
-
-  // Prevent same password reuse (optional but good)
   const isSame = await user.comparePassword(newPassword);
 
   if (isSame) {
@@ -251,14 +227,9 @@ export const editPassword = wrapAsync(async (req, res) => {
     });
   }
 
-  // Set new password (will be hashed in pre-save hook)
-  user.password = newPassword;
+  user.password_hash = newPassword;
 
   await user.save();
-
-  /* =========================
-     RESPONSE
-  ========================= */
 
   return sendResponse(res, {
     code: 200,

@@ -330,3 +330,37 @@ input[type="number"] {
     margin: 0 15px;
   }
 }
+
+.error-box {
+  display: none;
+  background: #ffe6e6;
+  color: #b00020;
+  padding: 10px 14px;
+  border-left: 4px solid #b00020;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* space for icon */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  font-size: 16px;
+}
+
+.toggle-password:hover {
+  color: #000;
+}

@@ -12,10 +12,6 @@ document.querySelector(".edit-btn").addEventListener("click", () => {
   const phoneNoP = document.getElementById("phone_no");
   const phoneNo = phoneNoP.textContent.trim();
 
-  // const fullNameP = document.createElement("p");
-  // fullName.id = "full_name";
-  // fullName.innerText = "name";
-
   const inputName = document.createElement("input");
   inputName.type = "text";
   inputName.value = fullName;
@@ -90,8 +86,6 @@ async function editSubmit() {
     toastr.error(error?.message || "Something went wrong!!", "Failed");
   }
 }
-
-///////////////////////////
 
 const otpInputs = document.querySelectorAll(".otp-inputs input");
 
@@ -206,13 +200,25 @@ document
     try {
       const res = await axios.patch("/user/profile/change-password", payload);
 
-      toastr.suucess(res.data.message || "Password updated", "success");
-
-      closePasswordModal();
+      if (res.data.success) {
+        toastr.success(res.data.message || "Password updated", "success");
+        closePasswordModal();
+      }
     } catch (err) {
       const error = err.response?.data;
 
-      toastr.error(error?.message || "Failed to update password", "error");
+      if (error?.message) {
+        const errorBox = document.querySelector(".error-box");
+        errorBox.style.display = "flex";
+        const errorTxt = document.querySelector(".error-text-password");
+        errorTxt.innerText = error.message;
+
+        setTimeout(() => {
+          errorBox.style.display = "none";
+        }, 2000);
+      } else {
+        toastr.error("Failed to update password", "error");
+      }
     }
   });
 
@@ -224,4 +230,20 @@ document.getElementById("passwordModal")?.addEventListener("click", (e) => {
   if (e.target.id === "passwordModal") {
     closePasswordModal();
   }
+});
+
+document.querySelectorAll(".toggle-password").forEach((icon) => {
+  icon.addEventListener("click", () => {
+    const input = document.getElementById(icon.getAttribute("data-target"));
+
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  });
 });

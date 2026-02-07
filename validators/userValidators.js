@@ -30,13 +30,15 @@ export const registerSchema = Joi.object({
   password: Joi.string()
     .min(8)
     .max(30)
-    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$"))
+    .pattern(
+      new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$"),
+    )
     .required()
     .messages({
       "string.empty": "Please enter the password!",
       "string.min": "Password must be at least 8 characters",
       "string.pattern.base":
-        "Password must contain uppercase, lowercase, and a number",
+        "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.",
     }),
   confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
     "any.only": "Passwords do not match",
@@ -47,13 +49,16 @@ export const newPassSchema = Joi.object({
   password: Joi.string()
     .min(8)
     .max(30)
-    .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$"))
+    .pattern(
+      new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$"),
+    )
+
     .required()
     .messages({
       "string.empty": "Please enter the password!",
       "string.min": "Password must be at least 8 characters",
       "string.pattern.base":
-        "Password must contain uppercase, lowercase, and a number",
+        "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.",
     }),
   confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
     "any.only": "Passwords do not match",
@@ -81,5 +86,31 @@ export const personalInfo = Joi.object({
     .allow("")
     .messages({
       "string.pattern.base": "Invalid phone number",
+    }),
+});
+
+export const newPassword = Joi.object({
+  currentPassword: Joi.string().required().messages({
+    "string.empty": "Please enter your current password",
+  }),
+
+  newPassword: Joi.string()
+    .min(8)
+    .max(30)
+    .pattern(
+      new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$"),
+    )
+    .required()
+    .messages({
+      "string.empty": "Please enter the new password!",
+      "string.min": "Password must be at least 8 characters",
+      "string.pattern.base":
+        "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+    }),
+  confirmPassword: Joi.string()
+    .valid(Joi.ref("newPassword"))
+    .required()
+    .messages({
+      "any.only": "Passwords do not match",
     }),
 });

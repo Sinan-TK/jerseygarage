@@ -1,73 +1,73 @@
 <main class="account-main">
 
-    <!-- PERSONAL INFORMATION -->
-    <section class="card personal-card">
-        <div class="card-header">
-            <h3>Personal Information</h3>
-            <div class="edit-btns">
-                <button class="edit-btn"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
-                <button onclick="editSubmit()" class="edit-btn edit-submit">Submit</button>
-                <a href="/user/profile" class="edit-btn edit-cancel">Cancel</a>
-            </div>
-        </div>
+  <!-- PERSONAL INFORMATION -->
+  <section class="card personal-card">
+    <div class="card-header">
+      <h3>Personal Information</h3>
+      <div class="edit-btns">
+        <button class="edit-btn"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+        <button onclick="editSubmit()" class="edit-btn edit-submit">Submit</button>
+        <a href="/user/profile" class="edit-btn edit-cancel">Cancel</a>
+      </div>
+    </div>
 
-        <div class="info-grid">
-            <div class="info-item">
-                <span>Full Name</span>
-                <p id="full_name">
-                    <%= userDetails.full_name %>
-                </p>
-            </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <span>Full Name</span>
+        <p id="full_name">
+          <%= userDetails.full_name %>
+        </p>
+      </div>
 
-            <div class="info-item">
-                <span>Email Address</span>
-                <p id="email">
-                    <%= userDetails.email %>
-                </p>
-            </div>
+      <div class="info-item">
+        <span>Email Address</span>
+        <p id="email">
+          <%= userDetails.email %>
+        </p>
+      </div>
 
-            <div class="info-item">
-                <span>Phone Number</span>
-                <p id="phone_no">
-                    <%= userDetails.phone_no !=null ? userDetails.phone_no : " N/A" %>
-                </p>
-            </div>
+      <div class="info-item">
+        <span>Phone Number</span>
+        <p id="phone_no">
+          <%= userDetails.phone_no !=null ? userDetails.phone_no : " N/A" %>
+        </p>
+      </div>
 
-            <div class="info-item">
-                <span>Member Since</span>
-                <p id="date">
-                    <%= new Date(userDetails.createdAt).toLocaleDateString("en-US") %>
-                </p>
-            </div>
+      <div class="info-item">
+        <span>Member Since</span>
+        <p id="date">
+          <%= new Date(userDetails.createdAt).toLocaleDateString("en-US") %>
+        </p>
+      </div>
 
-            <div class="info-item" onclick="openPasswordModal()">
-                <span>Password</span>
-                <p>************ <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
-                </p>
-            </div>
-        </div>
-    </section>
+      <div class="info-item" onclick="openPasswordModal()">
+        <span>Password</span>
+        <p>************ <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
+        </p>
+      </div>
+    </div>
+  </section>
 
-    <!-- STATS -->
-    <section class="stats-row">
+  <!-- STATS -->
+  <section class="stats-row">
 
-        <div class="card stat-card">
-            <div class="stat-top">
-                <span>Wallet Balance</span>
-                <a href="#" class="link">See details →</a>
-            </div>
-            <h2>₹500</h2>
-        </div>
+    <div class="card stat-card">
+      <div class="stat-top">
+        <span>Wallet Balance</span>
+        <a href="#" class="link">See details →</a>
+      </div>
+      <h2>₹500</h2>
+    </div>
 
-        <div class="card stat-card">
-            <div class="stat-top">
-                <span>Total Referrals</span>
-                <a href="#" class="link">See details →</a>
-            </div>
-            <h2>12</h2>
-        </div>
+    <div class="card stat-card">
+      <div class="stat-top">
+        <span>Total Referrals</span>
+        <a href="#" class="link">See details →</a>
+      </div>
+      <h2>12</h2>
+    </div>
 
-    </section>
+  </section>
 
 </main>
 
@@ -104,38 +104,41 @@
   <div class="modal-box">
 
     <h3>Change Password</h3>
+    <div class="error-box">
+      <p class="error-text-password">error</p>
+    </div>
+
 
     <form id="passwordForm">
 
       <!-- Current Password -->
       <div class="form-group">
         <label>Current Password</label>
-        <input
-          type="password"
-          id="currentPassword"
-          placeholder="Enter current password"
-        />
+
+        <div class="password-wrapper">
+          <input type="password" id="currentPassword" placeholder="Enter current password" />
+          <i class="fa-solid fa-eye toggle-password" data-target="currentPassword"></i>
+        </div>
       </div>
 
-      <!-- New Password -->
       <div class="form-group">
         <label>New Password</label>
-        <input
-          type="password"
-          id="newPassword"
-          placeholder="Enter new password"
-        />
+
+        <div class="password-wrapper">
+          <input type="password" id="newPassword" placeholder="Enter new password" />
+          <i class="fa-solid fa-eye toggle-password" data-target="newPassword"></i>
+        </div>
       </div>
 
-      <!-- Confirm Password -->
       <div class="form-group">
         <label>Confirm Password</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          placeholder="Re-enter new password"
-        />
+
+        <div class="password-wrapper">
+          <input type="password" id="confirmPassword" placeholder="Re-enter new password" />
+          <i class="fa-solid fa-eye toggle-password" data-target="confirmPassword"></i>
+        </div>
       </div>
+
 
       <!-- Buttons -->
       <div class="modal-actions">
