@@ -49,7 +49,9 @@ async function editSubmit() {
       if (res.data.message === "Email change") {
         toastr.success("Otp verification needed!!", res.data.message);
 
-        openOtpModal();
+        setTimeout(() => {
+          window.location.href = res.data.redirect;
+        }, 1000);
       } else {
         toastr.success(res.data.message, "Edited");
 
@@ -87,64 +89,6 @@ async function editSubmit() {
   }
 }
 
-const otpInputs = document.querySelectorAll(".otp-inputs input");
-
-/* Open modal */
-function openOtpModal() {
-  document.getElementById("otpModal").classList.add("active");
-  otpInputs[0].focus();
-}
-
-/* Close modal */
-function closeOtpModal() {
-  document.getElementById("otpModal").classList.remove("active");
-}
-
-/* OTP input behavior */
-otpInputs.forEach((input, index) => {
-  input.addEventListener("input", () => {
-    if (!/^\d$/.test(input.value)) {
-      input.value = "";
-      return;
-    }
-
-    if (input.value && otpInputs[index + 1]) {
-      otpInputs[index + 1].focus();
-    }
-  });
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" && !input.value && otpInputs[index - 1]) {
-      otpInputs[index - 1].focus();
-    }
-  });
-});
-
-/* Paste OTP */
-otpInputs[0].addEventListener("paste", (e) => {
-  const paste = e.clipboardData.getData("text").slice(0, 6);
-  [...paste].forEach((char, i) => {
-    if (otpInputs[i]) otpInputs[i].value = char;
-  });
-  otpInputs[5]?.focus();
-});
-
-/* Submit OTP */
-async function submitOtp(e) {
-  e.preventDefault();
-
-  let otp = "";
-  otpInputs.forEach((input) => (otp += input.value));
-
-  console.log("OTP:", otp);
-
-  try {
-    const res = await axios.post("/user/profile/mail", { otp });
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 /* =========================
    OPEN / CLOSE
 ========================= */
@@ -174,20 +118,6 @@ document
     const newPassword = document.getElementById("newPassword").value;
 
     const confirmPassword = document.getElementById("confirmPassword").value;
-
-    /* ===== VALIDATION ===== */
-
-    // if (newPassword.length < 6) {
-    //   alert("Password must be at least 6 characters");
-    //   return;
-    // }
-
-    // if (newPassword !== confirmPassword) {
-    //   alert("Passwords do not match");
-    //   return;
-    // }
-
-    /* ===== PAYLOAD ===== */
 
     const payload = {
       currentPassword,

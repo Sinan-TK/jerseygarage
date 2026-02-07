@@ -25,6 +25,8 @@ router.get("/profile", Userdetails, userController.profileRender);
 
 router.patch("/profile/edit", Userdetails, userController.editPersonalInfo);
 
+router.get("/email-verify",userController.emailOtpVerify);
+
 router.patch("/profile/change-password", userController.editPassword);
 
 router.get("/address", Userdetails, userController.addressPageRender);

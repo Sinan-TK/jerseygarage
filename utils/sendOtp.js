@@ -6,8 +6,8 @@ async function sendOTP(email, otp, message) {
     port: 465,
     secure: true,
     auth: {
-      user: "jerseygarageofficial@gmail.com",
-      pass: "ezriyacjwecbvddm",
+      user: process.env.EMAIL_NODEMAILER,
+      pass: process.env.APP_PASSWORD,
     },
     tls: {
       rejectUnauthorized: false,
@@ -15,7 +15,7 @@ async function sendOTP(email, otp, message) {
   });
 
   const mailOptions = {
-    from: "jerseygarageofficial@gmail.com",
+    from: process.env.EMAIL_NODEMAILER,
     to: email,
     subject: "Your OTP Code",
     text: `${message}Your OTP is: ${otp}`,

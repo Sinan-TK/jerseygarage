@@ -186,6 +186,19 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 // ======================================================================
 // 4. EMAIL OTP VERIFICATION PAGE RENDER
 // ======================================================================
+export const emailOtpVerify = wrapAsync(async (req, res) => {
+  res.render("user/pages/profile/emailVerify", {
+    title: "OTP Verification",
+    pageCSS: "otp-verify",
+    showHeader: true,
+    showFooter: true,
+    pageJS: "emailVerify.js",
+  });
+});
+
+// ======================================================================
+// 4. EDIT PASSWORD
+// ======================================================================
 export const editPassword = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
