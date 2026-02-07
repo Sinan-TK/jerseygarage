@@ -18,7 +18,7 @@ export const personalInfoEdit = Object.freeze({
   EMAIL_CHANGE: {
     code: 200,
     message: "Email change",
-    redirectToFrontend: "/user/email/otp-verify",
+    redirectToFrontend: "/user/email-verify",
   },
 });
 

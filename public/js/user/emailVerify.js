@@ -55,9 +55,7 @@ async function verifyOtp() {
 
   try {
     const res = await axios.post("/user/email-verify", { otpValue });
-
-    console.log(res);
-
+    
     if (res.data.success) {
       toastr.success("Otp verification successfull!", "Status:");
 

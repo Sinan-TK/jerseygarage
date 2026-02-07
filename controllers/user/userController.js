@@ -10,12 +10,14 @@ import Wishlist from "../../models/wishlistModel.js";
 import Variant from "../../models/varientModel.js";
 import Cart from "../../models/cartModel.js";
 import Product from "../../models/productModel.js";
+import Otp from "../../models/otpModel.js";
 import { generateOrderId } from "../../utils/generateOrderId.js";
 import Order from "../../models/orderModel.js";
 import { ObjectId } from "mongodb";
 import { buildCheckoutItems } from "../../utils/buildCheckoutItems.js";
 import generateInvoice from "../../utils/generateInvoice.js";
 import bcrypt from "bcrypt";
+import { generateOtp } from "../../utils/GenerateOtp.js";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -144,6 +146,7 @@ export const profileRender = (req, res) => {
 // 3. EDIT PERSONAL INFORMATION
 // ======================================================================
 export const editPersonalInfo = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
   const { error } = userValidators.personalInfo.validate(req.body);
 
   if (error) {
@@ -155,7 +158,7 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 
   const { fullName, email, phoneNo } = req.body;
 
-  const user = await User.findById(req.session.user.id);
+  const user = await User.findById(user_id);
 
   const result = await User.findByIdAndUpdate(
     user._id,
@@ -179,8 +182,62 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
       data: result,
     });
   } else {
+    req.session.emailVerify = email;
+    await generateOtp(email, "ChangeMailAddress", "Change Mail Address");
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_CHANGE);
   }
+});
+
+// ======================================================================
+// 3. EDIT PERSONAL INFORMATION
+// ======================================================================
+
+export const emailVerification = wrapAsync(async (req, res) => {
+  const email = req.session.emailVerify;
+  const purpose = "ChangeMailAddress";
+
+  const { error } = userValidators.otpSchema.validate(req.body);
+
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
+  }
+
+  const { otpValue } = req.body;
+
+  const otpDoc = await Otp.findOne({ email, purpose, is_used: false });
+
+  if (!otpDoc) {
+    return sendResponse(res, {
+      code: 410,
+      message: "OTP expired",
+    });
+  }
+
+  if (otpValue !== otpDoc.otp_code) {
+    return sendResponse(res, {
+      code: 401,
+      message: "Incorrect OTP. Please try again!",
+    });
+  }
+
+  otpDoc.is_used = true;
+  const user_id = req.session.user.id;
+  const user = await User.findById(user_id);
+
+  user.email = email;
+
+  user.save();
+
+  req.session.user.email = email;
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Otp verification successfull",
+    redirectToFrontend: "/user/profile",
+  });
 });
 
 // ======================================================================
