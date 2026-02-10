@@ -58,9 +58,13 @@
                 };
               </script>
 
-              <% if (pageJS) { %>
-                <script src="/js/user/<%= pageJS %>" defer></script>
+              <% if (title === "Wallet") { %>
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <% } %>
+
+                  <% if (pageJS) { %>
+                    <script src="/js/user/<%= pageJS %>" defer></script>
+                    <% } %>
 
 
 </body>

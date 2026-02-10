@@ -175,3 +175,193 @@
 .back-link a:hover {
   color: #000;
 }
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+
+/* Modal Box */
+
+.modal-box {
+  background: #fff;
+  width: 90%;
+  max-width: 420px;
+
+  border-radius: 10px;
+  padding: 20px;
+
+  animation: popup 0.2s ease;
+}
+
+@keyframes popup {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* Header */
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 15px;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+}
+
+.modal-header button {
+  border: none;
+  background: none;
+
+  font-size: 22px;
+  cursor: pointer;
+}
+
+
+/* Body */
+
+.modal-body label {
+  font-size: 14px;
+  display: block;
+  margin: 10px 0 6px;
+}
+
+.modal-body input {
+  width: 100%;
+  padding: 10px;
+
+  border: 1px solid #ddd;
+  border-radius: 6px;
+
+  outline: none;
+}
+
+
+/* Quick Amount */
+
+.quick-amounts {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+
+  margin: 12px 0;
+}
+
+.quick-amounts button {
+  padding: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.quick-amounts button:hover {
+  background: #f5f5f5;
+}
+
+
+/* Payment Method */
+
+.payment-method {
+  border: 2px solid #3f78ff;
+  border-radius: 6px;
+
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #f4f7ff;
+}
+
+.payment-method img {
+  width: 32px;
+  height: 32px;
+}
+
+.payment-method p {
+  font-size: 12px;
+  color: #666;
+}
+
+
+/* Proceed Button */
+
+.proceed-btn {
+  width: 100%;
+  margin-top: 15px;
+
+  padding: 12px;
+
+  background: #000;
+  color: #fff;
+
+  border: none;
+  border-radius: 6px;
+
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.proceed-btn:enabled {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.proceed-btn:enabled:hover {
+  opacity: 0.9;
+}
+
+/* =========================
+   FIX INPUT OVERFLOW
+========================= */
+
+.modal-body input {
+  width: 100%;
+  box-sizing: border-box;   /* IMPORTANT */
+}
+
+
+/* =========================
+   REMOVE NUMBER ARROWS
+========================= */
+
+/* Chrome, Edge, Safari */
+.modal-body input::-webkit-outer-spin-button,
+.modal-body input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.modal-body input[type="number"] {
+  -moz-appearance: textfield;
+}

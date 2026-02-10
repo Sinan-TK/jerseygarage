@@ -10,7 +10,7 @@ import Variant from "../../models/varientModel.js";
 import Cart from "../../models/cartModel.js";
 import Product from "../../models/productModel.js";
 import Otp from "../../models/otpModel.js";
-// import generateOrderId from "../../utils/generateOrderId.js";
+import razorpay from "../../config/razorpay.js";
 import Order from "../../models/orderModel.js";
 import { ObjectId } from "mongodb";
 import buildCheckoutItems from "../../utils/buildCheckoutItems.js";
@@ -20,6 +20,8 @@ import generateOtp from "../../utils/GenerateOtp.js";
 import Wallet from "../../models/walletModel.js";
 import * as userConstants from "../../constants/userConstants.js";
 import * as userServices from "../../services/user/userServices.js";
+import * as walletController from "../../utils/walletController.js";
+import crypto from "crypto";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -700,10 +702,72 @@ export const walletData = wrapAsync(async (req, res) => {
     });
   }
 
+  if (wallet && wallet.transactions) {
+    wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
   return sendResponse(res, {
     code: 200,
     message: "wallet data successfully got",
     data: wallet,
   });
 });
-//1223
+
+/* ==============================
+   CREATE WALLET ORDER
+============================== */
+
+export const walletTopupOrder = wrapAsync(async (req, res) => {
+  const { amount } = req.body;
+
+  if (!amount || amount < 100) {
+    return sendResponse(res, Responses.walletPayment.INVALID_AMOUNT);
+  }
+
+  const order = await razorpay.orders.create({
+    amount: amount * 100,
+    currency: "INR",
+    receipt: "wallet_" + Date.now(),
+  });
+
+  if (!order) {
+    return sendResponse(res, Responses.walletPayment.ORDER_FAILED);
+  }
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Order created",
+    data: order,
+  });
+});
+
+/* ==============================
+   VERIFY WALLET PAYMENT
+============================== */
+
+export const verifyWalletTopup = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } =
+    req.body;
+
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
+  }
+
+  const sign = razorpay_order_id + "|" + razorpay_payment_id;
+
+  const expected = crypto
+    .createHmac("sha256", process.env.RAZORPAY_TESTKEYSECRET)
+    .update(sign)
+    .digest("hex");
+
+  if (expected !== razorpay_signature) {
+    return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
+  }
+
+  await walletController.creditWallet(user_id, Number(amount), "Wallet Top-up");
+
+  return sendResponse(res, Responses.walletPayment.SUCCESS);
+});
+

@@ -1,10 +1,11 @@
 import Razorpay from "razorpay";
 
-export default new Razorpay({
+const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY,
   key_secret: process.env.RAZORPAY_TESTKEYSECRET,
 });
 
+export default razorpay;
 //<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 // import razorpay from "../config/razorpay.js";
@@ -20,4 +21,3 @@ export default new Razorpay({
 
 //   res.json(order);
 // };
-

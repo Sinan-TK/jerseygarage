@@ -79,6 +79,10 @@ router.get("/wallet", userController.walletPage);
 
 router.get("/wallet/data", userController.walletData);
 
+router.post("/wallet/topup", userController.walletTopupOrder);
+
+router.post("/wallet/verify", userController.verifyWalletTopup);
+
 router.post("/logout", Userdetails, userController.userLogout);
 
 export default router;

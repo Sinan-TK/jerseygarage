@@ -30,7 +30,7 @@
             <h2>Transaction History</h2>
 
             <div id="transactionList">
-                
+
             </div>
 
         </div>
@@ -38,3 +38,56 @@
     </div>
 
 </section>
+
+<!-- Add Money Modal -->
+<div class="modal-overlay" id="addMoneyModal">
+
+    <div class="modal-box">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h3>Add Money to Wallet</h3>
+            <button id="closeModal">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+
+            <!-- Amount -->
+            <label>Enter Amount (₹)</label>
+
+            <input type="number" id="walletAmount" placeholder="Minimum ₹100" min="100" />
+
+            <!-- Quick Buttons -->
+            <div class="quick-amounts">
+                <button data-amt="100">₹100</button>
+                <button data-amt="200">₹200</button>
+                <button data-amt="500">₹500</button>
+                <button data-amt="1000">₹1000</button>
+            </div>
+
+            <!-- Payment Method -->
+            <label>Payment Method</label>
+
+            <div class="payment-method active">
+
+                <img src="https://razorpay.com/favicon.png" alt="Razorpay" />
+
+                <div>
+                    <strong>Razorpay</strong>
+                    <p>Pay securely via Razorpay</p>
+                </div>
+
+            </div>
+
+            <!-- Proceed -->
+            <button class="proceed-btn" id="proceedBtn" disabled>
+                Proceed
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+

@@ -244,8 +244,30 @@ export const orderCancelReturn = Object.freeze({
     code: 200,
     message: "Return request submitted",
   },
-  INVALID_ACTION:{
+  INVALID_ACTION: {
     code: 400,
     message: "Invalid action",
-  }
+  },
 });
+
+export const walletPayment = {
+  INVALID_AMOUNT: {
+    code: 400,
+    message: "Invalid amount",
+  },
+
+  ORDER_FAILED: {
+    code: 500,
+    message: "Order creation failed",
+  },
+
+  PAYMENT_FAILED: {
+    code: 400,
+    message: "Payment verification failed",
+  },
+
+  SUCCESS: {
+    code: 200,
+    message: "Wallet credited successfully",
+  },
+};
