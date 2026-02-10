@@ -2,8 +2,7 @@ import otpGenerator from "otp-generator";
 import sendOTP from "../utils/sendOtp.js";
 import Otp from "../models/otpModel.js";
 
-
-export const generateOtp = async (email,purpose,message) => {
+const generateOtp = async (email, purpose, message) => {
   const otp = otpGenerator.generate(6, {
     digits: true,
     upperCaseAlphabets: false,
@@ -23,4 +22,4 @@ export const generateOtp = async (email,purpose,message) => {
   await sendOTP(email, otp, message);
 };
 
-
+export default generateOtp;

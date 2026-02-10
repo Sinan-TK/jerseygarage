@@ -7,7 +7,7 @@ import * as Responses from "../../utils/responses/admin/admin.response.js";
 import sendResponse from "../../utils/sendResponse.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import { adminSchema } from "../../validators/adminValidators.js";
-import { paginate } from "../../utils/pagination.js";
+import paginate from "../../utils/pagination.js";
 import * as adminService from "../../services/admin/adminService.js";
 
 // ======================================================================

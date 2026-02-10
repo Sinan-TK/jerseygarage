@@ -129,14 +129,123 @@ export const cartCheck = Object.freeze({
   },
 });
 
+export const emailVerify = Object.freeze({
+  OTP_EXPIRED: {
+    code: 410,
+    message: "OTP expired",
+  },
+  INCORRECT: {
+    code: 401,
+    message: "Incorrect OTP. Please try again!",
+  },
+  SUCCESS: {
+    code: 200,
+    message: "Otp verification successfull",
+    redirectToFrontend: "/user/profile",
+  },
+});
+
+export const editPassword = Object.freeze({
+  USER_NOT_FOUND: {
+    code: 404,
+    message: "User not found",
+  },
+  CURRENT_PASS_INCORRECT: {
+    code: 400,
+    message: "Current password is incorrect",
+  },
+  SAME_NEW_PASS: {
+    code: 400,
+    message: "New password must be different",
+  },
+  SUCCESS: {
+    code: 200,
+    message: "Password updated successfully",
+  },
+});
+
+export const deleteCartItem = Object.freeze({
+  NO_VARIANT_ID: {
+    code: 400,
+    message: "Variant ID is required",
+  },
+  NO_CART: {
+    code: 404,
+    message: "Cart not found",
+  },
+  NO_ITEM: {
+    code: 404,
+    message: "Item not found in cart",
+  },
+});
+
 export const placeOrder = Object.freeze({
+  NO_ADDRESS: {
+    code: 400,
+    message: "Shipping address is required",
+  },
+  NO_PAY_METHOD: {
+    code: 400,
+    message: "Payment method is required",
+  },
   EMPTY_CART: {
     code: 400,
     message: "Your cart is empty",
   },
-  SUCCESS: {
-    code: 200,
-    message: "All items are in stock. Proceed to checkout.",
-    redirectToFrontend: "/user/checkout",
+  ADDRESS_NOT_FOUND: {
+    code: 404,
+    message: "Shipping address not found",
   },
+  NO_ITEMS: {
+    code: 400,
+    message: "No valid items in cart",
+  },
+  PAY_VERIFY_FAILED: {
+    code: 400,
+    message: "Payment verification failed",
+  },
+  SUCCESS: {
+    code: 201,
+    message: "Order placed successfully",
+    redirectToFrontend: "/user/order/success",
+  },
+});
+
+export const orderCancelReturn = Object.freeze({
+  NO_REASON: {
+    code: 400,
+    message: "Please enter the reason",
+  },
+  NO_ITEMS: {
+    code: 400,
+    message: "Please select the item",
+  },
+  MISSING_FIELDS: {
+    code: 400,
+    message: "Missing required fields",
+  },
+  NO_ORDER: {
+    code: 404,
+    message: "Order not found",
+  },
+  NO_CANCEL: {
+    code: 400,
+    message: "Delivered orders cannot be cancelled",
+  },
+  NO_RETURN: {
+    code: 400,
+    message: "Order not delivered yet",
+  },
+  CANCEL_SUCCESS: {
+    code: 200,
+    message: "Order cancelled successfully",
+  },
+  RETURN_SUCCESS: {
+    code: 200,
+    message: "Return request submitted",
+  },
+  INVALID_ACTION:{
+    code: 400,
+    message: "Invalid action",
+  }
 });

@@ -5,18 +5,19 @@ import Product from "../../models/productModel.js";
 import Variant from "../../models/varientModel.js";
 import Category from "../../models/categoryModel.js";
 import Wishlist from "../../models/wishlistModel.js";
+import Wallet from "../../models/walletModel.js";
 import sendOTP from "../../utils/sendOtp.js";
-import { generateOtp } from "../../utils/GenerateOtp.js";
+import generateOtp from "../../utils/GenerateOtp.js";
 import * as Responses from "../../utils/responses/user/auth.responses.js";
 import sendResponse from "../../utils/sendResponse.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import * as userValidators from "../../validators/userValidators.js";
-import { paginate } from "../../utils/pagination.js";
+import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import productBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
-import * as authService from "../../services/user/authService.js";
+import * as authServices from "../../services/user/authServices.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -62,7 +63,7 @@ export const userVerification = wrapAsync(async (req, res) => {
 
   const { email, password } = req.body;
 
-  const result = await authService.verifyUserLogin(email, password);
+  const result = await authServices.verifyUserLogin(email, password);
 
   if (result?.error) {
     return sendResponse(res, result.error);
@@ -110,7 +111,7 @@ export const otpVerification = wrapAsync(async (req, res) => {
 
   const { otpValue } = req.body;
 
-  const result = await authService.otpVerify(email, purpose, otpValue);
+  const result = await authServices.otpVerify(email, purpose, otpValue);
 
   if (result?.error) {
     return sendResponse(res, result.error);
@@ -120,11 +121,18 @@ export const otpVerification = wrapAsync(async (req, res) => {
     const userData = req.session.userData;
     const email = req.session.tempEmail;
 
-    const newUser = new User({
+    const newUser = await User.create({
       full_name: userData.fullName,
       email,
       password_hash: userData.password,
     });
+
+    const wallet = await Wallet.create({
+      user: newUser._id,
+      balance: 0,
+    });
+
+    newUser.wallet = wallet._id;
 
     await newUser.save();
 
@@ -184,7 +192,7 @@ export const signupVerification = wrapAsync(async (req, res) => {
 
   const { email, fullName, password, confirmPassword } = req.body;
 
-  const result = await authService.emailVerification(email);
+  const result = await authServices.emailVerification(email);
 
   if (result?.error) {
     return sendResponse(res, result.error);

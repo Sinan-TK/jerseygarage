@@ -42,7 +42,7 @@
 
       <div class="info-item" onclick="openPasswordModal()">
         <span>Password</span>
-        <p>************ <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
+        <p>******** <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
         </p>
       </div>
     </div>
@@ -54,9 +54,9 @@
     <div class="card stat-card">
       <div class="stat-top">
         <span>Wallet Balance</span>
-        <a href="#" class="link">See details →</a>
+        <a href="/user/wallet" class="link">See details →</a>
       </div>
-      <h2>₹500</h2>
+      <h2>₹<%= userDetails.wallet.balance %>.00</h2>
     </div>
 
     <div class="card stat-card">
@@ -64,39 +64,12 @@
         <span>Total Referrals</span>
         <a href="#" class="link">See details →</a>
       </div>
-      <h2>12</h2>
+      <h2><%= userDetails.referral_count %></h2>
     </div>
 
   </section>
 
 </main>
-
-<!-- OTP MODAL
-<div class="otp-modal" id="otpModal">
-  <div class="otp-backdrop"></div>
-
-  <div class="otp-box">
-    <h3>Verify OTP</h3>
-    <p class="otp-text">
-      Enter the 6-digit OTP sent to your email
-    </p>
-
-    <form onsubmit="submitOtp(event)">
-      <div class="otp-inputs">
-        <input type="text" maxlength="1" inputmode="numeric" />
-        <input type="text" maxlength="1" inputmode="numeric" />
-        <input type="text" maxlength="1" inputmode="numeric" />
-        <input type="text" maxlength="1" inputmode="numeric" />
-        <input type="text" maxlength="1" inputmode="numeric" />
-        <input type="text" maxlength="1" inputmode="numeric" />
-      </div>
-
-      <button type="submit" class="otp-btn">Verify OTP</button>
-    </form>
-
-    <button class="otp-close" onclick="closeOtpModal()">×</button>
-  </div>
-</div> -->
 
 <!-- Change Password Modal -->
 <div class="modal-overlay" id="passwordModal">

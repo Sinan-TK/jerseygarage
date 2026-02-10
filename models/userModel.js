@@ -54,9 +54,9 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
 
-    is_verified: {
-      type: Boolean,
-      default: false,
+    wallet: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Wallet",
     },
 
     is_blocked: {
@@ -64,7 +64,7 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {

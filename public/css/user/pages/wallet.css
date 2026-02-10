@@ -1,0 +1,177 @@
+.wallet-section {
+  background: #f5f6f8;
+  padding: 30px 15px;
+  min-height: 100vh;
+}
+
+.wallet-container {
+  max-width: 900px;
+  margin: auto;
+}
+
+/* Wallet Card */
+
+.wallet-card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  flex-wrap: wrap;
+  gap: 15px;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 25px;
+}
+
+.wallet-info h3 {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.wallet-info h1 {
+  font-size: 32px;
+  color: #111;
+}
+
+
+/* Add Button */
+
+.add-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+
+  padding: 12px 20px;
+  border-radius: 6px;
+
+  cursor: pointer;
+  font-size: 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.add-btn:hover {
+  opacity: 0.85;
+}
+
+
+/* Transactions Box */
+
+.transactions {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.transactions h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+
+/* Single Transaction */
+
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.transaction:last-child {
+  border-bottom: none;
+}
+
+.left h4 {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.left p {
+  font-size: 13px;
+  color: #777;
+}
+
+
+/* Amount */
+
+.amount {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.credit {
+  color: green;
+}
+
+.debit {
+  color: red;
+}
+
+
+/* Responsive */
+
+@media (max-width: 600px) {
+
+  .wallet-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wallet-info h1 {
+    font-size: 26px;
+  }
+
+  .add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .transaction {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .amount {
+    align-self: flex-end;
+  }
+
+}
+
+/* Back Link */
+
+.back-link {
+  max-width: 900px;
+  margin: 0 auto 15px;
+}
+
+.back-link a {
+  text-decoration: none;
+  color: #444;
+  font-size: 14px;
+  font-weight: 600;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  transition: 0.2s;
+}
+
+.back-link a:hover {
+  color: #000;
+}

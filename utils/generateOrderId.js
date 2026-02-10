@@ -3,15 +3,13 @@ const generateRandomCode = (length = 6) => {
   let result = "";
 
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(
-      Math.floor(Math.random() * chars.length)
-    );
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
 
   return result;
 };
 
-export const generateOrderId = () => {
+const generateOrderId = () => {
   // Get today's date: YYYYMMDD
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -25,3 +23,5 @@ export const generateOrderId = () => {
 
   return `#ORD-${datePart}-${randomPart}`;
 };
+
+export default generateOrderId;

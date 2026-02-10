@@ -25,9 +25,9 @@ router.get("/profile", Userdetails, userController.profileRender);
 
 router.patch("/profile/edit", Userdetails, userController.editPersonalInfo);
 
-router.get("/email-verify",userController.emailOtpVerify);
+router.get("/email-verify", userController.emailOtpVerify);
 
-router.post("/email-verify",userController.emailVerification);
+router.post("/email-verify", userController.emailVerification);
 
 router.patch("/profile/change-password", userController.editPassword);
 
@@ -74,6 +74,10 @@ router.get("/orders/:id", userController.orderDetailsPage);
 router.get("/orders/invoice/:orderId", userController.downloadInvoice);
 
 router.patch("/orders/order-action", userController.orderCancelReturn);
+
+router.get("/wallet", userController.walletPage);
+
+router.get("/wallet/data", userController.walletData);
 
 router.post("/logout", Userdetails, userController.userLogout);
 

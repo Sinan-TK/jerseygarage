@@ -5,7 +5,7 @@ import wrapAsync from "../../utils/wrapAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import cloudinary from "../../config/cloudinary.js";
 import upload from "../../middlewares/multer.js";
-import { paginate } from "../../utils/pagination.js";
+import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/product.response.js";
 
@@ -34,7 +34,7 @@ export const productsPageRender = wrapAsync(async (req, res) => {
     return {
       ...product.toObject(),
       variants: variants.filter(
-        (v) => v.product_id.toString() === product._id.toString()
+        (v) => v.product_id.toString() === product._id.toString(),
       ),
     };
   });
@@ -120,8 +120,12 @@ export const addProduct = wrapAsync(async (req, res) => {
         return;
       }
 
-      if(Number(stock[size]<0)||Number(normalPrice[size]<0)||Number(basePrice[size]<0)){
-        sendResponse(res,Responses.addProduct.POSITIVE_LOGIC);
+      if (
+        Number(stock[size] < 0) ||
+        Number(normalPrice[size] < 0) ||
+        Number(basePrice[size] < 0)
+      ) {
+        sendResponse(res, Responses.addProduct.POSITIVE_LOGIC);
         return;
       }
     }
@@ -164,7 +168,7 @@ export const addProduct = wrapAsync(async (req, res) => {
         normal_price: Number(normalPrice[size]),
         stock: Number(stock[size]),
         is_available: Number(stock[size]) > 0,
-      }))
+      })),
     );
 
     sendResponse(res, Responses.addProduct.PRODUCT_ADDED);
@@ -196,17 +200,14 @@ export const unblockProduct = wrapAsync(async (req, res) => {
   const categoryId = await Product.findOne({ _id: id }).select("category");
 
   const catStatus = await Category.findOne({ _id: categoryId.category }).select(
-    "is_active"
+    "is_active",
   );
 
   if (!catStatus.is_active) {
     return sendResponse(res, Responses.productStatus.CATEGORY_BLOCKED);
   }
 
-  await Product.findByIdAndUpdate(
-    id,
-    { is_active: true },
-  );
+  await Product.findByIdAndUpdate(id, { is_active: true });
 
   return sendResponse(res, Responses.productStatus.PRODUCT_UNBLOCK);
 });
@@ -232,7 +233,7 @@ export const removeImage = wrapAsync(async (req, res) => {
   await Product.findByIdAndUpdate(
     productId,
     { $pull: { images: imageUrl } },
-    { new: true }
+    { new: true },
   );
 
   return sendResponse(res, Responses.removeImg.IMG_ROMOVED);
@@ -275,8 +276,12 @@ export const editProduct = wrapAsync(async (req, res) => {
         return sendResponse(res, Responses.addProduct.PRICE_LOGIC);
       }
 
-      if(Number(stock[size]<0)||Number(normalPrice[size]<0)||Number(basePrice[size]<0)){
-        sendResponse(res,Responses.addProduct.POSITIVE_LOGIC);
+      if (
+        Number(stock[size] < 0) ||
+        Number(normalPrice[size] < 0) ||
+        Number(basePrice[size] < 0)
+      ) {
+        sendResponse(res, Responses.addProduct.POSITIVE_LOGIC);
         return;
       }
     }
@@ -342,7 +347,7 @@ export const editProduct = wrapAsync(async (req, res) => {
           stock: Number(stock[size]),
           is_available: Number(stock[size]) > 0,
         },
-        { upsert: true }
+        { upsert: true },
       );
     }
 

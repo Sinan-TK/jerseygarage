@@ -3,7 +3,7 @@ import Variant from "../models/varientModel.js";
 import sendResponse from "./sendResponse.js";
 import * as Responses from "../utils/responses/user/user.response.js";
 
-export const buildCheckoutItems = async (items) => {
+const buildCheckoutItems = async (items) => {
   const checkoutItems = [];
   const warning = [];
 
@@ -46,3 +46,5 @@ export const buildCheckoutItems = async (items) => {
 
   return { checkoutItems, warning };
 };
+
+export default buildCheckoutItems;

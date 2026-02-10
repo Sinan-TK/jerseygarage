@@ -1,4 +1,4 @@
-export const paginate = async (Model, page = 1, limit = 5, query = {}) => {
+const paginate = async (Model, page = 1, limit = 5, query = {}) => {
   page = parseInt(page);
 
   const totalDocuments = await Model.countDocuments(query);
@@ -25,3 +25,5 @@ export const paginate = async (Model, page = 1, limit = 5, query = {}) => {
     },
   };
 };
+
+export default paginate;

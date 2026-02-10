@@ -1,6 +1,6 @@
 import User from "../../models/userModel.js";
 import * as Responses from "../../utils/responses/user/auth.responses.js";
-import { generateOtp } from "../../utils/GenerateOtp.js";
+import generateOtp from "../../utils/GenerateOtp.js";
 import Otp from "../../models/otpModel.js";
 
 //=============================================================================
