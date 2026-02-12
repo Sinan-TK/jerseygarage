@@ -20,7 +20,7 @@ import generateOtp from "../../utils/GenerateOtp.js";
 import Wallet from "../../models/walletModel.js";
 import * as userConstants from "../../constants/userConstants.js";
 import * as userServices from "../../services/user/userServices.js";
-import * as walletController from "../../utils/walletController.js";
+import * as walletHandler from "../../utils/walletHandler.js";
 import crypto from "crypto";
 
 // ======================================================================
@@ -678,7 +678,9 @@ export const orderCancelReturn = wrapAsync(async (req, res) => {
 ================================= */
 
 export const walletPage = (req, res) => {
-  res.render("user/pages/profile/wallet", {
+  res.render("user/layouts/profilelayout", {
+    view: "wallet",
+    profile: true,
     title: "Wallet",
     pageCSS: "wallet",
     showHeader: true,
@@ -766,8 +768,34 @@ export const verifyWalletTopup = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
   }
 
-  await walletController.creditWallet(user_id, Number(amount), "Wallet Top-up");
+  await walletHandler.creditWallet(user_id, Number(amount), "Wallet Top-up");
 
   return sendResponse(res, Responses.walletPayment.SUCCESS);
 });
 
+//
+
+//
+
+export const referralPage = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  const referredUsers = await User.find({ referred_by: user_id }).select(
+    "full_name createdAt",
+  );
+
+  const totalEarned = referredUsers.length * userConstants.REFERRAL_BONUS;
+
+  res.render("user/layouts/profilelayout", {
+    title: "Referral details",
+    pageCSS: "referral",
+    view: "referral",
+    profile: true,
+    referredUsers,
+    totalEarned,
+    referralBonus: userConstants.REFERRAL_BONUS,
+    showHeader: true,
+    showFooter: true,
+    pageJS: "referral.js",
+  });
+});

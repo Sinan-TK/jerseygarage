@@ -1,10 +1,16 @@
 async function registerData() {
+  const btn = document.querySelector(".register-btn");
+  btn.disabled = true;
+
   const email = document.getElementById("email").value.trim();
   const fullName = document.getElementById("fullname").value.trim();
   const password = document.getElementById("password").value.trim();
   const confirmPassword = document
     .getElementById("confirm-password")
     .value.trim();
+  const referralCode =
+    document.getElementById("referralCcode").value.trim() || "";
+
   const errorBox = document.getElementById("registerError");
   const errorText = document.getElementById("registerErrorText");
 
@@ -14,6 +20,7 @@ async function registerData() {
       fullName,
       password,
       confirmPassword,
+      referralCode,
     });
 
     if (res.data.success) {
@@ -25,6 +32,7 @@ async function registerData() {
     }
   } catch (err) {
     const error = err.response?.data;
+    btn.disabled = false;
 
     console.log(error);
 
@@ -54,3 +62,9 @@ confirmTogglePassword.addEventListener("click", () => {
   confirmTogglePassword.classList.toggle("fa-eye");
   confirmTogglePassword.classList.toggle("fa-eye-slash");
 });
+
+const params = new URLSearchParams(window.location.search);
+
+const ref = params.get("ref");
+
+document.getElementById("referralCcode").value = ref;

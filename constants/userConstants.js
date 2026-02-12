@@ -5,3 +5,5 @@ export const OTPPURPOSE = {
   FORGOTPASSWORD: "forget_password",
   CHANGEEMAIL: "ChangeMailAddress",
 };
+
+export const REFERRAL_BONUS = 50;

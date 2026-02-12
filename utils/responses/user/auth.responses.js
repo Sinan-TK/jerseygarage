@@ -64,6 +64,10 @@ export const registerLogic = Object.freeze({
     code: 409,
     message: "Session expired. Please try again!",
   },
+  INVALID_REF_CODE: {
+    code: 400,
+    message: "Invalid referral code",
+  },
   ACCOUNT_CREATED: {
     code: 200,
     message: "OTP sended successfully!",

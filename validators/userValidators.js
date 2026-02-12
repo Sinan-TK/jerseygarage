@@ -43,6 +43,7 @@ export const registerSchema = Joi.object({
   confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
     "any.only": "Passwords do not match",
   }),
+  referralCode: Joi.string().optional().allow("", null),
 });
 
 export const newPassSchema = Joi.object({

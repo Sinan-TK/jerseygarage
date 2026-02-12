@@ -75,13 +75,15 @@ router.get("/orders/invoice/:orderId", userController.downloadInvoice);
 
 router.patch("/orders/order-action", userController.orderCancelReturn);
 
-router.get("/wallet", userController.walletPage);
+router.get("/wallet",Userdetails, userController.walletPage);
 
 router.get("/wallet/data", userController.walletData);
 
 router.post("/wallet/topup", userController.walletTopupOrder);
 
 router.post("/wallet/verify", userController.verifyWalletTopup);
+
+router.get("/referral",Userdetails, userController.referralPage);
 
 router.post("/logout", Userdetails, userController.userLogout);
 

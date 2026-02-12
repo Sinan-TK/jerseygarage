@@ -33,11 +33,23 @@ export const verifyUserLogin = async (email, password) => {
 //=============================================================================
 //=============================================================================
 
-export const emailVerification = async (email) => {
+export const signupVerificationService = async (email, referralCode) => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
     return { error: Responses.registerLogic.USER_FOUND };
+  }
+
+  let referredBy = null;
+
+  if (referralCode) {
+    const code = referralCode.trim().toUpperCase();
+
+    referredBy = await User.findOne({ referral_code: code });
+
+    if (!referredBy) {
+      return { error: Responses.registerLogic.INVALID_REF_CODE };
+    }
   }
 
   await generateOtp(email, "signup", "SignUp OTP. ");
@@ -46,6 +58,7 @@ export const emailVerification = async (email) => {
     data: {
       email,
       purpose: "signup",
+      ...(referredBy && { referredBy: referredBy._id }),
     },
   };
 };

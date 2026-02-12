@@ -361,7 +361,3 @@
   margin: 0;
 }
 
-/* Firefox */
-.modal-body input[type="number"] {
-  -moz-appearance: textfield;
-}

@@ -1,0 +1,126 @@
+<section class="referral-section">
+
+    <!-- Referral Header -->
+    <div class="referral-header">
+        <h2>Referrals</h2>
+    </div>
+
+
+    <!-- Invite Box -->
+    <div class="invite-box">
+
+        <div class="invite-top">
+
+            <div class="invite-icon"><i class="fa-solid fa-gift"></i></div>
+
+            <div>
+                <h3>Invite Friends & Earn Rewards</h3>
+
+                <p>
+                    Get ₹<%= referralBonus %> in your wallet for every friend who signs up
+                    using your referral code!
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- Referral Code -->
+        <div class="referral-code-box">
+
+            <input type="text" id="referralCode" value="<%= userDetails.referral_code %>" readonly />
+
+            <button id="copyBtn"><i class="fa-regular fa-copy"></i></button>
+
+            <button id="shareBtn" class="share-btn">
+                Share Link
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Stats -->
+    <div class="referral-stats two-box">
+
+        <div class="stat-box">
+            <h4>Total Referrals</h4>
+            <p class="stat-value">
+                <%= userDetails.referral_count %>
+            </p>
+        </div>
+
+        <div class="stat-box">
+            <h4>Total Earned</h4>
+            <p class="stat-value">₹<%= totalEarned %>.00</p>
+        </div>
+
+    </div>
+
+
+
+    <!-- History -->
+    <div class="referral-history">
+
+        <h3>Referral History</h3>
+
+        <div class="history-table">
+            <% if(referredUsers.length===0){ %>
+                <div class="no-referrals">
+
+                    <p class="no-referrals-title">
+                        🌟 You haven’t referred anyone yet
+                    </p>
+
+                    <p class="no-referrals-text">
+                        Share your referral code and start earning rewards!
+                    </p>
+
+                </div>
+
+
+                <%}else{%>
+                    <div class="history-head">
+                        <span>Name</span>
+                        <span>Date</span>
+                        <span>Reward</span>
+                    </div>
+
+                    <% referredUsers.forEach((user)=>{ %>
+                        <div class="history-row">
+                            <span>
+                                <%= user.full_name %>
+                            </span>
+                            <span>
+                                <%= new Date(user.createdAt).toLocaleDateString("en-US", { year: "numeric" ,
+                                    month: "short" , day: "numeric" }) %>
+                            </span>
+                            <span class="reward">₹<%= referralBonus %></span>
+                        </div>
+                        <% }) }%>
+
+
+                            <!-- <div class="history-row">
+                                    <span>Mike Johnson</span>
+                                    <span>Oct 12, 2023</span>
+                                    <span class="reward">₹100</span>
+                                </div>
+
+                                <div class="history-row">
+                                    <span>Sarah Williams</span>
+                                    <span>Oct 10, 2023</span>
+                                    <span class="reward">₹100</span>
+                                </div>
+
+                                <div class="history-row">
+                                    <span>David Brown</span>
+                                    <span>Oct 5, 2023</span>
+                                    <span class="reward">₹100</span>
+                                </div> -->
+
+        </div>
+
+    </div>
+
+</section>

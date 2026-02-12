@@ -15,9 +15,12 @@ import * as userValidators from "../../validators/userValidators.js";
 import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import { createUniqueReferralCode } from "../../utils/referralCodeGenerator.js";
 import productBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import * as authServices from "../../services/user/authServices.js";
+import * as walletHandler from "../../utils/walletHandler.js";
+import * as userConstants from "../../constants/userConstants.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -121,11 +124,30 @@ export const otpVerification = wrapAsync(async (req, res) => {
     const userData = req.session.userData;
     const email = req.session.tempEmail;
 
+    const referral_code = await createUniqueReferralCode(userData.fullName);
+
     const newUser = await User.create({
       full_name: userData.fullName,
       email,
       password_hash: userData.password,
+      referral_code,
     });
+
+    if (userData.referredBy) {
+      const referredBy = await User.findById(userData.referredBy);
+
+      referredBy.referral_count = (referredBy.referral_count || 0) + 1;
+
+      referredBy.save();
+
+      await walletHandler.creditWallet(
+        referredBy._id,
+        Number(userConstants.REFERRAL_BONUS),
+        "Referral Bonus",
+      );
+
+      newUser.referred_by = userData.referredBy;
+    }
 
     const wallet = await Wallet.create({
       user: newUser._id,
@@ -190,9 +212,12 @@ export const signupVerification = wrapAsync(async (req, res) => {
     });
   }
 
-  const { email, fullName, password, confirmPassword } = req.body;
+  const { email, fullName, password, confirmPassword, referralCode } = req.body;
 
-  const result = await authServices.emailVerification(email);
+  const result = await authServices.signupVerificationService(
+    email,
+    referralCode,
+  );
 
   if (result?.error) {
     return sendResponse(res, result.error);
@@ -201,6 +226,9 @@ export const signupVerification = wrapAsync(async (req, res) => {
   req.session.userData = {
     fullName,
     password,
+    ...(result.data.referredBy && {
+      referredBy: result.data.referredBy,
+    }),
   };
   req.session.tempEmail = email;
   req.session.otpPurpose = result.data.purpose;
