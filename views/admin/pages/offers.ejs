@@ -176,7 +176,7 @@
         </form>
 
     </div>
-    <!-- Pagination -->     
+    <!-- Pagination -->
     <div class="pagination">
 
     </div>
@@ -309,4 +309,56 @@
         </div>
 
     </div>
+</div>
+
+<!-- Offer Details Modal -->
+<div class="modal-overlay" id="offerDetailsModal">
+
+    <div class="modal-container details-modal">
+
+        <div class="modal-header">
+            <h3>Offer Details</h3>
+            <button class="close-modal" id="closeDetailsModalBtn">&times;</button>
+        </div>
+
+        <div class="details-body">
+
+            <div class="details-row">
+                <label>Offer Name:</label>
+                <span id="detailOfferName"></span>
+            </div>
+
+            <div class="details-row">
+                <label>Offer Type:</label>
+                <span id="detailOfferType" class="offer-type"></span>
+            </div>
+
+            <div class="details-row">
+                <label>Applied To:</label>
+                <div id="detailAppliedTo" class="details-preview"></div>
+            </div>
+
+            <div class="details-row">
+                <label>Discount:</label>
+                <span id="detailDiscount"></span>
+            </div>
+
+            <div class="details-row">
+                <label>Valid Period:</label>
+                <span id="detailDateRange"></span>
+            </div>
+
+            <div class="details-row">
+                <label>Status:</label>
+                <span id="detailStatus" class="active"></span>
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+            <button class="details-cancel-btn" id="closeDetailsBtn">Close</button>
+        </div>
+
+    </div>
+
 </div>

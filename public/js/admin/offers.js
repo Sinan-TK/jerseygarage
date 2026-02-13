@@ -528,3 +528,88 @@ function pagination(data) {
         : ""
     }`;
 }
+
+/* =====================================================
+   OFFER DETAILS MODAL
+===================================================== */
+
+const detailsModal = document.getElementById("offerDetailsModal");
+const closeDetailsModalBtn = document.getElementById("closeDetailsModalBtn");
+const closeDetailsBtn = document.getElementById("closeDetailsBtn");
+
+/* Open Details */
+document.addEventListener("click", function (e) {
+  if (e.target.closest(".details-btn")) {
+    const offerId = e.target.closest(".details-btn").dataset.id;
+
+    const offer = offers.find((o) => o._id === offerId || o.id === offerId);
+    if (!offer) return;
+
+    // Set values
+    document.getElementById("detailOfferName").textContent = offer.name;
+    document.getElementById("detailOfferType").textContent =
+      offer.offerApplyType;
+
+    const discountText =
+      offer.discountType === "percentage"
+        ? `${offer.discountValue}% OFF`
+        : `₹${offer.discountValue} OFF`;
+
+    document.getElementById("detailDiscount").textContent = discountText;
+
+    document.getElementById("detailDateRange").textContent =
+      `${formatDate(offer.startDate)} → ${formatDate(offer.endDate)}`;
+
+    const statusElement = document.getElementById("detailStatus");
+
+    statusElement.textContent = offer.isActive ? "Active" : "Inactive";
+
+    statusElement.classList.remove("active", "inactive");
+
+    statusElement.classList.add(offer.isActive ? "active" : "inactive");
+
+    // Applied To Preview
+    const preview = document.getElementById("detailAppliedTo");
+    preview.innerHTML = "";
+
+    if (offer.offerApplyType === "product") {
+      const selectedProducts = products.filter((p) =>
+        offer.productIds?.includes(p.id || p._id),
+      );
+
+      selectedProducts.forEach((p) => {
+        const span = document.createElement("span");
+        span.textContent = p.name;
+        preview.appendChild(span);
+      });
+    } else {
+      const selectedCategories = categories.filter((c) =>
+        offer.categoryIds?.includes(c.id || c._id),
+      );
+
+      selectedCategories.forEach((c) => {
+        const span = document.createElement("span");
+        span.textContent = c.name;
+        preview.appendChild(span);
+      });
+    }
+
+    detailsModal.style.display = "flex";
+  }
+});
+
+/* Close Modal */
+closeDetailsModalBtn?.addEventListener("click", () => {
+  detailsModal.style.display = "none";
+});
+
+closeDetailsBtn?.addEventListener("click", () => {
+  detailsModal.style.display = "none";
+});
+
+/* Close on outside click */
+window.addEventListener("click", (e) => {
+  if (e.target === detailsModal) {
+    detailsModal.style.display = "none";
+  }
+});

@@ -491,3 +491,70 @@
     border: 1px solid black;
     cursor: pointer;
 }
+
+.details-modal {
+    max-width: 500px;
+}
+
+.details-body {
+    padding: 15px 5px;
+}
+
+.details-row {
+    margin-bottom: 12px;
+}
+
+.details-row label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.details-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.offer-type {
+    background: #0285c76b;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.details-preview span {
+    background: #d0d0d0a2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+#detailStatus {
+    font-weight: 600;
+}
+
+.details-cancel-btn {
+    background: #000000;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#detailStatus.active {
+  color: #16a34a;
+  padding: 2px 8px;
+  background: #16a34a5f;
+  border: 1px solid #16a34a;
+  border-radius: 10px;
+}
+
+#detailStatus.inactive {
+  color: #dc2626;
+  padding: 2px 8px;
+  background: #dc262649;
+  border: 1px solid #dc2626;
+  border-radius: 10px;
+}
