@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const categorySchema = Joi.object({
+const categorySchema = Joi.object({
   name: Joi.string().required().messages({
     "string.empty": "Category name is required",
   }),
@@ -11,5 +11,7 @@ export const categorySchema = Joi.object({
 
   color: Joi.string().required().messages({
     "string.empty": "Color is required",
-  })
+  }),
 });
+
+export default categorySchema;

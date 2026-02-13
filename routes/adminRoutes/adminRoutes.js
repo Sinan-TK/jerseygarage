@@ -3,9 +3,10 @@ import * as adminController from "../../controllers/admin/adminController.js";
 import * as adminMiddleware from "../../middlewares/adminMiddleware.js";
 import upload from "../../middlewares/multer.js";
 import { adminLayout } from "../../middlewares/layoutMiddleware.js";
-import adminUserRoutes from "../adminRoutes/userRoutes.js";
-import categoryRoutes from "../adminRoutes/categoryRoutes.js";
-import orderRoutes from "../adminRoutes/orderRoutes.js";
+import adminUserRoutes from "./userRoutes.js";
+import categoryRoutes from "./categoryRoutes.js";
+import orderRoutes from "./orderRoutes.js";
+import offerRoutes from "./offerRoutes.js"
 import productRoutes from "../adminRoutes/productRoutes.js";
 
 const router = express.Router();
@@ -29,10 +30,7 @@ router.use('/products',productRoutes);
 
 router.use("/orders",orderRoutes);
 
-
-
-
-router.get("/offers",adminController.featureNotAvailable);
+router.use("/offers",offerRoutes);
 
 
 router.get("/payments",adminController.featureNotAvailable);
