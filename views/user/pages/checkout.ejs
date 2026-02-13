@@ -12,7 +12,8 @@
 
             <% addresses.forEach((address)=>{ %>
                 <label class="radio-card <%= address.is_default ? 'active':'' %>">
-                    <input type="radio" name="address" value="<%= address._id %>" <%=address.is_default ? 'checked' :'' %>/>
+                    <input type="radio" name="address" value="<%= address._id %>" <%=address.is_default ? 'checked' :''
+                        %>/>
                     <div class="radio-content">
 
                         <div class="title">
@@ -54,42 +55,27 @@
         <section class="card">
             <h2>Payment Method</h2>
 
-            <!-- <label class="radio-card active">
-                    <input type="radio" name="payment" checked />
-                    <div class="radio-content">
-                        <div class="title">Credit / Debit Card</div>
-                        <p class="muted">All major cards accepted</p>
-                    </div>
-                </label>
+            <label class="radio-card">
+                <input type="radio" name="payment" value="Razorpay" />
+                <div class="radio-content">
+                    <div class="title">Razorpay</div>
+                    <p class="muted">Razorpay UPI</p>
+                </div>
+            </label>
 
-                <label class="radio-card">
-                    <input type="radio" name="payment" />
-                    <div class="radio-content">
-                        <div class="title">UPI</div>
-                        <p class="muted">Google Pay, PhonePe, Paytm</p>
-                    </div>
-                </label>
-
-                <label class="radio-card">
-                    <input type="radio" name="payment" />
-                    <div class="radio-content">
-                        <div class="title">Net Banking</div>
-                        <p class="muted">Pay directly from your bank</p>
-                    </div>
-                </label>
-
-                <label class="radio-card">
-                    <input type="radio" name="payment" />
-                    <div class="radio-content">
-                        <div class="title">Wallets</div>
-                        <p class="muted">PayPal, Amazon Pay & more</p>
-                    </div>
-                </label> -->
+            <label class="radio-card">
+                <input type="radio" name="payment" value="Wallet" />
+                <div class="radio-content">
+                    <div class="title">Wallet</div>
+                    <p class="muted">Wallet Balance</p>
+                </div>
+            </label>
 
             <label class="radio-card">
                 <input type="radio" name="payment" value="COD" />
                 <div class="radio-content">
-                    <div class="title">Cash on Delivery</div>
+                    <div class="title">COD</div>
+                    <p class="muted">Cash on Delivery</p>
                 </div>
             </label>
         </section>
@@ -100,66 +86,66 @@
     <!-- RIGHT SECTION -->
     <aside class="checkout-right">
         <div class="summary-card">
-           <% if(warning.length !==0){ %>
-              <div class="warning-message">
-                <h3><i class="fa-solid fa-triangle-exclamation"></i>warning</h3>
-                <ul>
-                  <% warning.forEach((warn)=>{ %>
-                    <li>
-                      <%= warn %>
-                    </li>
-                    <% }) %>
-                </ul>
-              </div>
-              <% } %>
-
-            <h3>Product Details</h3>
-
-            <% items.forEach((item)=>{%>
-
-                <div class="product">
-                    <div class="product-img">
-                        <img src="<%= item.image %>" />
-                    </div>
-                    <div>
-                        <p class="product-name">
-                            <%= item.name %>
-                        </p>
-                        <p class="muted">
-                            <%= item.size %>
-                        </p>
-                        <p class="muted">
-                           Quantity: <%= item.quantity %>
-                        </p>
-                        <strong>₹<%= item.subtotal %>.00</strong>
-                    </div>
+            <% if(warning.length !==0){ %>
+                <div class="warning-message">
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i>warning</h3>
+                    <ul>
+                        <% warning.forEach((warn)=>{ %>
+                            <li>
+                                <%= warn %>
+                            </li>
+                            <% }) %>
+                    </ul>
                 </div>
+                <% } %>
 
-                <% }) %>
+                    <h3>Product Details</h3>
 
-                    <div class="divider"></div>
+                    <% items.forEach((item)=>{%>
 
-                    <p class="delivery">Estimated Delivery: <strong>Oct 15 - Oct 18</strong></p>
+                        <div class="product">
+                            <div class="product-img">
+                                <img src="<%= item.image %>" />
+                            </div>
+                            <div>
+                                <p class="product-name">
+                                    <%= item.name %>
+                                </p>
+                                <p class="muted">
+                                    <%= item.size %>
+                                </p>
+                                <p class="muted">
+                                    Quantity: <%= item.quantity %>
+                                </p>
+                                <strong>₹<%= item.subtotal %>.00</strong>
+                            </div>
+                        </div>
 
-                    <div class="divider"></div>
+                        <% }) %>
 
-                    <h3>Order Summary</h3>
+                            <div class="divider"></div>
 
-                    <div class="row">
-                        <span>Subtotal (<%= items.length %> items)</span>
-                        <span>₹<%= subtotal %>.00</span>
-                    </div>
-                    <div class="row">
-                        <span>Shipping</span>
-                        <span>₹50.00</span>
-                    </div>
+                            <p class="delivery">Estimated Delivery: <strong>Oct 15 - Oct 18</strong></p>
 
-                    <div class="row total">
-                        <span>Total</span>
-                        <span>₹<%= total %>.00</span>
-                    </div>
+                            <div class="divider"></div>
 
-                    <!-- <div class="promo">
+                            <h3>Order Summary</h3>
+
+                            <div class="row">
+                                <span>Subtotal (<%= items.length %> items)</span>
+                                <span>₹<%= subtotal %>.00</span>
+                            </div>
+                            <div class="row">
+                                <span>Shipping</span>
+                                <span>₹50.00</span>
+                            </div>
+
+                            <div class="row total">
+                                <span>Total</span>
+                                <span>₹<%= total %>.00</span>
+                            </div>
+
+                            <!-- <div class="promo">
                             <input type="text" placeholder="SAVE20" />
                             <button>APPLY</button>
                         </div> -->

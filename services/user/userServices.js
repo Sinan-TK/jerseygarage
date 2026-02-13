@@ -16,7 +16,12 @@ import * as handleReturnCancel from "../../utils/handleReturnCancel.js";
 // ======================================================================
 // CART PAGE RENDER
 // ======================================================================
-export const cartQuantityService = async (cart) => {
+export const cartQuantityService = async ({
+  cart,
+  variant_id,
+  value,
+  quantity,
+}) => {
   if (!variant_id || !["plus", "minus"].includes(value)) {
     return { error: Responses.cartQuantity.INVALID };
   }

@@ -9,6 +9,7 @@ document.querySelectorAll(".qty").forEach((qtyBox) => {
   let quantity = parseInt(valueEl.innerText);
 
   const variant_id = valueEl.dataset.variant;
+  console.log(variant_id)
   const cartItem = qtyBox.closest(".cart-row");
   const itemSubtotal = cartItem.querySelector(".subtotal");
 

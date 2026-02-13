@@ -69,7 +69,7 @@ export const cartQuantity = wrapAsync(async (req, res) => {
   const shippingCharge = userConstants.SHIPPING_CHARGE;
   const cart = await Cart.findOne({ user_id });
 
-  const result = await userServices.cartQuantityService(cart, { ...req.body });
+  const result = await userServices.cartQuantityService({cart,...req.body });
 
   if (result?.error) {
     return sendResponse(res, result.error);
