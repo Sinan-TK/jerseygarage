@@ -45,7 +45,10 @@ export const addCategory = wrapAsync(async (req, res) => {
 
   const { name, description, color } = req.body;
 
-  const existingCategory = await Category.findOne({ name });
+  const existingCategory = await Category.findOne({
+    name: { $regex: `^${name}$`, $options: "i" },
+  });
+
   if (existingCategory) {
     return sendResponse(res, Responses.categoryRes.CATEGORY_EXIST);
   }
@@ -62,10 +65,10 @@ export const blockCategory = wrapAsync(async (req, res) => {
   const updatedData = await Category.findByIdAndUpdate(
     id,
     { is_active: false },
-    { new: true }
+    { new: true },
   );
 
-  await Product.updateMany({category:id},{ $set: { is_active: false } });
+  await Product.updateMany({ category: id }, { $set: { is_active: false } });
 
   return sendResponse(res, {
     ...Responses.categoryStatus.CATEGORY_BLOCK,
@@ -81,10 +84,10 @@ export const unblockCategory = wrapAsync(async (req, res) => {
   const updatedData = await Category.findByIdAndUpdate(
     id,
     { is_active: true },
-    { new: true }
+    { new: true },
   );
 
-  await Product.updateMany({category:id},{ $set: { is_active: true } });
+  await Product.updateMany({ category: id }, { $set: { is_active: true } });
 
   return sendResponse(res, {
     ...Responses.categoryStatus.CATEGORY_UNBLOCK,
@@ -100,9 +103,6 @@ export const editCategory = wrapAsync(async (req, res) => {
   const id = new ObjectId(req.params.id);
   const { name, description, color } = req.body;
 
-  console.log(name, description, color);
-  console.log(id);
-
   const { error } = categorySchema.validate(req.body);
 
   if (error) {
@@ -113,7 +113,7 @@ export const editCategory = wrapAsync(async (req, res) => {
   }
 
   const existingCategory = await Category.findOne({
-    name: { $regex: name, $options: "i" },
+    name: { $regex: `^${name}$`, $options: "i" },
     _id: { $ne: id },
   });
 
@@ -130,7 +130,7 @@ export const editCategory = wrapAsync(async (req, res) => {
     },
     {
       new: true,
-    }
+    },
   );
 
   return sendResponse(res, {
