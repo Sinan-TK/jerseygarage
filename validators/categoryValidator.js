@@ -8,10 +8,7 @@ const categorySchema = Joi.object({
   description: Joi.string().required().messages({
     "string.empty": "Category description is required",
   }),
-
-  color: Joi.string().required().messages({
-    "string.empty": "Color is required",
-  }),
+  
 });
 
 export default categorySchema;

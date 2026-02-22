@@ -11,22 +11,22 @@ import * as Responses from "../../utils/responses/admin/category.response.js";
 // 1. GET CATEGORY LIST (ADMIN CATEGORIES PAGE)
 // ======================================================================
 export const getCategories = wrapAsync(async (req, res) => {
-  let page = req.query.page || 1;
+  // let page = req.query.page || 1;
 
-  const result = await paginate(Category, page, 8);
+  // const result = await paginate(Category, page, 8);
 
-  const products = await Product.find({});
+  // const products = await Product.find({});
 
   res.render("admin/pages/categories", {
     title: "Categories",
     showLayout: true,
     cssFile: "/css/admin/categories.css",
-    categories: result.data,
-    pagination: result.meta,
+    // categories: result.data,
+    // pagination: result.meta,
     pageJS: "categories.js",
-    products,
-    categoryStatus: req.query.categoryStatus || "all",
-    searchContent: req.query.searchContent,
+    // products,
+    // categoryStatus: req.query.categoryStatus || "all",
+    // searchContent: req.query.searchContent,
   });
 });
 
@@ -43,7 +43,7 @@ export const addCategory = wrapAsync(async (req, res) => {
     });
   }
 
-  const { name, description, color } = req.body;
+  const { name, description } = req.body;
 
   const existingCategory = await Category.findOne({
     name: { $regex: `^${name}$`, $options: "i" },
@@ -53,7 +53,8 @@ export const addCategory = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.categoryRes.CATEGORY_EXIST);
   }
 
-  await Category.create({ name, description, color });
+  await Category.create({ name, description });
+
   return sendResponse(res, Responses.categoryRes.CATEGORY_ADDED);
 });
 
@@ -101,7 +102,7 @@ export const unblockCategory = wrapAsync(async (req, res) => {
 
 export const editCategory = wrapAsync(async (req, res) => {
   const id = new ObjectId(req.params.id);
-  const { name, description, color } = req.body;
+  const { name, description } = req.body;
 
   const { error } = categorySchema.validate(req.body);
 
@@ -121,22 +122,12 @@ export const editCategory = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.categoryRes.CATEGORY_EXIST);
   }
 
-  const updatedCategory = await Category.findByIdAndUpdate(
-    id,
-    {
-      name,
-      description,
-      color,
-    },
-    {
-      new: true,
-    },
-  );
-
-  return sendResponse(res, {
-    ...Responses.categoryRes.CATEGORY_EDITED,
-    data: updatedCategory,
+  await Category.findByIdAndUpdate(id, {
+    name,
+    description,
   });
+
+  return sendResponse(res, Responses.categoryRes.CATEGORY_EDITED);
 });
 
 // ======================================================================
@@ -144,32 +135,25 @@ export const editCategory = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const searchCategory = wrapAsync(async (req, res) => {
-  const search = req.query.searchContent || "";
-  const status = req.query.categoryStatus || "all";
-
-  console.log(search, status);
+  const { page, search, status } = req.query;
 
   let filter = {};
 
-  if (search) {
-    filter.$or = [{ name: { $regex: search, $options: "i" } }];
+  if (search?.trim()) {
+    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    filter.name = { $regex: escapedSearch, $options: "i" };
   }
 
   if (status === "blocked") filter.is_active = false;
   if (status === "active") filter.is_active = true;
 
-  let page = req.query.page || 1;
-
   const result = await paginate(Category, page, 8, filter);
+  const products = await Product.find();
 
-  res.render("admin/pages/categories", {
-    title: "Categories",
-    showLayout: true,
-    cssFile: "/css/admin/categories.css",
-    categories: result.data,
-    pagination: result.meta,
-    pageJS: "categories.js",
-    categoryStatus: req.query.categoryStatus || "all",
-    searchContent: req.query.searchContent,
+  return sendResponse(res, {
+    code: 200,
+    message: "data rendered successfully",
+    data: { categories: result.data, pagination: result.meta, products },
   });
 });

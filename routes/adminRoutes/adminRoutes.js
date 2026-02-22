@@ -6,6 +6,7 @@ import { adminLayout } from "../../middlewares/layoutMiddleware.js";
 import adminUserRoutes from "./userRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
 import orderRoutes from "./orderRoutes.js";
+import couponRoutes from "./couponRoutes.js";
 import offerRoutes from "./offerRoutes.js"
 import productRoutes from "../adminRoutes/productRoutes.js";
 
@@ -31,6 +32,8 @@ router.use('/products',productRoutes);
 router.use("/orders",orderRoutes);
 
 router.use("/offers",offerRoutes);
+
+router.use("/coupons",couponRoutes);
 
 
 router.get("/payments",adminController.featureNotAvailable);

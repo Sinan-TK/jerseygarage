@@ -14,12 +14,6 @@ const categorySchema = new mongoose.Schema(
       required: true,
     },
 
-    color: {
-      type: String,
-      enum: ["#dfeafe", "#f4e9ff", "#e2ffe9", "#fff5c6", "#ffe1e1", "#f7f7f7"],
-      required: true,
-    },
-
     is_active: {
       type: Boolean,
       default: true,

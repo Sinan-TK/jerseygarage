@@ -111,7 +111,7 @@ body {
   border-radius: 10px;
   list-style: none;
   padding: 0;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   z-index: 150;
 }
 
@@ -147,12 +147,13 @@ thead th {
 #userTableBody tr {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+th,
 td {
-  padding: 14px 65px;
-  font-size: 14px;
+  padding: 14px 18px;
+  text-align: left;
 }
 
 .user-info {
@@ -233,7 +234,7 @@ td {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
   display: none;
   align-items: center;
@@ -246,7 +247,7 @@ td {
   padding: 28px;
   border-radius: 14px;
   text-align: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
 .modal-content h3 {
@@ -254,8 +255,13 @@ td {
   font-weight: 800;
 }
 
-.red-title { color: #d9534f; }
-.green-title { color: #28a745; }
+.red-title {
+  color: #d9534f;
+}
+
+.green-title {
+  color: #28a745;
+}
 
 .modal-buttons {
   display: flex;
@@ -280,6 +286,12 @@ td {
 
 /* Responsive */
 @media (max-width: 880px) {
-  .users-page { padding: 20px; }
-  .users-table { display: block; overflow-x: auto; }
+  .users-page {
+    padding: 20px;
+  }
+
+  .users-table {
+    display: block;
+    overflow-x: auto;
+  }
 }

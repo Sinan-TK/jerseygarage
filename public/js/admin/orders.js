@@ -78,14 +78,12 @@ async function loadFilter(page) {
 
       renderOrders(res.data.data);
     } catch (err) {
-      
       const error = err.response?.data;
       console.log(error);
       toastr.error(error?.message || "Something went wrong", "Failed");
     }
   }
 }
-
 
 function clearFilter() {
   window.location.href = "/admin/orders";
