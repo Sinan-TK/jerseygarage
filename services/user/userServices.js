@@ -12,6 +12,7 @@ import * as Responses from "../../utils/responses/user/user.response.js";
 import * as userValidators from "../../validators/userValidators.js";
 import * as userConstants from "../../constants/userConstants.js";
 import * as handleReturnCancel from "../../utils/handleReturnCancel.js";
+import Wishlist from "../../models/wishlistModel.js";
 
 // ======================================================================
 // CART PAGE RENDER
@@ -280,6 +281,15 @@ export const addToCartService = async (
 
   cart.total_amount = total;
   await cart.save();
+
+  const wishlist = await Wishlist.findOne({ user_id });
+  if (!wishlist) return { items_count, success: true };
+
+  wishlist.items = wishlist.items.filter(
+    (item) => item.variant_id.toString() !== variant_id.toString(),
+  );
+
+  wishlist.save();
 
   return { items_count, success: true };
 };

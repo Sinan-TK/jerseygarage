@@ -3,8 +3,8 @@ import session from "express-session";
 import nocache from "nocache";
 import passport from "passport";
 
-import authRoutes from "../routes/authRoutes.js";
-import userRoutes from "../routes/userRoutes.js";
+import authRoutes from "../routes/userRoutes/authRoutes.js";
+import userRoutes from "../routes/userRoutes/userRoutes.js";
 
 const userApp = express();
 

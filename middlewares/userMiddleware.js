@@ -2,14 +2,22 @@ import express from "express";
 import sendResponse from "../utils/sendResponse.js";
 import Cart from "../models/cartModel.js";
 import wrapAsync from "../utils/wrapAsync.js";
-// import { message } from "statuses";
+import User from "../models/userModel.js";
 
-// const router = express.Router();
-
-// router.use((req, res, next) => {
-//   res.locals.user = req.session.user || null;
-//   next();
-// });
+export const Userdetails = async (req, res, next) => {
+  try {
+    const userId = req.session.user.id;
+    const userDeatils = await User.findById(userId)
+      .populate("wallet", "balance")
+      .lean();
+    res.locals.userDetails = userDeatils;
+    next();
+  } catch (error) {
+    console.error("Profile User Detail middleware error:", error);
+    res.locals.userDetails = [];
+    next();
+  }
+};
 
 export const userNotFound = (req, res, next) => {
   if (!req.session.user) {

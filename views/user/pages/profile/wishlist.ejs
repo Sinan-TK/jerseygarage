@@ -4,41 +4,15 @@
   <div class="wishlist-header">
     <h2>My Wishlist</h2>
     <span class="item-count">
-      <%= products.length %> items
+      <span id="items-count">0</span> items
     </span>
   </div>
-  <% if(products.length===0){ %>
-    <div class="empty-wishlist">
-      <p>Your wishlist is empty</p>
-    </div>
-    <% }else{ %>
-      <!-- WISHLIST GRID -->
-      <div class="wishlist-grid">
+  <div class="empty-wishlist">
+    <p>Your wishlist is empty</p>
+  </div>
+  <div class="wishlist-grid">
 
-        <!-- CARD -->
-        <% products.forEach((product)=>{ %>
-          <a href="/product/<%= product.variant_id.product_id._id %>">
-            <div class="wishlist-card">
-              <button class="remove-btn" data-item="<%= product.variant_id._id %>">×</button>
-
-              <div class="product-img"><img src="<%= product.variant_id.product_id.images[0] %>"></div>
-
-              <div class="product-info">
-                <h4>
-                  <%= product.variant_id.product_id.name %>
-                </h4>
-                <p class="variant">Size: <%= product.variant_id.size %>
-                </p>
-                <p class="price">₹<%= product.variant_id.base_price %>
-                </p>
-              </div>
-
-              <button data-variant="<%= product.variant_id._id %>" data-product="<%= product.variant_id.product_id._id %>"  class="cart-btn add-to-cart-btn">Add to Cart</button>
-            </div>
-          </a>
-          <%})%>
-      </div>
-      <%}%>
+  </div>
 
 
 

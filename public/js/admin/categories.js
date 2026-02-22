@@ -19,9 +19,7 @@ function openModalProductList(btn) {
 
   const container = document.querySelector(".modal-products");
   container.innerHTML = "";
-  console.log(1);
   const catProducts = products.filter((p) => p.category === category._id);
-  console.log(2);
   if (catProducts.length === 0) {
     container.innerHTML = `
     <div class="no-products">

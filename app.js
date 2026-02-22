@@ -19,11 +19,6 @@ import toastHandler from "./middlewares/toastHandler.js";
 import googlePassportConfig from "./config/passport.js";
 googlePassportConfig(); // REQUIRED
 
-// Routes imports
-import adminRoutes from "./routes/adminRoutes/adminRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-
 //session apps user and admin
 import userApp from "./apps/userApp.js";
 import adminApp from "./apps/adminApp.js";
