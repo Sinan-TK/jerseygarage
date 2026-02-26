@@ -142,26 +142,34 @@
   font-size: 18px;
 }
 
-.promo {
+.promo-dropdown {
   display: flex;
-  margin-top: 12px;
+  gap: 10px;
+  align-items: center;
 }
 
-.promo input {
+.promo-dropdown select {
   flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px 0 0 6px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
 }
 
-.promo button {
+.promo-dropdown button {
   padding: 10px 16px;
+  border-radius: 6px;
   border: none;
   background: #000;
   color: #fff;
-  border-radius: 0 6px 6px 0;
+  font-weight: 600;
+  cursor: pointer;
 }
 
+.promo-dropdown button:hover {
+  opacity: 0.8;
+}
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .checkout-container {

@@ -39,7 +39,7 @@ const variantSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Prevent duplicate size variants for same product

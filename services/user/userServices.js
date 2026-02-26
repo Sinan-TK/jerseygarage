@@ -1,6 +1,6 @@
 import Cart from "../../models/cartModel.js";
 import User from "../../models/userModel.js";
-import Variant from "../../models/varientModel.js";
+import Variant from "../../models/variantModel.js";
 import Address from "../../models/addressModel.js";
 import Order from "../../models/orderModel.js";
 import Otp from "../../models/otpModel.js";
@@ -13,6 +13,8 @@ import * as userValidators from "../../validators/userValidators.js";
 import * as userConstants from "../../constants/userConstants.js";
 import * as handleReturnCancel from "../../utils/handleReturnCancel.js";
 import Wishlist from "../../models/wishlistModel.js";
+import * as offerCalculator from "../../utils/offerApply.js";
+import gstCalculator from "../../utils/gstCalculator.js";
 
 // ======================================================================
 // CART PAGE RENDER
@@ -55,22 +57,14 @@ export const cartQuantityService = async ({
     }
   }
 
-  let total = 0;
-  let itemTotal = 0;
-  for (const cartItem of cart.items) {
-    const variant = await Variant.findById(cartItem.variant_id);
-    if (variant._id.toString() === variant_id) {
-      itemTotal = variant.base_price * cartItem.quantity;
-    }
-    total += variant.base_price * cartItem.quantity;
-  }
+  const result = await offerCalculator.checkOfferApply(cart.items, variant_id);
 
-  cart.total_amount = total;
+  cart.total_amount = result.total;
   await cart.save();
 
   return {
     quantity: item?.quantity || 0,
-    itemTotal,
+    itemTotal: result.itemTotal,
     subtotal: cart.total_amount,
     total: userConstants.SHIPPING_CHARGE + cart.total_amount,
   };
@@ -215,12 +209,14 @@ export const editPasswordSerive = async (body, user_id) => {
 export const addToCartService = async (
   product_id,
   variant_id,
-  quantity,
+  quantityValue,
   user_id,
 ) => {
-  if (!variant_id || !quantity || quantity < 1) {
+  if (!variant_id || !quantityValue || quantityValue < 1) {
     return { error: Responses.addToCart.INVALID };
   }
+
+  const quantity = Number(quantityValue);
 
   const variant = await Variant.findById(variant_id);
 
@@ -321,13 +317,9 @@ export const deleteCartItemService = async ({ variant_id, user_id }) => {
     (item) => item.variant_id.toString() !== variant_id,
   );
 
-  let total = 0;
-  for (const item of cart.items) {
-    const variant = await Variant.findById(item.variant_id);
-    total += variant.base_price * item.quantity;
-  }
+  const result = await offerCalculator.deleteCartOffer(cart.items);
 
-  cart.total_amount = total;
+  cart.total_amount = result.total;
   await cart.save();
 
   return {
@@ -372,6 +364,10 @@ export const placeOrderService = async ({
 
   const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
 
+  const items = await offerCalculator.applyOffer(checkoutItems);
+
+  const gstAmount = await gstCalculator(items);
+
   if (warning.length > 0) {
     return {
       error: {
@@ -382,16 +378,13 @@ export const placeOrderService = async ({
     };
   }
 
-  if (!checkoutItems.length) {
+  if (!items.length) {
     return { error: Responses.placeOrder.NO_ITEMS };
   }
 
-  const itemsPrice = checkoutItems.reduce(
-    (sum, item) => sum + item.subtotal,
-    0,
-  );
+  const itemsPrice = items.reduce((sum, item) => sum + item.subtotal, 0);
 
-  const totalPrice = itemsPrice + userConstants.SHIPPING_CHARGE;
+  const totalPrice = itemsPrice + userConstants.SHIPPING_CHARGE + gstAmount ;
 
   let paymentStatus = "Pending";
   let paidAt = null;
@@ -408,7 +401,7 @@ export const placeOrderService = async ({
     paidAt = Date.now();
   }
 
-  const products = checkoutItems.map((item) => {
+  const products = items.map((item) => {
     return {
       name: item.name,
       product_id: item.product_id,
@@ -418,7 +411,9 @@ export const placeOrderService = async ({
       subtotal: item.subtotal,
       image: item.image,
       variant_id: item.variant_id,
-      subtotal: item.subtotal,
+      gst_rate: item.gst_rate,
+      unit_gst: item.unit_gst,
+      total_gst: item.total_gst,
     };
   });
 
@@ -447,12 +442,13 @@ export const placeOrderService = async ({
 
     itemsPrice,
     shippingCharge: userConstants.SHIPPING_CHARGE,
+    totalGST: gstAmount,
     totalPrice,
 
     orderStatus: "Placed",
   });
 
-  for (const item of checkoutItems) {
+  for (const item of items) {
     await Variant.updateOne(
       { _id: item.variant_id },
       { $inc: { stock: -item.quantity } },

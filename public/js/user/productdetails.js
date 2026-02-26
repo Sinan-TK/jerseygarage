@@ -72,8 +72,8 @@ sizeButtons.forEach((btn) => {
 
   // click handler
   btn.addEventListener("click", () => {
-    normalPriceEl.textContent = `₹${variant.normal_price}`;
-    basePriceEl.textContent = `₹${variant.base_price}`;
+    normalPriceEl.textContent = `₹${variant.offer_price? variant.base_price : variant.normal_price}`;
+    basePriceEl.textContent = `₹${variant.offer_price? variant.offer_price :variant.base_price}`;
     stock.textContent = `Only ${variant.stock} left in stock`;
 
     sizeButtons.forEach((b) => b.classList.remove("active"));

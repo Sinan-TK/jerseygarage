@@ -46,7 +46,9 @@
                     <label class="radio-card" onclick="openAddAddressModal()">
                         <input type="radio" name="address" />
                         <div class="radio-content">
-                            <div class="title">Use a different address</div>
+                            <div class="title">
+                                <%= addresses.length===0?"Add address": "Use a different address" %>
+                            </div>
                         </div>
                     </label>
         </section>
@@ -117,7 +119,7 @@
                                 <p class="muted">
                                     Quantity: <%= item.quantity %>
                                 </p>
-                                <strong>₹<%= item.subtotal %>.00</strong>
+                                <strong>₹<%= item.unit_price %>.00</strong>
                             </div>
                         </div>
 
@@ -133,22 +135,32 @@
 
                             <div class="row">
                                 <span>Subtotal (<%= items.length %> items)</span>
-                                <span>₹<%= subtotal %>.00</span>
+                                <span>₹<%= (subtotal).toFixed(2) %></span>
                             </div>
                             <div class="row">
                                 <span>Shipping</span>
-                                <span>₹50.00</span>
+                                <span>₹<%= (shippingCharge).toFixed(2) %></span>
+                            </div>
+                            <div class="row">
+                                <span>GST</span>
+                                <span>₹<%= (gstAmount).toFixed(2) %></span>
                             </div>
 
                             <div class="row total">
                                 <span>Total</span>
-                                <span>₹<%= total %>.00</span>
+                                <span>₹<%= (total).toFixed(2) %></span>
                             </div>
 
-                            <!-- <div class="promo">
-                            <input type="text" placeholder="SAVE20" />
-                            <button>APPLY</button>
-                        </div> -->
+                            <div class="promo-dropdown">
+                                <select id="promoSelect">
+                                    <option value="">Select Coupon</option>
+                                    <option value="SAVE10">SAVE10</option>
+                                    <option value="SAVE20">SAVE20</option>
+                                    <option value="FLAT100">FLAT100</option>
+                                </select>
+
+                                <button id="applyPromoBtn">APPLY</button>
+                            </div>
 
         </div>
     </aside>

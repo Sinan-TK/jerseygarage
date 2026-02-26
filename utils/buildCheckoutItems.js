@@ -1,5 +1,5 @@
 import Product from "../models/productModel.js";
-import Variant from "../models/varientModel.js";
+import Variant from "../models/variantModel.js";
 import sendResponse from "./sendResponse.js";
 import * as Responses from "../utils/responses/user/user.response.js";
 
@@ -32,6 +32,7 @@ const buildCheckoutItems = async (items) => {
     checkoutItems.push({
       product_id: product._id,
       variant_id: variant._id,
+      category: product.category,
 
       name: product.name,
       image: product.images?.[0],

@@ -4,7 +4,7 @@
 
     <!-- Breadcrumb -->
     <div class="breadcrumb">
-        <span>Orders</span>
+        <span><a href="/admin/orders">Orders</a></span>
         <span class="divider">/</span>
         <span class="active">
             <%= order.orderId %>
@@ -43,6 +43,7 @@
                         <tr>
                             <th>Product</th>
                             <th>Unit Price</th>
+                            <th>GST rate</th>
                             <th>Total</th>
                             <th>Action</th>
                         </tr>
@@ -68,7 +69,8 @@
 
                                 <td>₹<%= product.price %> × <%= product.quantity %>
                                 </td>
-                                <td>₹<%= product.subtotal %>
+                                <td><%= product.gst_rate %>% (₹<%= product.unit_gst%> × <%= product.quantity %>)</td>
+                                <td>₹<%= (product.subtotal).toFixed(2) %>
                                 </td>
                                 <td><span class="order-badge">
                                         <%= product.status %>
@@ -88,24 +90,24 @@
 
                 <div class="finance-row">
                     <span>Subtotal</span>
-                    <span id="subTotal">₹<%= order.itemsPrice %>.00</span>
+                    <span id="subTotal">₹<%= (order.itemsPrice).toFixed(2) %></span>
                 </div>
 
                 <div class="finance-row">
                     <span>Shipping</span>
-                    <span id="shipping">₹<%= order.shippingCharge %>.00</span>
+                    <span id="shipping">₹<%= (order.shippingCharge).toFixed(2) %></span>
                 </div>
 
-                <div class="finance-row discount">
-                    <span>Discount</span>
-                    <span id="discount">₹0.00</span>
+                <div class="finance-row">
+                    <span>GST</span>
+                    <span id="discount">₹<%= (order.totalGST).toFixed(2) %></span>
                 </div>
 
                 <hr>
 
                 <div class="finance-row total">
                     <span>Grand Total</span>
-                    <span id="grandTotal">₹<%= order.totalPrice %>.00</span>
+                    <span id="grandTotal">₹<%= (order.totalPrice).toFixed(2) %></span>
                 </div>
             </div>
 

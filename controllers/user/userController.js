@@ -5,7 +5,7 @@ import sendResponse from "../../utils/sendResponse.js";
 import addressValidators from "../../validators/addressValidators.js";
 import User from "../../models/userModel.js";
 import Address from "../../models/addressModel.js";
-import Variant from "../../models/varientModel.js";
+import Variant from "../../models/variantModel.js";
 import Cart from "../../models/cartModel.js";
 import Product from "../../models/productModel.js";
 import Otp from "../../models/otpModel.js";
@@ -20,7 +20,9 @@ import Wallet from "../../models/walletModel.js";
 import * as userConstants from "../../constants/userConstants.js";
 import * as userServices from "../../services/user/userServices.js";
 import * as walletHandler from "../../utils/walletHandler.js";
+import { applyOffer } from "../../utils/offerApply.js";
 import crypto from "crypto";
+import gstCalculator from "../../utils/gstCalculator.js";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -43,6 +45,13 @@ export const cartRender = wrapAsync(async (req, res) => {
 
   const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
 
+  const products = await applyOffer(checkoutItems);
+
+  const total = products.reduce((sum, item) => sum + item.subtotal, 0);
+
+  cart.total_amount = total;
+  cart.save();
+
   const priceDetails = {
     subtotal: cart.total_amount,
     total: userConstants.SHIPPING_CHARGE + cart.total_amount,
@@ -55,7 +64,7 @@ export const cartRender = wrapAsync(async (req, res) => {
     showHeader: true,
     showFooter: true,
     pageJS: "cart.js",
-    products: checkoutItems,
+    products,
     warning,
     priceDetails,
   });
@@ -68,7 +77,7 @@ export const cartQuantity = wrapAsync(async (req, res) => {
   const shippingCharge = userConstants.SHIPPING_CHARGE;
   const cart = await Cart.findOne({ user_id });
 
-  const result = await userServices.cartQuantityService({cart,...req.body });
+  const result = await userServices.cartQuantityService({ cart, ...req.body });
 
   if (result?.error) {
     return sendResponse(res, result.error);
@@ -321,9 +330,13 @@ export const checkoutPage = wrapAsync(async (req, res) => {
 
   const { checkoutItems, warning } = await buildCheckoutItems(items);
 
-  const subtotal = checkoutItems.reduce((sum, item) => sum + item.subtotal, 0);
+  const products = await applyOffer(checkoutItems);
 
-  const total = subtotal + shippingCharge;
+  const subtotal = products.reduce((sum, item) => sum + item.subtotal, 0);
+
+  const gstAmount = await gstCalculator(products);
+
+  const total = subtotal + shippingCharge + gstAmount;
 
   const addresses = await Address.find({ user_id })
     .sort({
@@ -336,9 +349,11 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     pageCSS: "checkout",
     pageJS: "checkout.js",
     title: "Checkout Page",
-    items: checkoutItems,
+    items: products,
     addresses,
     subtotal,
+    gstAmount,
+    shippingCharge,
     total,
     warning,
     showHeader: true,

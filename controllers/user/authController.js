@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import User from "../../models/userModel.js";
 import Otp from "../../models/otpModel.js";
 import Product from "../../models/productModel.js";
-import Variant from "../../models/varientModel.js";
+import Variant from "../../models/variantModel.js";
 import Category from "../../models/categoryModel.js";
 import Wishlist from "../../models/wishlistModel.js";
 import Wallet from "../../models/walletModel.js";
@@ -21,6 +21,7 @@ import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import * as authServices from "../../services/user/authServices.js";
 import * as walletHandler from "../../utils/walletHandler.js";
 import * as userConstants from "../../constants/userConstants.js";
+import Offer from "../../models/offerModel.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -358,11 +359,22 @@ export const renderHomePage = wrapAsync(async (req, res) => {
     wishlist = await Wishlist.findOne({ user_id }).select("items").lean();
   }
 
+  const now = new Date();
+
+  const offers = await Offer.find({
+    isActive: true,
+    startDate: { $lte: now },
+    endDate: { $gte: now },
+  }).lean();
+
+  // console.log(offers)
+
   res.render("user/pages/home", {
     title: "Home",
     pageCSS: "home",
     showHeader: true,
     showFooter: true,
+    offers,
     wishlist,
     pageJS: "home.js",
     products,
@@ -512,6 +524,14 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
     wishlist = await Wishlist.findOne({ user_id }).select("items").lean();
   }
 
+  const now = new Date();
+
+  const offers = await Offer.find({
+    isActive: true,
+    startDate: { $lte: now },
+    endDate: { $gte: now },
+  });
+
   return sendResponse(res, {
     code: 200,
     message: "Filter products rendered",
@@ -553,6 +573,67 @@ export const productDetailPage = wrapAsync(async (req, res) => {
       },
     },
   ]);
+
+  const productData = product[0];
+
+  const now = new Date();
+
+  const offers = await Offer.find({
+    isActive: true,
+    startDate: { $lte: now },
+    endDate: { $gte: now },
+    $or: [
+      {
+        offerApplyType: "product",
+        productIds: productData._id,
+      },
+      {
+        offerApplyType: "category",
+        categoryIds: productData.category,
+      },
+    ],
+  }).lean();
+
+  if (offers.length > 0) {
+    const referencePrice = Math.min(
+      ...productData.variants.map((v) => v.base_price),
+    );
+
+    let bestOffer = null;
+    let bestPrice = referencePrice;
+
+    for (const offer of offers) {
+      let priceAfterOffer = referencePrice;
+
+      if (offer.discountType === "percentage") {
+        priceAfterOffer -= (priceAfterOffer * offer.discountValue) / 100;
+      } else if (offer.discountType === "flat") {
+        priceAfterOffer -= offer.discountValue;
+      }
+
+      if (priceAfterOffer < 0) priceAfterOffer = 0;
+
+      if (priceAfterOffer < bestPrice) {
+        bestPrice = priceAfterOffer;
+        bestOffer = offer;
+      }
+    }
+
+    if (bestOffer) {
+      productData.offer = bestOffer;
+      for (const variant of productData.variants) {
+        let price = variant.base_price;
+
+        if (bestOffer.discountType === "percentage") {
+          price -= (price * bestOffer.discountValue) / 100;
+        } else if (bestOffer.discountType === "flat") {
+          price -= bestOffer.discountValue;
+        }
+
+        variant.offer_price = Math.max(price, 0);
+      }
+    }
+  }
 
   const relatedProducts = await Product.aggregate([
     {
@@ -613,7 +694,7 @@ export const productDetailPage = wrapAsync(async (req, res) => {
   res.render("user/pages/productdetails", {
     title: "Product detail",
     pageCSS: "productdetails",
-    product,
+    product: productData,
     relatedProducts: finalRelatedProducts,
     showFooter: true,
     showHeader: true,

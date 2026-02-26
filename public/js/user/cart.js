@@ -9,9 +9,9 @@ document.querySelectorAll(".qty").forEach((qtyBox) => {
   let quantity = parseInt(valueEl.innerText);
 
   const variant_id = valueEl.dataset.variant;
-  console.log(variant_id)
   const cartItem = qtyBox.closest(".cart-row");
   const itemSubtotal = cartItem.querySelector(".subtotal");
+  const gstAmount = document.getElementById("gst-amount");
 
   plusBtn.addEventListener("click", async () => {
     try {
@@ -24,9 +24,9 @@ document.querySelectorAll(".qty").forEach((qtyBox) => {
       if (res.data.success) {
         quantity = res.data.data.quantity;
         valueEl.innerText = res.data.data.quantity;
-        itemSubtotal.innerText = `₹${res.data.data.itemTotal}.00`;
-        total.innerHTML = `₹${res.data.data.total}.00`;
-        subTotal.innerHTML = `₹${res.data.data.subtotal}.00`;
+        itemSubtotal.innerText = `₹${res.data.data.itemTotal.toFixed(2)}`;
+        total.innerHTML = `₹${res.data.data.total.toFixed(2)}`;
+        subTotal.innerHTML = `₹${res.data.data.subtotal.toFixed(2)}`;
       }
     } catch (err) {
       const error = err.response?.data;
@@ -47,9 +47,9 @@ document.querySelectorAll(".qty").forEach((qtyBox) => {
         if (res.data.success) {
           quantity = res.data.data.quantity;
           valueEl.innerText = res.data.data.quantity;
-          itemSubtotal.innerText = `₹${res.data.data.itemTotal}.00`;
-          total.innerHTML = `₹${res.data.data.total}.00`;
-          subTotal.innerHTML = `₹${res.data.data.subtotal}.00`;
+          itemSubtotal.innerText = `₹${res.data.data.itemTotal.toFixed(2)}`;
+          total.innerHTML = `₹${res.data.data.total.toFixed(2)}`;
+          subTotal.innerHTML = `₹${res.data.data.subtotal.toFixed(2)}`;
         }
       } catch (err) {
         const error = err.response?.data;

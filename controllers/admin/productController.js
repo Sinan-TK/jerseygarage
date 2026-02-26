@@ -1,6 +1,6 @@
 import Product from "../../models/productModel.js";
 import Category from "../../models/categoryModel.js";
-import Variant from "../../models/varientModel.js";
+import Variant from "../../models/variantModel.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import cloudinary from "../../config/cloudinary.js";

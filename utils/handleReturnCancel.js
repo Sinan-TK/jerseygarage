@@ -1,4 +1,4 @@
-import Variant from "../models/varientModel.js";
+import Variant from "../models/variantModel.js";
 
 
 export const handleCancel = async (order, action, items, reason) => {

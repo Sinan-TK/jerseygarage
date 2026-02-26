@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const orderItemSchema = new mongoose.Schema(
   {
     product_id: {
@@ -35,7 +34,22 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
     },
 
-    subtotal:{
+    gst_rate: {
+      type: Number,
+      required: true,
+    },
+
+    unit_gst: {
+      type: Number,
+      required: true,
+    },
+
+    total_gst: {
+      type: Number,
+      required: true,
+    },
+
+    subtotal: {
       type: Number,
       required: true,
     },
@@ -94,7 +108,6 @@ const requestHistorySchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
-
     orderId: {
       type: String,
       required: true,
@@ -160,6 +173,11 @@ const orderSchema = new mongoose.Schema(
     shippingCharge: {
       type: Number,
       default: 0,
+    },
+
+    totalGST:{
+      type:Number,
+      required:true
     },
 
     totalPrice: {

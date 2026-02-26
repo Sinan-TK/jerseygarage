@@ -26,50 +26,111 @@
               }
               %>
 
-              <!-- WISHLIST ICON -->
+              <% 
+                const applicableOffers = [];
 
-              <% if(user){ %>
-                <div class="product-actions">
-                  <% let isWishlisted=false; if (wishlist && wishlist.items && selectedVariant) { for (let item of
-                    wishlist.items) { if ( item.variant_id.toString()===selectedVariant._id.toString() ) {
-                    isWishlisted=true; break; } } } %>
-                    <button data-variant="<%= selectedVariant._id %>"
-                      class="wishlist-btn <%= isWishlisted ? `isWishlistedTrue` : `isWishlistedFalse` %>"
-                      title="Add to Wishlist">
-                      <i class="fa-regular fa-heart"></i>
-                    </button>
-                </div>
-                <% } %>
+                for (let i = 0; i < offers.length; i++) {
+                  const offer = offers[i];
+                  if (
+                    offer.offerApplyType === "product" &&
+                    offer.productIds &&
+                    offer.productIds.find(function (id) {
+                      return id.toString() === product._id.toString();
+                    })
+                  ) {
+                    applicableOffers.push(offer);
+                    continue;
+                  }
+                  if (
+                    offer.offerApplyType === "category" &&
+                    offer.categoryIds &&
+                    offer.categoryIds.find(function (id) {
+                      return id.toString() === product.category.toString();
+                    })
+                  ) {
+                    applicableOffers.push(offer);
+                  }
+                }%>
 
-                  <img src="<%=product.images[0]%>" alt="<%=product.name%>">
-
-                  <div class="product-details">
-                    <p class="product-name">
-                      <%= product.name %>
-                    </p>
-
-                    <div class="price-section">
-                      <p class="product-price-normal">
-
-                        <% if (selectedVariant) { %>
-                          ₹<%= selectedVariant.normal_price %>
-                            <% } else { %>
-                              <span>Out of Stock</span>
-                              <% } %>
-                      </p>
-
-                      <p class="product-price-base">
-                        ₹<%= selectedVariant.base_price %>
-                      </p>
+                  <% if (applicableOffers.length !== 0) { %>
+                    <div class="offer-div">
+                      <span>Offer</span>
                     </div>
+                    <% } %>
 
-                    <!-- ADD TO CART BUTTON -->
-                    <button data-variant="<%= selectedVariant._id %>" data-product="<%= product._id %>"
-                      class="add-to-cart-btn">
-                      <i class="fa-solid fa-cart-shopping"></i>
-                      Add to Cart
-                    </button>
-                  </div>
+                      <!-- WISHLIST ICON -->
+                      <% if(user){ %>
+                        <div class="product-actions">
+                          <% let isWishlisted=false; if (wishlist && wishlist.items && selectedVariant) { for (let item
+                            of wishlist.items) { if ( item.variant_id.toString()===selectedVariant._id.toString() ) {
+                            isWishlisted=true; break; } } } %>
+                            <button data-variant="<%= selectedVariant._id %>"
+                              class="wishlist-btn <%= isWishlisted ? `isWishlistedTrue` : `isWishlistedFalse` %>"
+                              title="Add to Wishlist">
+                              <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <% } %>
+
+                          <img src="<%=product.images[0]%>" alt="<%=product.name%>">
+
+                          <div class="product-details">
+                            <p class="product-name">
+                              <%= product.name %>
+                            </p>
+
+                            <div class="price-section">
+                              <p class="product-price-normal">
+                                <%
+                                  let displayPrice = selectedVariant.base_price;
+                                  let bestPrice = displayPrice;
+                                  let appliedOffer = null;
+                                %>
+  
+  
+  
+  
+  
+                                <%
+                                  for (let i = 0; i < applicableOffers.length; i++) {
+                                    const offer = applicableOffers[i];
+                                    let priceAfterOffer = displayPrice;
+  
+                                    if (offer.discountType === "percentage") {
+                                      priceAfterOffer -= (priceAfterOffer * offer.discountValue) / 100;
+                                    } else {
+                                      priceAfterOffer -= offer.discountValue;
+                                    }
+  
+                                    if (priceAfterOffer < bestPrice) {
+                                      bestPrice = priceAfterOffer;
+                                      appliedOffer = offer;
+                                    }
+                                  }
+  
+                                  displayPrice = bestPrice;
+                                %>
+
+                                <% if (selectedVariant) { %>
+                                  ₹<%= displayPrice < selectedVariant.base_price? selectedVariant.base_price : selectedVariant.normal_price  %>
+                                    <% } else { %>
+                                      <span>Out of Stock</span>
+                                      <% } %>
+                              </p>
+
+                              <p class="product-price-base">
+
+                                  ₹<%= displayPrice.toFixed(0) %>
+                              </p>
+                            </div>
+
+                            <!-- ADD TO CART BUTTON -->
+                            <button data-variant="<%= selectedVariant._id %>" data-product="<%= product._id %>"
+                              class="add-to-cart-btn">
+                              <i class="fa-solid fa-cart-shopping"></i>
+                              Add to Cart
+                            </button>
+                          </div>
           </div>
 
         </a>

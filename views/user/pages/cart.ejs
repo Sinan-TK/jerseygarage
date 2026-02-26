@@ -15,7 +15,7 @@
 
           <!-- LEFT: CART ITEMS -->
           <div class="cart-items">
-            <% if(warning.length > 0){ %>
+            <% if(warning.length> 0){ %>
               <div class="warning-message">
                 <h3><i class="fa-solid fa-triangle-exclamation"></i>warning</h3>
                 <ul>
@@ -52,7 +52,8 @@
                       </div>
                     </div>
 
-                    <div class="price">₹<%= product.unit_price %>.00</div>
+                    <div class="price">₹<%= (product.unit_price).toFixed(2) %>
+                    </div>
 
                     <div class="qty">
                       <button class="qty-minus">-</button>
@@ -63,11 +64,12 @@
                     </div>
 
 
-                    <div class="subtotal">₹<%= product.subtotal %>.00</div>
+                    <div class="subtotal">₹<%= (product.subtotal).toFixed(2) %>
+                    </div>
                   </div>
                   <% }) %>
 
-                    <p class="note">Shipping charge is calculated at checkout</p>
+                    <p class="note">Applicable GST is calculated at checkout.</p>
 
                     <div class="cart-actions">
                       <button class="btn-outline" id="continueShop">Continue Shopping</button>
@@ -82,18 +84,18 @@
 
             <div class="summary-item">
               <span>Subtotal</span>
-              <span id="subTotal">₹<%= priceDetails.subtotal %>.00</span>
+              <span id="subTotal">₹<%= (priceDetails.subtotal).toFixed(2) %></span>
             </div>
             <div class="summary-item">
               <span>Shipping</span>
-              <span>₹<%= priceDetails.shippingCharge %>.00</span>
+              <span>₹<%= (priceDetails.shippingCharge).toFixed(2) %></span>
             </div>
 
             <hr>
 
             <div class="summary-total">
               <span>Total</span>
-              <span id="total">₹<%= priceDetails.total %>.00</span>
+              <span id="total">₹<%= (priceDetails.total).toFixed(2) %></span>
             </div>
           </div>
 
