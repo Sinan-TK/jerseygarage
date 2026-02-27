@@ -17,7 +17,7 @@ const couponSchema = new mongoose.Schema(
 
     discountType: {
       type: String,
-      enum: ["percentage", "fixed"],
+      enum: ["percentage", "flat"],
       required: true,
     },
 
@@ -29,6 +29,7 @@ const couponSchema = new mongoose.Schema(
     minPurchaseAmount: {
       type: Number,
       default: 0,
+      required: true,
     },
 
     maxDiscountAmount: {
@@ -56,10 +57,21 @@ const couponSchema = new mongoose.Schema(
       default: true,
     },
 
+    perUserLimit: {
+      type: Number,
+      default: 1,
+    },
+
     usersUsed: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        count: {
+          type: Number,
+          default: 1,
+        },
       },
     ],
   },

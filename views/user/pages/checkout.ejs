@@ -73,13 +73,19 @@
                 </div>
             </label>
 
-            <label class="radio-card">
-                <input type="radio" name="payment" value="COD" />
+            <label id="codLabel" class="radio-card <%= total > 500 ? 'disabled' : '' %>">
+                <input type="radio" name="payment" value="COD" <%=total> 500 ? 'disabled' : '' %>
+                />
                 <div class="radio-content">
                     <div class="title">COD</div>
                     <p class="muted">Cash on Delivery</p>
                 </div>
             </label>
+
+
+            <p id="codText" class="muted <%= total > 500 ? 'small':'hidden' %> ">
+                COD available only for orders above ₹500
+            </p>
         </section>
 
         <button class="place-order">PLACE ORDER</button>
@@ -148,15 +154,21 @@
 
                             <div class="row total">
                                 <span>Total</span>
-                                <span>₹<%= (total).toFixed(2) %></span>
+                                <span id="totalAmount">₹<%= (total).toFixed(2) %></span>
+                            </div>
+
+                            <div class="couponText hidden" id="couponText">
+                                Coupon applied successfully 🎉
                             </div>
 
                             <div class="promo-dropdown">
                                 <select id="promoSelect">
                                     <option value="">Select Coupon</option>
-                                    <option value="SAVE10">SAVE10</option>
-                                    <option value="SAVE20">SAVE20</option>
-                                    <option value="FLAT100">FLAT100</option>
+                                    <% coupons.forEach((coupon)=>{ %>
+                                        <option value="<%= coupon.code %>">
+                                            <%= coupon.code %>
+                                        </option>
+                                        <% }) %>
                                 </select>
 
                                 <button id="applyPromoBtn">APPLY</button>

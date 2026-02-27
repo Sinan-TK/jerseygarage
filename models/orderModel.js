@@ -142,6 +142,7 @@ const orderSchema = new mongoose.Schema(
         "Shipped",
         "OutForDelivery",
         "Delivered",
+        "Pending",
 
         // Cancel / Return states
         "Cancelled", // All items cancelled
@@ -157,6 +158,18 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["COD", "Razorpay", "Wallet"],
       required: true,
+    },
+    
+    razorpay: {
+      orderId: {
+        type: String, // Razorpay order_id
+      },
+      paymentId: {
+        type: String, // Razorpay payment_id
+      },
+      signature: {
+        type: String, // Razorpay signature
+      },
     },
 
     paymentStatus: {
@@ -175,9 +188,9 @@ const orderSchema = new mongoose.Schema(
       default: 0,
     },
 
-    totalGST:{
-      type:Number,
-      required:true
+    totalGST: {
+      type: Number,
+      required: true,
     },
 
     totalPrice: {
@@ -196,6 +209,28 @@ const orderSchema = new mongoose.Schema(
 
     deliveredAt: {
       type: Date,
+    },
+
+    is_couponed: {
+      type: Boolean,
+      default: false,
+    },
+
+    coupon: {
+      code: {
+        type: String,
+      },
+      discountType: {
+        type: String,
+        enum: ["percentage", "flat"],
+      },
+      discountValue: {
+        type: Number,
+      },
+      discountAmount: {
+        type: Number,
+        default: 0,
+      },
     },
 
     cancelHistory: [requestHistorySchema],

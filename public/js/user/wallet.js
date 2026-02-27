@@ -1,9 +1,6 @@
 async function walletData() {
   try {
     const res = await axios.get("/user/wallet/data");
-
-    console.log(res.data.data);
-
     loadWallet(res.data.data);
   } catch (err) {
     const error = err.response?.data;
@@ -16,7 +13,7 @@ async function walletData() {
 --------------------------*/
 
 function loadWallet(data) {
-  document.getElementById("balance").innerText = data.balance;
+  document.getElementById("balance").innerText = data.balance.toFixed(2);
 
   const list = document.getElementById("transactionList");
 
@@ -36,7 +33,7 @@ function loadWallet(data) {
 
       <div class="amount ${item.type === "credit" ? "credit" : "debit"}">
 
-        ${item.type === "credit" ? "+ ₹" + item.amount : "- ₹" + item.amount}
+        ${item.type === "credit" ? "+ ₹" + item.amount.toFixed(2) : "- ₹" + item.amount.toFixed(2)}
 
       </div>
 
@@ -154,15 +151,15 @@ proceedBtn.addEventListener("click", async () => {
     ========================= */
 
     const options = {
-      key: "rzp_test_SEVl4Rs6YWN7WK",
+      key: order.key,
 
       amount: order.amount,
       currency: order.currency,
 
-      name: "JerseyGarage",
-      description: "Wallet Top-up",
+      name: order.name,
+      description: order.description,
 
-      order_id: order.id,
+      order_id: order.orderId,
 
       handler: async function (response) {
         /* =========================
@@ -172,19 +169,16 @@ proceedBtn.addEventListener("click", async () => {
         try {
           const verifyRes = await axios.post("/user/wallet/verify", {
             ...response,
-            amount,
           });
 
           const verifyResult = verifyRes.data;
 
-          if (verifyRes.status === 200) {
+          if (verifyRes.data.success) {
             toastr.success(verifyRes.data.message, "Credited");
             walletData();
             closeModal();
-          } else {
-            toastr.error(verifyResult.message);
             resetBtn();
-          }
+          } 
         } catch (err) {
           const error = err.response?.data;
           toastr.error(error?.message || "Verification failed", "Failed");

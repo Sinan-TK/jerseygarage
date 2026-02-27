@@ -250,7 +250,7 @@ export const orderCancelReturn = Object.freeze({
   },
 });
 
-export const walletPayment = {
+export const walletPayment = Object.freeze({
   INVALID_AMOUNT: {
     code: 400,
     message: "Invalid amount",
@@ -270,4 +270,44 @@ export const walletPayment = {
     code: 200,
     message: "Wallet credited successfully",
   },
-};
+});
+
+export const razorpayOrderVerify = Object.freeze({
+  PAYMENT_FAILED: {
+    code: 400,
+    message: "Payment verification failed",
+  },
+
+  SUCCESS: {
+    code: 201,
+    message: "Order placed successfully",
+    redirectToFrontend: "/user/order/success",
+  },
+});
+
+export const couponCheck = Object.freeze({
+  NOT_APPLIED: {
+    code: 400,
+    message: "No coupon applied",
+  },
+
+  INVALID_CODE: {
+    code: 404,
+    message: "Invalid coupon code",
+  },
+
+  COUPON_EXPIRED: {
+    code: 410,
+    message: "Coupon has expired",
+  },
+
+  USAGE_LIMIT: {
+    code: 409,
+    message: "Coupon usage limit reached",
+  },
+
+  ALREADY_USED: {
+    code: 409,
+    message: "You have already used this coupon",
+  },
+});

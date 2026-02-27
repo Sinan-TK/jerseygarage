@@ -6,13 +6,20 @@ const router = express.Router();
 
 router.get("/", couponController.couponPage);
 
-// router.get("/data", offerController.offerData);
+router.get("/add", couponController.addCouponPage);
 
-// router.post("/add", offerController.addOffer);
+router.post("/add", couponController.addCoupon);
 
-// router.put("/edit/:id", offerController.editOffer);
+router.get("/data", couponController.fetchCoupons);
 
-// router.delete("/delete/:id", offerController.deleteOffer);
+router.get("/edit/:id", couponController.editCouponPage);
 
+router.get("/edit/data/:couponId", couponController.editCouponData);
+
+router.patch("/edit/:couponId", couponController.editCoupon);
+
+router.get("/details/:couponId", couponController.couponDetailsPage);
+
+router.delete("/delete/:couponId", couponController.deleteCoupon);
 
 export default router;

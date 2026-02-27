@@ -19,7 +19,6 @@ import { createUniqueReferralCode } from "../../utils/referralCodeGenerator.js";
 import productBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import * as authServices from "../../services/user/authServices.js";
-import * as walletHandler from "../../utils/walletHandler.js";
 import * as userConstants from "../../constants/userConstants.js";
 import Offer from "../../models/offerModel.js";
 
@@ -141,11 +140,27 @@ export const otpVerification = wrapAsync(async (req, res) => {
 
       referredBy.save();
 
-      await walletHandler.creditWallet(
-        referredBy._id,
-        Number(userConstants.REFERRAL_BONUS),
-        "Referral Bonus",
-      );
+      let wallet = await Wallet.findOne({ user: referredBy._id });
+      const amount = Number(userConstants.REFERRAL_BONUS);
+
+      // Auto-create (safety)
+      if (!wallet) {
+        wallet = await Wallet.create({
+          user: referredBy._id,
+          balance: 0,
+          transactions: [],
+        });
+      }
+
+      wallet.balance += amount;
+
+      wallet.transactions.push({
+        type: "credit",
+        amount,
+        reason: "Referral Bonus",
+      });
+
+      await wallet.save();
 
       newUser.referred_by = userData.referredBy;
     }

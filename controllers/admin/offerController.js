@@ -48,9 +48,8 @@ export const offerData = wrapAsync(async (req, res) => {
     filter.isActive = false;
   }
 
-  const pagination = await paginate(Offer,page, 10, filter);
+  const pagination = await paginate(Offer, page, 10, filter);
 
-  //   const offers = await Offer.find(filter).sort({ createdAt: -1 });
   const products = await Product.find({ is_active: true }).select("name");
   const categories = await Category.find({ is_active: true }).select("name");
   return sendResponse(res, {
@@ -250,7 +249,7 @@ export const editOffer = wrapAsync(async (req, res) => {
 //
 
 export const deleteOffer = wrapAsync(async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
 
   const deleted = await Offer.findByIdAndDelete(id);
 

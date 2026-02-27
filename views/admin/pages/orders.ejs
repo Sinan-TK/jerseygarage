@@ -12,27 +12,26 @@
         <input type="text" id="searchOrder" placeholder="ID (ORD-02102025-)">
 
         <select id="statusFilter">
-            <option value="all">All</option>
-            <!-- <option value="draft">Draft</option> -->
+            <option value="all">Order Status</option>
+            <option value="Pending">Pending</option>
             <option value="Placed">Placed</option>
             <option value="Confirmed">Confirmed</option>
-            <option value="draft">Out for delivery</option>
-            <option value="draft">Delivered</option>
-            <option value="draft">Cancelled</option>
-            <option value="draft">Returned</option>
-            <option value="draft">Return Approved</option>
-            <option value="draft">Return Requested</option>
-            <option value="draft">Return Rejected</option>
+            <option value="Packed">Packed</option>
+            <option value="Shipped">Shipped</option>
+            <option value="OutForDelivery">Out for Delivery</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
             <option value="Partially-Cancelled">Partially Cancelled</option>
-            <!-- <option value="draft">Partially Cancelled</option> -->
-            <option value="draft">Failed</option>
+            <option value="Returned">Returned</option>
+            <option value="PartiallyReturned">Partially Returned</option>
+            <!-- <option value="draft">Failed</option> -->
         </select>
 
         <select id="paymentFilter">
-            <option value="all">All</option>
-            <option value="razorpay">Pending</option>
-            <option value="cod">Paid</option>
-            <option value="cod">Failed</option>
+            <option value="all">payment Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Paid">Paid</option>
+            <option value="Refunded">Refunded</option>
         </select>
 
         <input type="date" id="fromDate">

@@ -89,7 +89,6 @@ export const orderDetailsPageRender = wrapAsync(async (req, res) => {
   const order = await Order.findById(id).populate("user_id", "full_name email");
 
   order.products.forEach((item) => {
-    console.log(item);
     item.subtotal += item.total_gst;
   });
 

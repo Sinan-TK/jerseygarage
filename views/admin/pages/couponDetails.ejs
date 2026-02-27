@@ -1,0 +1,104 @@
+<div class="page-content">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumbs">
+        <a href="/admin/coupons">Coupons</a>
+        <span>/</span>
+        <span>Coupon Details</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>Coupon Details</h2>
+        <p>View complete information about this coupon</p>
+    </div>
+
+    <!-- Coupon Details Card -->
+    <div class="coupon-details-card">
+
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <label>Coupon Code</label>
+                <span>
+                    <%= coupon.code %>
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Status</label>
+                <span class="status <%= coupon.isActive?'active':'inactive' %>">
+                    <%= coupon.isActive?'Active':'Inactive' %>
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Discount Type</label>
+                <span>
+                    <%= coupon.discountType %>
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Discount Value</label>
+                <span>
+                    <%= coupon.discountType==="percentage" ? `${coupon.discountValue}%`:`₹${coupon.discountValue}` %>
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Minimum Purchase</label>
+                <span>₹<%= (coupon.minPurchaseAmount).toFixed(2) %></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Maximum Discount</label>
+                <span>
+                    <%= coupon.maxDiscountAmount ? `₹${(coupon.maxDiscountAmount).toFixed(2)}`:"Not Defined" %>
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Usage Limit</label>
+                <span>
+                    <%= coupon.usageLimit %> times
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Per User Limit</label>
+                <span>
+                    <%= coupon.perUserLimit %> time
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Used Count</label>
+                <span>
+                    <%= coupon.usedCount %>
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <label>Expiry Date</label>
+                <span><%= coupon.expiryDate %></span>
+            </div>
+
+        </div>
+
+        <!-- Description -->
+        <div class="description-box">
+            <label>Description</label>
+            <p>
+                <%= coupon.description?coupon.description:"No description" %>
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-row">
+            <a href="/admin/coupons" class="btn back-btn">Back</a>
+        </div>
+
+    </div>
+
+</div>

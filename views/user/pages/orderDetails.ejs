@@ -147,17 +147,29 @@
 
         <div class="summary-row">
             <span>Subtotal</span>
-            <span>₹<%= order.itemsPrice %>.00</span>
+            <span>₹<%= (order.itemsPrice).toFixed(2) %></span>
         </div>
 
         <div class="summary-row">
             <span>Shipping</span>
-            <span>₹<%= order.shippingCharge %>.00</span>
+            <span>₹<%= (order.shippingCharge).toFixed(2) %></span>
         </div>
+
+        <div class="summary-row">
+            <span>GST</span>
+            <span>₹<%= (order.totalGST).toFixed(2) %></span>
+        </div>
+
+        <% if(order.is_couponed){ %>
+        <div class="summary-row">
+            <span>Coupon Discount (<%= order.coupon.code %>)</span>
+            <span>₹<%= (order.coupon.discountAmount).toFixed(2) %></span>
+        </div>
+        <%}%>
 
         <div class="summary-row total">
             <span>Total</span>
-            <span>₹<%= order.totalPrice %>.00</span>
+            <span>₹<%= (order.totalPrice).toFixed(2) %></span>
         </div>
     </div>
 

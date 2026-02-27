@@ -6,6 +6,7 @@ const walletSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: true,
     },
 
     balance: {
@@ -36,6 +37,18 @@ const walletSchema = new mongoose.Schema(
           default: null,
         },
 
+        razorpay: {
+          orderId: String,
+          paymentId: String,
+          signature: String,
+        },
+
+        status: {
+          type: String,
+          enum: ["PENDING", "SUCCESS", "FAILED"],
+          default: "SUCCESS",
+        },
+
         date: {
           type: Date,
           default: Date.now,
@@ -43,9 +56,8 @@ const walletSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Wallet = mongoose.model("Wallet", walletSchema);
-
 export default Wallet;

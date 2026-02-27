@@ -56,7 +56,7 @@
         <span>Wallet Balance</span>
         <a href="/user/wallet" class="link">See details →</a>
       </div>
-      <h2>₹<%= userDetails.wallet.balance %>.00</h2>
+      <h2>₹<%= (userDetails.wallet.balance).toFixed(2) %></h2>
     </div>
 
     <div class="card stat-card">

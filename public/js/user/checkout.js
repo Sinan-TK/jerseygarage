@@ -142,7 +142,14 @@ document
     }
   });
 
-document.querySelector(".place-order").addEventListener("click", async () => {
+let couponCode = "";
+
+const placeOrderBtn = document.querySelector(".place-order");
+
+placeOrderBtn.addEventListener("click", async () => {
+  placeOrderBtn.disabled = true;
+  placeOrderBtn.innerText = "Processing...";
+
   const addressId = selectedValue("address");
 
   const paymentMethod = selectedValue("payment");
@@ -151,19 +158,109 @@ document.querySelector(".place-order").addEventListener("click", async () => {
     const res = await axios.post("/user/place-order", {
       addressId,
       paymentMethod,
+      couponCode,
     });
-
-    console.log(res);
 
     if (res.data.data?.waring) {
       toastr.waring(res.data.data.waring, "warning");
     }
 
     if (res.data.success) {
-      toastr.success(res.data.message, "Success");
-      setTimeout(() => {
-        window.location.href = res.data.redirect;
-      }, 1000);
+      const data = res.data.data;
+      console.log(data);
+      if (data.paymentMethod === "Razorpay") {
+        const order = data;
+
+        const options = {
+          key: order.key,
+
+          amount: order.amount,
+          currency: order.currency,
+
+          name: order.name,
+          description: order.description,
+
+          order_id: order.orderId,
+
+          handler: async function (response) {
+            /* =========================
+           3. VERIFY PAYMENT
+        ========================= */
+
+            try {
+              const verifyRes = await axios.post("/user/payment/verify", {
+                ...response,
+              });
+
+              const verifyResult = verifyRes.data;
+
+              if (verifyRes.data.success) {
+                toastr.success(verifyRes.data.message, "Paid");
+                setTimeout(() => {
+                  window.location.href = verifyRes.data.redirect;
+                }, 1500);
+              }
+            } catch (err) {
+              const error = err.response?.data;
+              toastr.error(
+                error?.message || "Payment verification failed",
+                "Failed",
+              );
+              resetBtn();
+            }
+          },
+
+          modal: {
+            ondismiss: function () {
+              resetBtn();
+            },
+          },
+
+          theme: {
+            color: "#000",
+          },
+        };
+
+        new Razorpay(options).open();
+      } else {
+        toastr.success(res.data.message, "Success");
+        setTimeout(() => {
+          window.location.href = res.data.redirect;
+        }, 1000);
+      }
+    }
+  } catch (err) {
+    const error = err.response?.data;
+    resetBtn();
+    console.log(error);
+    toastr.error(error?.message || "Something went wrong", "Failed");
+  }
+});
+
+function selectedValue(name) {
+  return document.querySelector(`input[name="${name}"]:checked`)?.value || "";
+}
+
+document.getElementById("applyPromoBtn").addEventListener("click", async () => {
+  console.log("working");
+  const code = document.getElementById("promoSelect").value;
+
+  try {
+    const res = await axios.post("/user/checkout/coupon", { code });
+
+    if (res.data.success) {
+      const data = res.data.data;
+      document.getElementById("totalAmount").innerHTML = data.total.toFixed(2);
+      if (data.total < 500) {
+        document.getElementById("codLabel").classList.remove("disabled");
+        document.querySelector("input[value='COD']").disabled = true;
+        document.getElementById("codText").classList.replace("small", "hidden");
+
+        const couponDiv = document.getElementById("couponText");
+        couponDiv.classList.replace("hidden", "success");
+        couponDiv.innerHTML = `"${data.coupon.code}" Coupon applied successfully 🎉 `;
+      }
+      couponCode = data.coupon.code;
     }
   } catch (err) {
     const error = err.response?.data;
@@ -172,6 +269,7 @@ document.querySelector(".place-order").addEventListener("click", async () => {
   }
 });
 
-function selectedValue(name) {
-  return document.querySelector(`input[name="${name}"]:checked`)?.value || "";
+function resetBtn() {
+  placeOrderBtn.disabled = false;
+  placeOrderBtn.innerText = "PLACE ORDER";
 }

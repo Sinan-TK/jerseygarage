@@ -23,6 +23,8 @@ import * as walletHandler from "../../utils/walletHandler.js";
 import { applyOffer } from "../../utils/offerApply.js";
 import crypto from "crypto";
 import gstCalculator from "../../utils/gstCalculator.js";
+import Coupon from "../../models/couponModel.js";
+import * as couponChecks from "../../utils/checkCoupon.js";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -345,19 +347,62 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     })
     .lean();
 
+  const coupons = await couponChecks.checkCoupon(user_id, subtotal);
+
   res.render("user/pages/checkout", {
     pageCSS: "checkout",
     pageJS: "checkout.js",
-    title: "Checkout Page",
+    title: "Checkout",
     items: products,
     addresses,
     subtotal,
     gstAmount,
+    coupons,
     shippingCharge,
     total,
     warning,
     showHeader: true,
     showFooter: true,
+  });
+});
+
+// ======================================================================
+// 6. APPLY COUPON
+// ======================================================================
+
+export const applyCoupon = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const { code } = req.body;
+  let items = [];
+
+  const cart = await Cart.findOne({ user_id });
+
+  if (!cart || cart.items.length === 0) {
+    return res.redirect("/user/cart");
+  }
+
+  items = cart.items;
+
+  const { checkoutItems, warning } = await buildCheckoutItems(items);
+
+  const products = await applyOffer(checkoutItems);
+
+  const subtotal = products.reduce((sum, item) => sum + item.subtotal, 0);
+
+  const result = await couponChecks.couponApply(user_id, code, subtotal);
+
+  if (result?.error) {
+    return sendResponse(res, result.error);
+  }
+
+  const gstAmount = await gstCalculator(products);
+
+  const total = result.finalAmount + userConstants.SHIPPING_CHARGE + gstAmount;
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Coupon Applied succussfully",
+    data: { coupon: result, total },
   });
 });
 
@@ -501,17 +546,102 @@ export const orderSuccess = wrapAsync(async (req, res) => {
 export const placeOrder = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
-  const { addressId, paymentMethod, paymentResult } = req.body;
-
   const result = await userServices.placeOrderService({ ...req.body, user_id });
 
   if (result?.error) {
     return sendResponse(res, result.error);
   }
 
-  req.session.orderId = result.orderId;
+  if (result.success) {
+    if (result.paymentMethod === "Razorpay") {
+      req.session.pendingOrderId = result.orderId;
+      req.session.orderId = result.orderId;
+      return sendResponse(res, {
+        code: 200,
+        message: "paying through razorpay",
+        data: { ...result.razorpay, paymentMethod: result.paymentMethod },
+      });
+    }
 
-  return sendResponse(res, Responses.placeOrder.SUCCESS);
+    req.session.orderId = result.orderId;
+
+    return sendResponse(res, {
+      ...Responses.placeOrder.SUCCESS,
+      data: { paymentMethod: result.paymentMethod },
+    });
+  }
+});
+
+// ======================================================================
+// 6. ORDER LISTING PAGE
+// ======================================================================
+
+export const orderPayVerify = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const orderId = req.session.pendingOrderId;
+  delete req.session.pendingOrderId;
+
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+    req.body;
+
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    return sendResponse(res, Responses.razorpayOrderVerify.PAYMENT_FAILED);
+  }
+
+  const sign = razorpay_order_id + "|" + razorpay_payment_id;
+
+  const expected = crypto
+    .createHmac("sha256", process.env.RAZORPAY_TESTKEYSECRET)
+    .update(sign)
+    .digest("hex");
+
+  if (expected !== razorpay_signature) {
+    return sendResponse(res, Responses.razorpayOrderVerify.PAYMENT_FAILED);
+  }
+
+  const order = await Order.findOne({
+    _id: orderId,
+    user_id,
+    "razorpay.orderId": razorpay_order_id,
+  });
+
+  const items = order.products;
+
+  if (!order) {
+    return sendResponse(res, Responses.razorpayOrderVerify.PAYMENT_FAILED);
+  }
+
+  order.paymentStatus = "Paid";
+  order.orderStatus = "Placed";
+
+  order.razorpay.paymentId = razorpay_payment_id;
+  order.razorpay.signature = razorpay_signature;
+
+  await order.save();
+
+  if (order.is_couponed) {
+    const couponCode = order.coupon.code;
+
+    const couponUsage = await couponChecks.applyCouponUsage(
+      couponCode,
+      user_id,
+    );
+
+    if (couponUsage?.error) {
+      return { error: couponUsage.error };
+    }
+  }
+
+  for (const item of items) {
+    await Variant.updateOne(
+      { _id: item.variant_id },
+      { $inc: { stock: -item.quantity } },
+    );
+  }
+
+  await Cart.deleteOne({ user_id });
+
+  return sendResponse(res, Responses.razorpayOrderVerify.SUCCESS);
 });
 
 // ======================================================================
@@ -653,25 +783,51 @@ export const walletData = wrapAsync(async (req, res) => {
 
 export const walletTopupOrder = wrapAsync(async (req, res) => {
   const { amount } = req.body;
+  console.log(amount);
+  const user_id = req.session.user.id;
 
   if (!amount || amount < 100) {
     return sendResponse(res, Responses.walletPayment.INVALID_AMOUNT);
   }
 
-  const order = await razorpay.orders.create({
-    amount: amount * 100,
+  const razorpayOrder = await razorpay.orders.create({
+    amount: Math.round(amount * 100), // paise
     currency: "INR",
-    receipt: "wallet_" + Date.now(),
+    receipt: `wallet_${Date.now()}`,
   });
 
-  if (!order) {
+  if (!razorpayOrder) {
     return sendResponse(res, Responses.walletPayment.ORDER_FAILED);
   }
+
+  let wallet = await Wallet.findOne({ user: user_id });
+  if (!wallet) {
+    wallet = await Wallet.create({ user: user_id });
+  }
+
+  wallet.transactions.push({
+    type: "credit",
+    amount,
+    reason: "Wallet Top-up",
+    status: "PENDING",
+    razorpay: {
+      orderId: razorpayOrder.id,
+    },
+  });
+
+  await wallet.save();
 
   return sendResponse(res, {
     code: 200,
     message: "Order created",
-    data: order,
+    data: {
+      key: process.env.RAZORPAY_KEY,
+      orderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: "INR",
+      name: "JerseyGarage",
+      description: "Wallet Top-up",
+    },
   });
 });
 
@@ -682,7 +838,7 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
 export const verifyWalletTopup = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } =
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
     req.body;
 
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -700,7 +856,33 @@ export const verifyWalletTopup = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
   }
 
-  await walletHandler.creditWallet(user_id, Number(amount), "Wallet Top-up");
+  const wallet = await Wallet.findOne({
+    user: user_id,
+    "transactions.razorpay.orderId": razorpay_order_id,
+  });
+
+  if (!wallet) {
+    return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
+  }
+
+  const transaction = wallet.transactions.find(
+    (t) => t.razorpay?.orderId === razorpay_order_id && t.status === "PENDING",
+  );
+
+  if (!transaction) {
+    return sendResponse(res, {
+      code: 409,
+      message: "Wallet top-up already processed",
+    });
+  }
+
+  wallet.balance += transaction.amount;
+
+  transaction.status = "SUCCESS";
+  transaction.razorpay.paymentId = razorpay_payment_id;
+  transaction.razorpay.signature = razorpay_signature;
+
+  await wallet.save();
 
   return sendResponse(res, Responses.walletPayment.SUCCESS);
 });

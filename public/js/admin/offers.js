@@ -357,7 +357,6 @@ applyType?.addEventListener("change", () => {
 ===================================================== */
 
 const editModal = document.getElementById("editOfferModal");
-const editForm = document.getElementById("editOfferForm");
 const editStatusToggle = document.getElementById("editOfferStatus");
 const editStatusLabel = document.getElementById("editStatusLabel");
 

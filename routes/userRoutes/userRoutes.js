@@ -21,9 +21,17 @@ router.use(userMiddleware.userNotFound);
 
 router.use(authMiddleware.profileIcon);
 
-router.get("/profile", userMiddleware.Userdetails, userController.profileRender);
+router.get(
+  "/profile",
+  userMiddleware.Userdetails,
+  userController.profileRender,
+);
 
-router.patch("/profile/edit", userMiddleware.Userdetails, userController.editPersonalInfo);
+router.patch(
+  "/profile/edit",
+  userMiddleware.Userdetails,
+  userController.editPersonalInfo,
+);
 
 router.get("/email-verify", userController.emailOtpVerify);
 
@@ -31,15 +39,31 @@ router.post("/email-verify", userController.emailVerification);
 
 router.patch("/profile/change-password", userController.editPassword);
 
-router.get("/address", userMiddleware.Userdetails, userController.addressPageRender);
+router.get(
+  "/address",
+  userMiddleware.Userdetails,
+  userController.addressPageRender,
+);
 
-router.get("/address/data", userMiddleware.Userdetails, userController.addressData);
+router.get(
+  "/address/data",
+  userMiddleware.Userdetails,
+  userController.addressData,
+);
 
 router.post("/address", userMiddleware.Userdetails, userController.addAddress);
 
-router.delete("/address", userMiddleware.Userdetails, userController.removeAddress);
+router.delete(
+  "/address",
+  userMiddleware.Userdetails,
+  userController.removeAddress,
+);
 
-router.patch("/address/edit/:id", userMiddleware.Userdetails, userController.editAddress);
+router.patch(
+  "/address/edit/:id",
+  userMiddleware.Userdetails,
+  userController.editAddress,
+);
 
 router.get("/cart", userMiddleware.Userdetails, userController.cartRender);
 
@@ -62,13 +86,21 @@ router.get(
   userController.checkoutPage,
 );
 
+router.post("/checkout/coupon", userController.applyCoupon);
+
 router.post("/place-order", userController.placeOrder);
+
+router.post("/payment/verify", userController.orderPayVerify);
 
 router.delete("/cart/remove", userController.deleteCartItem);
 
 router.get("/order/success", userController.orderSuccess);
 
-router.get("/orders", userMiddleware.Userdetails, userController.orderListingPage);
+router.get(
+  "/orders",
+  userMiddleware.Userdetails,
+  userController.orderListingPage,
+);
 
 router.get("/orders/:id", userController.orderDetailsPage);
 
@@ -84,7 +116,11 @@ router.post("/wallet/topup", userController.walletTopupOrder);
 
 router.post("/wallet/verify", userController.verifyWalletTopup);
 
-router.get("/referral", userMiddleware.Userdetails, userController.referralPage);
+router.get(
+  "/referral",
+  userMiddleware.Userdetails,
+  userController.referralPage,
+);
 
 router.post("/logout", userMiddleware.Userdetails, userController.userLogout);
 

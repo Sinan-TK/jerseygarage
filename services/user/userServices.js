@@ -15,6 +15,9 @@ import * as handleReturnCancel from "../../utils/handleReturnCancel.js";
 import Wishlist from "../../models/wishlistModel.js";
 import * as offerCalculator from "../../utils/offerApply.js";
 import gstCalculator from "../../utils/gstCalculator.js";
+import * as couponChecks from "../../utils/checkCoupon.js";
+import razorpay from "../../config/razorpay.js";
+import Wallet from "../../models/walletModel.js";
 
 // ======================================================================
 // CART PAGE RENDER
@@ -336,7 +339,7 @@ export const deleteCartItemService = async ({ variant_id, user_id }) => {
 export const placeOrderService = async ({
   addressId,
   paymentMethod,
-  paymentResult,
+  couponCode,
   user_id,
 }) => {
   if (!addressId) {
@@ -384,21 +387,38 @@ export const placeOrderService = async ({
 
   const itemsPrice = items.reduce((sum, item) => sum + item.subtotal, 0);
 
-  const totalPrice = itemsPrice + userConstants.SHIPPING_CHARGE + gstAmount ;
+  let price = itemsPrice;
+  let isCouponed = false;
+  let coupon = {};
+
+  if (couponCode) {
+    const result = await couponChecks.couponApply(user_id, couponCode, price);
+
+    if (result?.error) {
+      return sendResponse(res, result.error);
+    }
+    price = result.finalAmount;
+    isCouponed = true;
+    coupon = {
+      code: result.code,
+      discountType: result.discountType,
+      discountValue: result.discountValue,
+      discountAmount: result.discountAmount,
+    };
+  }
+
+  const totalPrice = price + userConstants.SHIPPING_CHARGE + gstAmount;
 
   let paymentStatus = "Pending";
   let paidAt = null;
 
-  // Online payment
-  if (paymentMethod !== "COD") {
-    if (!paymentResult?.id) {
-      return { error: Responses.placeOrder.PAY_VERIFY_FAILED };
-    }
-
-    //  In real apps → verify with gateway here
-
-    paymentStatus = "Paid";
-    paidAt = Date.now();
+  if (paymentMethod === "COD" && totalPrice > 500) {
+    return {
+      error: {
+        code: 403,
+        message: "Cash on Delivery is not available for orders above ₹500",
+      },
+    };
   }
 
   const products = items.map((item) => {
@@ -445,8 +465,83 @@ export const placeOrderService = async ({
     totalGST: gstAmount,
     totalPrice,
 
-    orderStatus: "Placed",
+    is_couponed: isCouponed,
+    coupon: isCouponed ? coupon : null,
+
+    orderStatus: paymentMethod === "Razorpay" ? "Pending" : "Placed",
   });
+
+  if (paymentMethod === "Wallet") {
+    const wallet = await Wallet.findOne({ user: user_id });
+
+    if (!wallet) {
+      return {
+        error: {
+          code: 404,
+          message: "Wallet not found",
+        },
+      };
+    }
+
+    if (wallet.balance < totalPrice) {
+      return {
+        error: {
+          code: 400,
+          message: "Insufficient wallet balance",
+        },
+      };
+    }
+
+    wallet.balance -= totalPrice;
+
+    wallet.transactions.push({
+      type: "debit",
+      amount: totalPrice,
+      reason: "Order Payment",
+      orderId: order._id, // internal order reference
+      status: "SUCCESS",
+    });
+
+    wallet.save();
+  }
+
+  if (order.paymentMethod === "Razorpay") {
+    const razorpayOrder = await razorpay.orders.create({
+      amount: Math.round(order.totalPrice * 100), // paise
+      currency: "INR",
+      receipt: order.orderId,
+    });
+
+    order.razorpay = {
+      orderId: razorpayOrder.id,
+    };
+    await order.save();
+
+    return {
+      success: true,
+      paymentMethod: "Razorpay",
+      razorpay: {
+        key: process.env.RAZORPAY_KEY,
+        orderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: "INR",
+        name: "JerseyGarage",
+        description: "Order Payment",
+      },
+      orderId: order._id,
+    };
+  }
+
+  if (isCouponed) {
+    const couponUsage = await couponChecks.applyCouponUsage(
+      couponCode,
+      user_id,
+    );
+
+    if (couponUsage?.error) {
+      return { error: couponUsage.error };
+    }
+  }
 
   for (const item of items) {
     await Variant.updateOne(
@@ -457,7 +552,11 @@ export const placeOrderService = async ({
 
   await Cart.deleteOne({ user_id });
 
-  return { orderId: order._id };
+  return {
+    success: true,
+    paymentMethod,
+    orderId: order._id,
+  };
 };
 
 //
