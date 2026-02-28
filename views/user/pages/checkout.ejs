@@ -69,7 +69,7 @@
                 <input type="radio" name="payment" value="Wallet" />
                 <div class="radio-content">
                     <div class="title">Wallet</div>
-                    <p class="muted">Wallet Balance</p>
+                    <p class="muted">Wallet Balance : ₹<%= wallet.balance %></p>
                 </div>
             </label>
 
@@ -163,7 +163,7 @@
 
                             <div class="promo-dropdown">
                                 <select id="promoSelect">
-                                    <option value="">Select Coupon</option>
+                                    <option  value="">Select Coupon</option>
                                     <% coupons.forEach((coupon)=>{ %>
                                         <option value="<%= coupon.code %>">
                                             <%= coupon.code %>

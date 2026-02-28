@@ -1,6 +1,9 @@
-async function walletData() {
+async function walletData(page = 1) {
   try {
-    const res = await axios.get("/user/wallet/data");
+    const res = await axios.get("/user/wallet/data", {
+      params: { page },
+    });
+    console.log(res.data.data);
     loadWallet(res.data.data);
   } catch (err) {
     const error = err.response?.data;
@@ -13,6 +16,7 @@ async function walletData() {
 --------------------------*/
 
 function loadWallet(data) {
+  const page = data.pagination;
   document.getElementById("balance").innerText = data.balance.toFixed(2);
 
   const list = document.getElementById("transactionList");
@@ -41,6 +45,30 @@ function loadWallet(data) {
 
     list.appendChild(div);
   });
+  document.querySelector(".pagination").innerHTML = pagination(page);
+}
+
+function pagination(data) {
+  const backward = data.page > 1 ? true : false;
+  const forward = data.page < data.totalPages ? true : false;
+  return `${
+    backward
+      ? `<button onclick="walletData(${data.page - 1})" class="arrow-btn">
+      <i class="fa-solid fa-chevron-left"></i>
+  </button>`
+      : ""
+  }
+
+  <span class="current-page-display">
+      ${data.page}
+  </span>
+    ${
+      forward
+        ? `<button onclick="walletData(${data.page + 1})" class="arrow-btn">
+      <i class="fa-solid fa-chevron-right"></i>
+  </button>`
+        : ""
+    }`;
 }
 
 function formatDate(dateString) {
@@ -178,7 +206,7 @@ proceedBtn.addEventListener("click", async () => {
             walletData();
             closeModal();
             resetBtn();
-          } 
+          }
         } catch (err) {
           const error = err.response?.data;
           toastr.error(error?.message || "Verification failed", "Failed");

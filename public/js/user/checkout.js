@@ -242,7 +242,6 @@ function selectedValue(name) {
 }
 
 document.getElementById("applyPromoBtn").addEventListener("click", async () => {
-  console.log("working");
   const code = document.getElementById("promoSelect").value;
 
   try {
@@ -255,12 +254,13 @@ document.getElementById("applyPromoBtn").addEventListener("click", async () => {
         document.getElementById("codLabel").classList.remove("disabled");
         document.querySelector("input[value='COD']").disabled = true;
         document.getElementById("codText").classList.replace("small", "hidden");
-
-        const couponDiv = document.getElementById("couponText");
-        couponDiv.classList.replace("hidden", "success");
-        couponDiv.innerHTML = `"${data.coupon.code}" Coupon applied successfully 🎉 `;
       }
+      const couponDiv = document.getElementById("couponText");
+      couponDiv.classList.replace("hidden", "success");
+      couponDiv.innerHTML = `"${data.coupon.code}" Coupon applied successfully 🎉 `;
       couponCode = data.coupon.code;
+      const dropdown = document.querySelector(".promo-dropdown");
+      dropdown.style.display = "none";
     }
   } catch (err) {
     const error = err.response?.data;

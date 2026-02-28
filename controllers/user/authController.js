@@ -21,6 +21,7 @@ import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import * as authServices from "../../services/user/authServices.js";
 import * as userConstants from "../../constants/userConstants.js";
 import Offer from "../../models/offerModel.js";
+import WalletTransaction from "../../models/walletTransaction.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -147,18 +148,18 @@ export const otpVerification = wrapAsync(async (req, res) => {
       if (!wallet) {
         wallet = await Wallet.create({
           user: referredBy._id,
-          balance: 0,
-          transactions: [],
         });
       }
 
-      wallet.balance += amount;
-
-      wallet.transactions.push({
-        type: "credit",
+      await WalletTransaction.create({
+        wallet:wallet._id,
+        user:wallet.user,
+        type:"credit",
+        reason:"Referral Bouns",
         amount,
-        reason: "Referral Bonus",
-      });
+      })   
+
+      wallet.balance += amount;
 
       await wallet.save();
 

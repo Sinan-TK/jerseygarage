@@ -18,6 +18,7 @@ import gstCalculator from "../../utils/gstCalculator.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
 import razorpay from "../../config/razorpay.js";
 import Wallet from "../../models/walletModel.js";
+import WalletTransaction from "../../models/walletTransaction.js";
 
 // ======================================================================
 // CART PAGE RENDER
@@ -472,15 +473,12 @@ export const placeOrderService = async ({
   });
 
   if (paymentMethod === "Wallet") {
-    const wallet = await Wallet.findOne({ user: user_id });
+    let wallet = await Wallet.findOne({ user: user_id });
 
     if (!wallet) {
-      return {
-        error: {
-          code: 404,
-          message: "Wallet not found",
-        },
-      };
+      wallet = await Wallet.create({
+        user: user_id,
+      });
     }
 
     if (wallet.balance < totalPrice) {
@@ -494,11 +492,13 @@ export const placeOrderService = async ({
 
     wallet.balance -= totalPrice;
 
-    wallet.transactions.push({
+    await WalletTransaction.create({
+      wallet: wallet._id,
+      user: wallet.user,
       type: "debit",
-      amount: totalPrice,
+      amount: order.totalPrice,
       reason: "Order Payment",
-      orderId: order._id, // internal order reference
+      orderId: order._id,
       status: "SUCCESS",
     });
 

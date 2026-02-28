@@ -17,6 +17,7 @@ import generateInvoice from "../../utils/generateInvoice.js";
 import bcrypt from "bcrypt";
 import generateOtp from "../../utils/GenerateOtp.js";
 import Wallet from "../../models/walletModel.js";
+import WalletTransaction from "../../models/walletTransaction.js";
 import * as userConstants from "../../constants/userConstants.js";
 import * as userServices from "../../services/user/userServices.js";
 import * as walletHandler from "../../utils/walletHandler.js";
@@ -25,6 +26,7 @@ import crypto from "crypto";
 import gstCalculator from "../../utils/gstCalculator.js";
 import Coupon from "../../models/couponModel.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
+import paginate from "../../utils/pagination.js";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -347,6 +349,13 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     })
     .lean();
 
+  let wallet = await Wallet.findOne({ user: user_id });
+  if (!wallet) {
+    wallet = await Wallet.create({
+      user: user_id,
+    });
+  }
+
   const coupons = await couponChecks.checkCoupon(user_id, subtotal);
 
   res.render("user/pages/checkout", {
@@ -357,6 +366,7 @@ export const checkoutPage = wrapAsync(async (req, res) => {
     addresses,
     subtotal,
     gstAmount,
+    wallet,
     coupons,
     shippingCharge,
     total,
@@ -757,23 +767,26 @@ export const walletPage = (req, res) => {
 
 export const walletData = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
-  const wallet = await Wallet.findOne({ user: user_id }).lean();
+  const page = req.query.page || 1;
+
+  let wallet = await Wallet.findOne({ user: user_id }).lean();
 
   if (!wallet) {
-    return sendResponse(res, {
-      code: 404,
-      message: "There is wallet for the user",
-    });
+    wallet = await Wallet.create({ user: user_id });
   }
 
-  if (wallet && wallet.transactions) {
-    wallet.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }
+  const filter = { wallet: wallet._id, user: user_id };
+
+  const pagination = await paginate(WalletTransaction, page, 10, filter);
 
   return sendResponse(res, {
     code: 200,
     message: "wallet data successfully got",
-    data: wallet,
+    data: {
+      balance: wallet.balance,
+      transactions: pagination.data,
+      pagination: pagination.meta,
+    },
   });
 });
 
@@ -783,21 +796,10 @@ export const walletData = wrapAsync(async (req, res) => {
 
 export const walletTopupOrder = wrapAsync(async (req, res) => {
   const { amount } = req.body;
-  console.log(amount);
   const user_id = req.session.user.id;
 
   if (!amount || amount < 100) {
     return sendResponse(res, Responses.walletPayment.INVALID_AMOUNT);
-  }
-
-  const razorpayOrder = await razorpay.orders.create({
-    amount: Math.round(amount * 100), // paise
-    currency: "INR",
-    receipt: `wallet_${Date.now()}`,
-  });
-
-  if (!razorpayOrder) {
-    return sendResponse(res, Responses.walletPayment.ORDER_FAILED);
   }
 
   let wallet = await Wallet.findOne({ user: user_id });
@@ -805,7 +807,19 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
     wallet = await Wallet.create({ user: user_id });
   }
 
-  wallet.transactions.push({
+  const razorpayOrder = await razorpay.orders.create({
+    amount: Math.round(amount * 100), // paise
+    currency: "INR",
+    receipt: `wallet_${wallet._id}`,
+  });
+
+  if (!razorpayOrder) {
+    return sendResponse(res, Responses.walletPayment.ORDER_FAILED);
+  }
+
+  await WalletTransaction.create({
+    wallet: wallet._id,
+    user: wallet.user,
     type: "credit",
     amount,
     reason: "Wallet Top-up",
@@ -814,8 +828,6 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
       orderId: razorpayOrder.id,
     },
   });
-
-  await wallet.save();
 
   return sendResponse(res, {
     code: 200,
@@ -856,20 +868,23 @@ export const verifyWalletTopup = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
   }
 
-  const wallet = await Wallet.findOne({
-    user: user_id,
-    "transactions.razorpay.orderId": razorpay_order_id,
-  });
+  const wallet = await Wallet.findOne({ user: user_id });
 
   if (!wallet) {
     return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
   }
 
-  const transaction = wallet.transactions.find(
-    (t) => t.razorpay?.orderId === razorpay_order_id && t.status === "PENDING",
-  );
+  const transaction = await WalletTransaction.findOne({
+    wallet: wallet._id,
+    user: wallet.user,
+    "razorpay.orderId": razorpay_order_id,
+  });
 
   if (!transaction) {
+    return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
+  }
+
+  if (transaction.status !== "PENDING") {
     return sendResponse(res, {
       code: 409,
       message: "Wallet top-up already processed",
@@ -883,6 +898,7 @@ export const verifyWalletTopup = wrapAsync(async (req, res) => {
   transaction.razorpay.signature = razorpay_signature;
 
   await wallet.save();
+  await transaction.save();
 
   return sendResponse(res, Responses.walletPayment.SUCCESS);
 });
