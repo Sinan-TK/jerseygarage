@@ -18,7 +18,7 @@ import gstCalculator from "../../utils/gstCalculator.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
 import razorpay from "../../config/razorpay.js";
 import Wallet from "../../models/walletModel.js";
-import WalletTransaction from "../../models/walletTransaction.js";
+import WalletTransaction from "../../models/walletTransactionModel.js";
 
 // ======================================================================
 // CART PAGE RENDER

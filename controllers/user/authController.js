@@ -21,7 +21,7 @@ import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import * as authServices from "../../services/user/authServices.js";
 import * as userConstants from "../../constants/userConstants.js";
 import Offer from "../../models/offerModel.js";
-import WalletTransaction from "../../models/walletTransaction.js";
+import WalletTransaction from "../../models/walletTransactionModel.js";
 
 // ======================================================================
 // 1. LOGIN PAGE

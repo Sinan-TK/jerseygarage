@@ -17,7 +17,7 @@ import generateInvoice from "../../utils/generateInvoice.js";
 import bcrypt from "bcrypt";
 import generateOtp from "../../utils/GenerateOtp.js";
 import Wallet from "../../models/walletModel.js";
-import WalletTransaction from "../../models/walletTransaction.js";
+import WalletTransaction from "../../models/walletTransactionModel.js";
 import * as userConstants from "../../constants/userConstants.js";
 import * as userServices from "../../services/user/userServices.js";
 import * as walletHandler from "../../utils/walletHandler.js";
