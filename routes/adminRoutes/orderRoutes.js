@@ -12,5 +12,6 @@ router.get("/details/:id", orderController.orderDetailsPageRender);
 
 router.patch("/change-status", orderController.changeStatus);
 
+router.patch("/return", orderController.returnRequest);
 
 export default router;

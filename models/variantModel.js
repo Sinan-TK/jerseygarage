@@ -32,6 +32,11 @@ const variantSchema = new mongoose.Schema(
       min: 0,
     },
 
+    lockedStock: {
+      type: Number,
+      default: 0,
+    },
+
     is_available: {
       type: Boolean,
       default: true,

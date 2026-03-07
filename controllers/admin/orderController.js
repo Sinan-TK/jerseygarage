@@ -1,6 +1,10 @@
 import wrapAsync from "../../utils/wrapAsync.js";
 import Order from "../../models/orderModel.js";
+import User from "../../models/userModel.js";
 import sendResponse from "../../utils/sendResponse.js";
+import * as walletHandler from "../../utils/walletHandler.js";
+import paginate from "../../utils/pagination.js";
+import { processRefundReturn } from "../../utils/handleReturnCancel.js";
 
 // ======================================================================
 // 6. ORDER PAGE
@@ -51,31 +55,19 @@ export const ordersListing = wrapAsync(async (req, res) => {
       filter.createdAt.$lte = endDate;
     }
   }
-  const limit = 10;
-  const totalDocuments = await Order.countDocuments(filter);
-  const totalPages = Math.ceil(totalDocuments / limit);
+  const pagination = await paginate(Order, page, 10, filter);
 
-  if (page > totalPages) page = totalPages;
-  if (page < 1) page = 1;
-
-  const skip = (page - 1) * limit;
-
-  const orders = await Order.find(filter)
-    .populate("user_id", "full_name")
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .lean();
+  for (const order of pagination.data) {
+    const user = await User.findById(order.user_id).select("full_name");
+    order.user_id = user;
+  }
 
   return sendResponse(res, {
     code: 200,
     message: "listing successfully",
     data: {
-      orders,
-      pagination: {
-        totalPages,
-        currentPage: page,
-      },
+      orders: pagination.data,
+      pagination: pagination.meta,
     },
   });
 });
@@ -168,5 +160,101 @@ export const changeStatus = wrapAsync(async (req, res) => {
   return sendResponse(res, {
     code: 200,
     message: "Status updated successfully!",
+  });
+});
+
+//
+
+//
+
+export const returnRequest = wrapAsync(async (req, res) => {
+  const { type, returnId, orderId } = req.body;
+
+  if (!type || !returnId || !orderId) {
+    return sendResponse(res, { code: 403, message: "Something went wrong" });
+  }
+
+  const order = await Order.findById(orderId);
+  if (!order) {
+    return sendResponse(res, { code: 400, message: "Order not found" });
+  }
+
+  const returnEntry = order.returnHistory.find(
+    (r) => r._id.toString() === returnId.toString(),
+  );
+
+  if (!returnEntry) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Return request not found",
+    });
+  }
+
+  if (returnEntry.status !== "Pending") {
+    return sendResponse(res, {
+      code: 400,
+      message: "Return request already processed",
+    });
+  }
+
+  if (type === "accept") {
+    // Update each product in the return request
+    let refund = 0;
+
+    for (const itemId of returnEntry.items) {
+      const product = order.products.find(
+        (p) => p._id.toString() === itemId.toString(),
+      );
+
+      if (!product) continue;
+
+      product.status = "Returned";
+      product.requestStatus = "Pending";
+
+      const price = product.subtotal + (product.total_gst || 0);
+
+      order.totalPrice -= price;
+
+      refund += price;
+    }
+
+    const allReturned = order.products.every((p) => p.status === "Returned");
+
+    if (allReturned) {
+      if (order.is_couponed) {
+        const coupon = order.coupon;
+        refund -= coupon.discountAmount;
+        order.totalPrice += coupon.discountAmount;
+      }
+      order.totalPrice -= order.shippingCharge;
+      refund += order.shippingCharge;
+    }
+
+    // Update return entry status
+    returnEntry.status = "Approved";
+
+    // Process refund
+    await processRefundReturn(order, refund, returnEntry.items);
+  } else if (type === "reject") {
+    // Revert product statuses back to Active
+    for (const itemId of returnEntry.items) {
+      const product = order.products.find(
+        (p) => p._id.toString() === itemId.toString(),
+      );
+      if (!product) continue;
+      product.status = "Active";
+      product.requestStatus = "None";
+    }
+
+    returnEntry.status = "Rejected";
+  } else {
+    return sendResponse(res, { code: 400, message: "Invalid type" });
+  }
+
+  await order.save();
+
+  return sendResponse(res, {
+    code: 200,
+    message: type === "accept" ? "Return accepted" : "Return rejected",
   });
 });

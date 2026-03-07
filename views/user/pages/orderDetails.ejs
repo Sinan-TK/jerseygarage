@@ -115,7 +115,7 @@
 
 
     <!-- Order Items -->
-    <div class="card">
+    <div id="orderItems" class="card">
         <h3>Order Items</h3>
 
         <% order.products.forEach((product)=>{ %>
@@ -147,7 +147,7 @@
 
         <div class="summary-row">
             <span>Subtotal</span>
-            <span>₹<%= (order.itemsPrice).toFixed(2) %></span>
+            <span id="itemsPrice">₹<%= (order.itemsPrice).toFixed(2) %></span>
         </div>
 
         <div class="summary-row">
@@ -155,22 +155,29 @@
             <span>₹<%= (order.shippingCharge).toFixed(2) %></span>
         </div>
 
-        <div class="summary-row">
+        <div id="gstAmountDiv" class="summary-row">
             <span>GST</span>
-            <span>₹<%= (order.totalGST).toFixed(2) %></span>
+            <span id="gstAmount">₹<%= (order.totalGST).toFixed(2) %></span>
         </div>
 
-        <% if(order.is_couponed){ %>
-        <div class="summary-row">
-            <span>Coupon Discount (<%= order.coupon.code %>)</span>
-            <span>₹<%= (order.coupon.discountAmount).toFixed(2) %></span>
-        </div>
-        <%}%>
+        <% if(order.refundAmount){ %>
+            <div id="refundAmountDiv" class="summary-row">
+                <span>Refund Amount</span>
+                <span id="refundAmount">-₹<%= (order.refundAmount).toFixed(2) %></span>
+            </div>
+            <%}%>
 
-        <div class="summary-row total">
-            <span>Total</span>
-            <span>₹<%= (order.totalPrice).toFixed(2) %></span>
-        </div>
+                <% if(order.is_couponed){ %>
+                    <div class="summary-row">
+                        <span>Coupon Discount (<%= order.coupon.code %>)</span>
+                        <span>-₹<%= (order.coupon.discountAmount).toFixed(2) %></span>
+                    </div>
+                    <%}%>
+
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="totalPrice">₹<%= (order.totalPrice).toFixed(2) %></span>
+                        </div>
     </div>
 
     <!-- Address -->
@@ -201,13 +208,13 @@
             </p>
         </div>
 
-        <% if(order.orderStatus !== "Cancelled"){ %>
-        <div class="cancel-box">
-            <button class="cancel-btn" id="openOrderModal">
-                <%= order.orderStatus==="Delivered" ? "Return" : "Cancel" %> Order
-            </button>
-        </div>
-        <% } %>
+        <% if(order.products.some(i=> i.status === "Active")){ %>
+            <div class="cancel-box">
+                <button class="cancel-btn" id="openOrderModal">
+                    <%= order.orderStatus==="Delivered" ? "Return" : "Cancel" %> Order
+                </button>
+            </div>
+            <% } %>
 
     </div>
 
@@ -228,6 +235,9 @@
 
         <!-- Body -->
         <div class="modal-body">
+            <div id="errorBox" class="modal-section error-cancel">
+                <p id="errorText"></p>
+            </div>
 
             <!-- Action Type -->
             <div class="modal-section">
@@ -250,6 +260,10 @@
             <!-- Reason -->
             <div class="modal-section">
                 <label>Reason</label>
+
+                <select id="actionReasonDropdown" class="action-reason">
+
+                </select>
 
                 <textarea id="actionReason" placeholder="Enter reason..."></textarea>
             </div>

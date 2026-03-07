@@ -1,4 +1,5 @@
 import wrapAsync from "../../utils/wrapAsync.js";
+import mongoose from "mongoose";
 import * as userValidators from "../../validators/userValidators.js";
 import * as Responses from "../../utils/responses/user/user.response.js";
 import sendResponse from "../../utils/sendResponse.js";
@@ -457,9 +458,9 @@ export const proceedToCheckout = wrapAsync(async (req, res) => {
 
   if (warning.length > 0) {
     return sendResponse(res, {
-      code: 409,
-      message: warning.join(""),
-      data: { warn: true },
+      code: 200,
+      message: "Some Products are not available",
+      data: { warnings: warning },
     });
   }
 
@@ -519,6 +520,7 @@ export const userLogout = (req, res) => {
 export const orderSuccess = wrapAsync(async (req, res) => {
   const orderId = req.session.orderId;
   const user_id = req.session.user.id;
+  delete req.session.orderid;
 
   const order = await Order.findOne({
     _id: orderId,
@@ -540,7 +542,7 @@ export const orderSuccess = wrapAsync(async (req, res) => {
   };
 
   res.render("user/pages/paymentsuccess", {
-    title: "Payment Success",
+    title: "Order Success",
     pageJS: "paymentsuccess.js",
     pageCSS: "paymentsuccess",
     details,
@@ -548,6 +550,21 @@ export const orderSuccess = wrapAsync(async (req, res) => {
     showHeader: false,
   });
 });
+
+//
+//
+//
+
+export const orderFailed = (req, res) => {
+  delete req.session.orderid;
+  res.render("user/pages/paymentfailed", {
+    title: "Order Failed",
+    pageJS: "",
+    pageCSS: "paymentfailed",
+    showFooter: false,
+    showHeader: false,
+  });
+};
 
 // ======================================================================
 // 6. PLACE ORDER
@@ -599,7 +616,6 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
   }
 
   const sign = razorpay_order_id + "|" + razorpay_payment_id;
-
   const expected = crypto
     .createHmac("sha256", process.env.RAZORPAY_TESTKEYSECRET)
     .update(sign)
@@ -615,44 +631,108 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
     "razorpay.orderId": razorpay_order_id,
   });
 
-  const items = order.products;
-
   if (!order) {
     return sendResponse(res, Responses.razorpayOrderVerify.PAYMENT_FAILED);
   }
 
-  order.paymentStatus = "Paid";
-  order.orderStatus = "Placed";
+  // ── Transaction ───────────────────────────────────────────────────────────
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  order.razorpay.paymentId = razorpay_payment_id;
-  order.razorpay.signature = razorpay_signature;
-
-  await order.save();
-
-  if (order.is_couponed) {
-    const couponCode = order.coupon.code;
-
-    const couponUsage = await couponChecks.applyCouponUsage(
-      couponCode,
-      user_id,
+  try {
+    // Update order status
+    await Order.updateOne(
+      { _id: order._id },
+      {
+        paymentStatus: "Paid",
+        orderStatus: "Placed",
+        paidAt: new Date(),
+        "razorpay.paymentId": razorpay_payment_id,
+        "razorpay.signature": razorpay_signature,
+      },
+      { session },
     );
 
-    if (couponUsage?.error) {
-      return { error: couponUsage.error };
+    // Release lock — stock already deducted at place order
+    for (const item of order.products) {
+      await Variant.updateOne(
+        { _id: item.variant_id },
+        { $inc: { lockedStock: -item.quantity } },
+        { session },
+      );
     }
-  }
 
-  for (const item of items) {
+    // Apply coupon usage
+    if (order.is_couponed) {
+      const couponUsage = await couponChecks.applyCouponUsage(
+        order.coupon.code,
+        user_id,
+        session,
+      );
+      if (couponUsage?.error) {
+        await session.abortTransaction();
+        session.endSession();
+        return sendResponse(res, couponUsage.error);
+      }
+    }
+
+    // Clear cart
+    await Cart.deleteOne({ user_id }, { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return sendResponse(res, Responses.razorpayOrderVerify.SUCCESS);
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
+});
+
+//
+
+//
+
+export const orderPayFailed = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const orderId = req.session.pendingOrderId;
+  delete req.session.pendingOrderId;
+
+  const order = await Order.findOne({
+    _id: orderId,
+    user_id,
+    orderStatus: "Pending",
+    paymentStatus: "Pending",
+  });
+
+  if (!order)
+    return sendResponse(res, { code: 404, message: "Order not found" });
+
+  // Release locked stock
+  for (const item of order.products) {
     await Variant.updateOne(
       { _id: item.variant_id },
-      { $inc: { stock: -item.quantity } },
+      { $inc: { stock: +item.quantity, lockedStock: -item.quantity } },
     );
   }
 
-  await Cart.deleteOne({ user_id });
+  // Mark order as failed
+  await Order.updateOne(
+    { _id: order._id },
+    { orderStatus: "Failed", paymentStatus: "Failed" },
+  );
 
-  return sendResponse(res, Responses.razorpayOrderVerify.SUCCESS);
+  return sendResponse(res, {
+    code: 200,
+    message: "Razorpay payment Failed",
+    redirectToFrontend: "/user/order/failed",
+  });
 });
+
+//
+//
+//
 
 // ======================================================================
 // 6. ORDER LISTING PAGE
@@ -666,7 +746,7 @@ export const orderListingPage = wrapAsync(async (req, res) => {
     .sort({ createdAt: -1 });
 
   res.render("user/layouts/profilelayout", {
-    title: "User orders",
+    title: "User Orders",
     pageCSS: "order",
     view: "order",
     profile: true,
@@ -741,7 +821,7 @@ export const orderCancelReturn = wrapAsync(async (req, res) => {
   }
 
   if (result?.success) {
-    return sendResponse(res, res.success);
+    return sendResponse(res, result.success);
   }
 });
 
@@ -777,7 +857,7 @@ export const walletData = wrapAsync(async (req, res) => {
 
   const filter = { wallet: wallet._id, user: user_id };
 
-  const pagination = await paginate(WalletTransaction, page, 10, filter);
+  const pagination = await paginate(WalletTransaction, page, 6, filter);
 
   return sendResponse(res, {
     code: 200,
@@ -802,32 +882,23 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.walletPayment.INVALID_AMOUNT);
   }
 
-  let wallet = await Wallet.findOne({ user: user_id });
-  if (!wallet) {
-    wallet = await Wallet.create({ user: user_id });
-  }
-
   const razorpayOrder = await razorpay.orders.create({
     amount: Math.round(amount * 100), // paise
     currency: "INR",
-    receipt: `wallet_${wallet._id}`,
+    receipt: `wallet_${user_id}`,
   });
 
   if (!razorpayOrder) {
     return sendResponse(res, Responses.walletPayment.ORDER_FAILED);
   }
 
-  await WalletTransaction.create({
-    wallet: wallet._id,
-    user: wallet.user,
-    type: "credit",
+  await walletHandler.creditWallet(
+    user_id,
     amount,
-    reason: "Wallet Top-up",
-    status: "PENDING",
-    razorpay: {
-      orderId: razorpayOrder.id,
-    },
-  });
+    "PENDING",
+    "Wallet Top-up",
+    razorpayOrder.id,
+  );
 
   return sendResponse(res, {
     code: 200,

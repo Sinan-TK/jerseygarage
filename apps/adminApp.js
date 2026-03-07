@@ -14,7 +14,7 @@ adminApp.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 60 * 10,
+      maxAge: 1000 * 60 * 30,
       httpOnly: true,
       path: "/admin",
     },

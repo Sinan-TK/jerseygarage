@@ -69,7 +69,7 @@
                 <input type="radio" name="payment" value="Wallet" />
                 <div class="radio-content">
                     <div class="title">Wallet</div>
-                    <p class="muted">Wallet Balance : ₹<%= wallet.balance %></p>
+                    <p class="muted">Wallet Balance : ₹<%= (wallet.balance).toFixed(2) %></p>
                 </div>
             </label>
 
@@ -96,8 +96,8 @@
         <div class="summary-card">
             <% if(warning.length !==0){ %>
                 <div class="warning-message">
-                    <h3><i class="fa-solid fa-triangle-exclamation"></i>warning</h3>
-                    <ul>
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i>Sorry</h3>
+                    <ul id="warningList">
                         <% warning.forEach((warn)=>{ %>
                             <li>
                                 <%= warn %>

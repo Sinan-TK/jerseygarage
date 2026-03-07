@@ -67,11 +67,6 @@ router.patch(
 
 router.get("/cart", userMiddleware.Userdetails, userController.cartRender);
 
-// router.get("/wishlist", userMiddleware.Userdetails, userController.wishlistRender);
-
-// router.post("/wishlist", userMiddleware.Userdetails, userController.addWishlist);
-
-// router.delete("/wishlist/:id", userMiddleware.Userdetails, userController.removeWishlist);
 router.use("/wishlist", userMiddleware.Userdetails, wishlistRoutes);
 
 router.post("/add-to-cart", userController.addToCart);
@@ -92,9 +87,21 @@ router.post("/place-order", userController.placeOrder);
 
 router.post("/payment/verify", userController.orderPayVerify);
 
+router.post("/payment/failed", userController.orderPayFailed);
+
 router.delete("/cart/remove", userController.deleteCartItem);
 
-router.get("/order/success", userController.orderSuccess);
+router.get(
+  "/order/success",
+  userMiddleware.checkOrder,
+  userController.orderSuccess,
+);
+
+router.get(
+  "/order/failed",
+  userMiddleware.checkOrder,
+  userController.orderFailed,
+);
 
 router.get(
   "/orders",

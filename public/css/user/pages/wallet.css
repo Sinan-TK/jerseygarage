@@ -122,6 +122,10 @@
   color: red;
 }
 
+.status-pending{
+  color: rgb(198, 198, 0);
+}
+
 
 /* Responsive */
 

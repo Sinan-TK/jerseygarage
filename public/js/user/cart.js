@@ -63,16 +63,31 @@ document.querySelectorAll(".qty").forEach((qtyBox) => {
 document.getElementById("checkoutBtn").addEventListener("click", async () => {
   try {
     const res = await axios.post("/user/checkout");
-    if (res.data.success) {
+    if (res.data?.data?.warnings?.length > 0) {
+      toastr.warning(res.data.message, "sorry");
+      const cartItems = document.querySelector(".cart-items");
+      const existing = cartItems.querySelector(".warning-message");
+      if (existing) existing.remove();
+      const waringMess = document.createElement("div");
+      waringMess.className = "warning-message";
+      waringMess.innerHTML = `<h3><i class="fa-solid fa-triangle-exclamation"></i>Sorry</h3>`;
+      const waringList = document.createElement("ul");
+      const warns = res.data.data.warnings;
+      console.log(warns);
+      warns.forEach((warn) => {
+        const li = document.createElement("li");
+        li.innerHTML = warn;
+        waringList.appendChild(li);
+      });
+      waringMess.appendChild(waringList);
+      cartItems.prepend(waringMess);
+    } else {
       window.location.href = res.data.redirect;
     }
   } catch (err) {
     const error = err.response?.data;
-    if (error?.data) {
-      toastr.warning(error.message, "Warning!!");
-    } else {
-      toastr.error(error.message, "Error!!");
-    }
+    console.log(error);
+    toastr.error(error.message || "Something went wrong", "Error!!");
   }
 });
 

@@ -7,7 +7,8 @@ import adminUserRoutes from "./userRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
 import orderRoutes from "./orderRoutes.js";
 import couponRoutes from "./couponRoutes.js";
-import offerRoutes from "./offerRoutes.js"
+import offerRoutes from "./offerRoutes.js";
+import salesReportRoutes from "./salesReportRoutes.js"
 import productRoutes from "../adminRoutes/productRoutes.js";
 
 const router = express.Router();
@@ -35,6 +36,8 @@ router.use("/offers",offerRoutes);
 
 router.use("/coupons",couponRoutes);
 
+router.use("/sales-report",salesReportRoutes);
+
 
 router.get("/payments",adminController.featureNotAvailable);
 
@@ -44,7 +47,6 @@ router.get("/reviews",adminController.featureNotAvailable);
 
 router.get('/logout', adminController.logOut );
 
-router.get('/users/search', adminController.searchUser);
 
 
 // router.get('/featureNotAvailable',adminController.featureNotAvailable);

@@ -54,9 +54,20 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
     },
 
+    offerDiscount: {
+      type: Number,
+      default: 0,
+    },
+
     status: {
       type: String,
-      enum: ["Active", "Cancelled", "Returned"],
+      enum: [
+        "Active",
+        "Cancelled",
+        "Cancel-Requested",
+        "Returned",
+        "Return-Requested",
+      ],
       default: "Active",
     },
 
@@ -75,32 +86,29 @@ const orderItemSchema = new mongoose.Schema(
    HISTORY SCHEMA
 ============================ */
 
-const requestHistorySchema = new mongoose.Schema(
-  {
-    items: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-      },
-    ],
-
-    reason: {
-      type: String,
-      required: true,
+const requestHistorySchema = new mongoose.Schema({
+  items: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
     },
+  ],
 
-    requestedAt: {
-      type: Date,
-      default: Date.now,
-    },
-
-    status: {
-      type: String,
-      enum: ["Pending", "Approved", "Rejected"],
-      default: "Pending",
-    },
+  reason: {
+    type: String,
+    required: true,
   },
-  { _id: false },
-);
+
+  requestedAt: {
+    type: Date,
+    default: Date.now,
+  },
+
+  status: {
+    type: String,
+    enum: ["Pending", "Approved", "Rejected"],
+    default: "Pending",
+  },
+});
 
 /* ============================
    MAIN ORDER SCHEMA
@@ -143,15 +151,16 @@ const orderSchema = new mongoose.Schema(
         "OutForDelivery",
         "Delivered",
         "Pending",
+        "Failed",
 
         // Cancel / Return states
         "Cancelled", // All items cancelled
         "Partially-Cancelled", // Some cancelled
         "Returned", // All returned
-        "PartiallyReturned", // Some returned
+        "Partially-Returned", // Some returned
       ],
 
-      default: "Placed",
+      default: "Pending",
     },
 
     paymentMethod: {
@@ -159,7 +168,7 @@ const orderSchema = new mongoose.Schema(
       enum: ["COD", "Razorpay", "Wallet"],
       required: true,
     },
-    
+
     razorpay: {
       orderId: {
         type: String, // Razorpay order_id
@@ -174,7 +183,7 @@ const orderSchema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: ["Pending", "Paid", "Refunded"],
+      enum: ["Pending", "Paid", "Refunded", "Failed"],
       default: "Pending",
     },
 
@@ -196,6 +205,11 @@ const orderSchema = new mongoose.Schema(
     totalPrice: {
       type: Number,
       required: true,
+    },
+
+    totalDiscount: {
+      type: Number,
+      default: 0,
     },
 
     refundAmount: {
@@ -226,6 +240,10 @@ const orderSchema = new mongoose.Schema(
       },
       discountValue: {
         type: Number,
+      },
+      minPurchaseAmount: {
+        type: Number,
+        default: 0,
       },
       discountAmount: {
         type: Number,

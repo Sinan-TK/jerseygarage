@@ -87,8 +87,10 @@ function closeModal() {
 
 function setupActionOptions() {
   const select = document.getElementById("actionType");
+  const selectReasons = document.getElementById("actionReasonDropdown");
 
   select.innerHTML = "";
+  selectReasons.innerHTML = "";
 
   /* NOT delivered → Cancel */
   if (ORDER_STATUS !== "Delivered") {
@@ -96,6 +98,13 @@ function setupActionOptions() {
       <option value="full-cancel">Full Cancel</option>
       <option value="partial-cancel">Partial Cancel</option>
     `;
+    selectReasons.innerHTML += `
+        <option value="">Reason</option>
+        <option value="Ordered by mistake">Ordered by mistake</option>
+        <option value="Delivery time is too long">Delivery time is too long</option>
+        <option value="Found a better price elsewhere">Found a better price elsewhere</option>
+        <option value="Changed mind">Changed mind</option>
+        <option value="Payment or checkout issue">Payment or checkout issue</option>`;
   }
 
   /* Delivered → Return */
@@ -104,6 +113,13 @@ function setupActionOptions() {
       <option value="full-return">Full Return</option>
       <option value="partial-return">Partial Return</option>
     `;
+    selectReasons.innerHTML += `
+        <option value="">Reason</option>
+        <option value="Received a damaged or defective product">Received a damaged or defective product</option>
+        <option value="Wrong product delivered">Wrong product delivered</option>
+        <option value="Product does not match description">Product does not match description</option>
+        <option value="Size / fit issue">Size / fit issue</option>
+        <option value="Quality not as expected">Quality not as expected</option>`;
   }
 }
 
@@ -154,7 +170,9 @@ function handleActionChange() {
 async function submitAction() {
   const action = document.getElementById("actionType").value;
 
-  const reason = document.getElementById("actionReason").value;
+  const reason =
+    document.getElementById("actionReasonDropdown").value ||
+    document.getElementById("actionReason").value;
 
   const items = [];
 
@@ -182,18 +200,22 @@ async function submitAction() {
     items,
   };
 
-  console.log("Sending:", payload);
-
   /* ===== API CALL ===== */
 
   try {
     const res = await axios.patch("/user/orders/order-action", payload);
-
     console.log(res);
+    loadItems(res.data.data);
     closeModal();
+    toastr.success(res.data.message, "Success");
   } catch (err) {
     const error = err.response?.data;
-    toastr.error(error?.message || "Something went wrong", "Failed");
+    console.error(error);
+    const errorBox = document.getElementById("errorBox")
+    const errorText = document.getElementById("errorText");
+    errorBox.style.display = "flex";
+    errorText.innerHTML = error?.message||"Something went wrong!!"
+    // toastr.error(error?.message || "Something went wrong", "Failed");
   }
 }
 
@@ -206,3 +228,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+function loadItems(data) {
+  console.log(data);
+  document.getElementById("itemsPrice").innerHTML =
+    `₹${data.itemsPrice.toFixed(2)}`;
+  console.log("working 1");
+
+  document.getElementById("gstAmount").innerHTML =
+    `₹${data.totalGST.toFixed(2)}`;
+  console.log("working 2");
+
+  // Remove old refund div if it exists
+  const existingRefund = document.getElementById("refundAmountDiv");
+  if (existingRefund) existingRefund.remove();
+
+  if (data.refundAmount) {
+    const gstAmountDiv = document.getElementById("gstAmountDiv");
+    const newDiv = document.createElement("div");
+    newDiv.className = "summary-row"; //
+
+    newDiv.innerHTML = `<span>Refund Amount</span>
+    <span id="refundAmount">-₹${data.refundAmount.toFixed(2)}</span>`;
+    gstAmountDiv.insertAdjacentElement("afterend", newDiv);
+  }
+  console.log("working 4");
+
+  document.getElementById("totalPrice").innerHTML =
+    `₹${data.totalPrice.toFixed(2)}`;
+  // document.getElementById()
+  // document.getElementById()
+  const card = document.getElementById("orderItems");
+  card.innerHTML = "";
+  const h3 = document.createElement("h3");
+  h3.innerHTML = "Order Items";
+  card.append(h3);
+  data.products.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<img src="${item.image}" />
+          <div class="item-info">
+              <h4>${item.name}</h4>
+              <p>Size: ${item.size} • Qty: ${item.quantity}</p>
+              <strong> ${item.price} </strong>
+          </div>
+          <span class="item-status status-${item.status}">
+              ${item.status}
+          </span>`;
+
+    card.append(div);
+  });
+}

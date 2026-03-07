@@ -1,4 +1,5 @@
 import Wallet from "../models/walletModel.js";
+import WalletTransaction from "../models/walletTransactionModel.js";
 
 /* =========================
    CREDIT WALLET
@@ -7,35 +8,39 @@ import Wallet from "../models/walletModel.js";
 export const creditWallet = async (
   userId,
   amount,
+  status,
   reason,
-  orderId = null
+  razorpayOrderId = null,
+  orderId = null,
 ) => {
-
   let wallet = await Wallet.findOne({ user: userId });
 
   // Auto-create (safety)
   if (!wallet) {
     wallet = await Wallet.create({
       user: userId,
-      balance: 0,
-      transactions: []
     });
   }
 
-  wallet.balance += amount;
+  if (status === "SUCCESS") {
+    wallet.balance += amount;
+  }
 
-  wallet.transactions.push({
+  await WalletTransaction.create({
+    user: wallet.user,
+    wallet: wallet._id,
     type: "credit",
     amount,
     reason,
-    orderId
+    status,
+    orderId,
+    razorpay: razorpayOrderId ? { orderId: razorpayOrderId } : null,
   });
 
   await wallet.save();
 
   return wallet;
 };
-
 
 /* =========================
    DEBIT WALLET
@@ -44,27 +49,32 @@ export const creditWallet = async (
 export const debitWallet = async (
   userId,
   amount,
+  status,
   reason,
-  orderId = null
+  orderId = null,
 ) => {
-
-  const wallet = await Wallet.findOne({ user: userId });
+  let wallet = await Wallet.findOne({ user: userId });
 
   if (!wallet) {
-    throw new Error("WALLET_NOT_FOUND");
+    wallet = await Wallet.create({ user: userId });
   }
 
   if (wallet.balance < amount) {
-    throw new Error("INSUFFICIENT_BALANCE");
+    return { error: { code: 402, message: "Insufficient wallet balance" } };
   }
 
-  wallet.balance -= amount;
+  if (status === "SUCCESS") {
+    wallet.balance -= amount;
+  }
 
-  wallet.transactions.push({
+  await WalletTransaction.create({
+    user: wallet.user,
+    wallet: wallet._id,
     type: "debit",
     amount,
     reason,
-    orderId
+    status,
+    orderId,
   });
 
   await wallet.save();

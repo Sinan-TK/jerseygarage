@@ -4,9 +4,11 @@ import Variant from "../../models/variantModel.js";
 import Address from "../../models/addressModel.js";
 import Order from "../../models/orderModel.js";
 import Otp from "../../models/otpModel.js";
+import WalletTransaction from "../../models/walletTransactionModel.js";
 import sendResponse from "../../utils/sendResponse.js";
 import buildCheckoutItems from "../../utils/buildCheckoutItems.js";
 import wrapAsync from "../../utils/wrapAsync.js";
+import mongoose from "mongoose";
 import generateOrderId from "../../utils/generateOrderId.js";
 import * as Responses from "../../utils/responses/user/user.response.js";
 import * as userValidators from "../../validators/userValidators.js";
@@ -16,9 +18,9 @@ import Wishlist from "../../models/wishlistModel.js";
 import * as offerCalculator from "../../utils/offerApply.js";
 import gstCalculator from "../../utils/gstCalculator.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
+import * as walletHandler from "../../utils/walletHandler.js";
 import razorpay from "../../config/razorpay.js";
 import Wallet from "../../models/walletModel.js";
-import WalletTransaction from "../../models/walletTransactionModel.js";
 
 // ======================================================================
 // CART PAGE RENDER
@@ -343,50 +345,37 @@ export const placeOrderService = async ({
   couponCode,
   user_id,
 }) => {
-  if (!addressId) {
-    return { error: Responses.placeOrder.NO_ADDRESS };
-  }
-
-  if (!paymentMethod) {
-    return { error: Responses.placeOrder.NO_PAY_METHOD };
-  }
+  if (!addressId) return { error: Responses.placeOrder.NO_ADDRESS };
+  if (!paymentMethod) return { error: Responses.placeOrder.NO_PAY_METHOD };
 
   const cart = await Cart.findOne({ user_id });
-
-  if (!cart || cart.items.length === 0) {
+  if (!cart || cart.items.length === 0)
     return { error: Responses.placeOrder.EMPTY_CART };
-  }
 
-  const address = await Address.findOne({
-    _id: addressId,
-    user_id,
-  });
-
-  if (!address) {
-    return { error: Responses.placeOrder.ADDRESS_NOT_FOUND };
-  }
+  const address = await Address.findOne({ _id: addressId, user_id });
+  if (!address) return { error: Responses.placeOrder.ADDRESS_NOT_FOUND };
 
   const { checkoutItems, warning } = await buildCheckoutItems(cart.items);
-
   const items = await offerCalculator.applyOffer(checkoutItems);
-
   const gstAmount = await gstCalculator(items);
 
   if (warning.length > 0) {
     return {
       error: {
-        code: 409,
+        code: 200,
         message: "Some items are unavailable",
-        data: { warning },
+        data: { warnings: warning },
       },
     };
   }
 
-  if (!items.length) {
-    return { error: Responses.placeOrder.NO_ITEMS };
-  }
+  if (!items.length) return { error: Responses.placeOrder.NO_ITEMS };
 
   const itemsPrice = items.reduce((sum, item) => sum + item.subtotal, 0);
+  const totalDiscount = items.reduce(
+    (sum, item) => sum + (item.offerDiscount || 0),
+    0,
+  );
 
   let price = itemsPrice;
   let isCouponed = false;
@@ -394,10 +383,7 @@ export const placeOrderService = async ({
 
   if (couponCode) {
     const result = await couponChecks.couponApply(user_id, couponCode, price);
-
-    if (result?.error) {
-      return sendResponse(res, result.error);
-    }
+    if (result?.error) return { error: result.error };
     price = result.finalAmount;
     isCouponed = true;
     coupon = {
@@ -405,13 +391,11 @@ export const placeOrderService = async ({
       discountType: result.discountType,
       discountValue: result.discountValue,
       discountAmount: result.discountAmount,
+      minPurchaseAmount: result.minPurchaseAmount,
     };
   }
 
   const totalPrice = price + userConstants.SHIPPING_CHARGE + gstAmount;
-
-  let paymentStatus = "Pending";
-  let paidAt = null;
 
   if (paymentMethod === "COD" && totalPrice > 500) {
     return {
@@ -422,99 +406,66 @@ export const placeOrderService = async ({
     };
   }
 
-  const products = items.map((item) => {
-    return {
-      name: item.name,
-      product_id: item.product_id,
-      size: item.size,
-      quantity: item.quantity,
-      price: item.unit_price,
-      subtotal: item.subtotal,
-      image: item.image,
-      variant_id: item.variant_id,
-      gst_rate: item.gst_rate,
-      unit_gst: item.unit_gst,
-      total_gst: item.total_gst,
-    };
-  });
+  const products = items.map((item) => ({
+    name: item.name,
+    product_id: item.product_id,
+    size: item.size,
+    quantity: item.quantity,
+    price: item.unit_price,
+    subtotal: item.subtotal,
+    image: item.image,
+    variant_id: item.variant_id,
+    gst_rate: item.gst_rate,
+    unit_gst: item.unit_gst,
+    total_gst: item.total_gst,
+    offerDiscount: item.offerDiscount,
+  }));
 
   const orderId = await generateOrderId();
 
-  const order = await Order.create({
-    orderId,
-
-    user_id,
-
-    products,
-
-    shippingAddress: {
-      full_name: address.full_name,
-      phone_no: address.phone_no,
-      address_line: address.address_line,
-      city: address.city,
-      state: address.state,
-      zip_code: address.zip_code,
-      country: address.country,
-    },
-
-    paymentMethod,
-    paymentStatus,
-    paidAt,
-
-    itemsPrice,
-    shippingCharge: userConstants.SHIPPING_CHARGE,
-    totalGST: gstAmount,
-    totalPrice,
-
-    is_couponed: isCouponed,
-    coupon: isCouponed ? coupon : null,
-
-    orderStatus: paymentMethod === "Razorpay" ? "Pending" : "Placed",
-  });
-
-  if (paymentMethod === "Wallet") {
-    let wallet = await Wallet.findOne({ user: user_id });
-
-    if (!wallet) {
-      wallet = await Wallet.create({
-        user: user_id,
-      });
-    }
-
-    if (wallet.balance < totalPrice) {
-      return {
-        error: {
-          code: 400,
-          message: "Insufficient wallet balance",
-        },
-      };
-    }
-
-    wallet.balance -= totalPrice;
-
-    await WalletTransaction.create({
-      wallet: wallet._id,
-      user: wallet.user,
-      type: "debit",
-      amount: order.totalPrice,
-      reason: "Order Payment",
-      orderId: order._id,
-      status: "SUCCESS",
+  // ── Razorpay — no transaction, stock locked, paid later ─────────────────
+  if (paymentMethod === "Razorpay") {
+    const order = await Order.create({
+      orderId,
+      user_id,
+      products,
+      shippingAddress: {
+        full_name: address.full_name,
+        phone_no: address.phone_no,
+        address_line: address.address_line,
+        city: address.city,
+        state: address.state,
+        zip_code: address.zip_code,
+        country: address.country,
+      },
+      paymentMethod,
+      paymentStatus: "Pending",
+      paidAt: null,
+      itemsPrice,
+      shippingCharge: userConstants.SHIPPING_CHARGE,
+      totalGST: gstAmount,
+      totalPrice,
+      totalDiscount,
+      is_couponed: isCouponed,
+      coupon: isCouponed ? coupon : null,
+      orderStatus: "Pending",
     });
 
-    wallet.save();
-  }
+    // Lock stock
+    for (const item of items) {
+      await Variant.updateOne(
+        { _id: item.variant_id },
+        { $inc: { stock: -item.quantity, lockedStock: +item.quantity } },
+      );
+    }
 
-  if (order.paymentMethod === "Razorpay") {
     const razorpayOrder = await razorpay.orders.create({
-      amount: Math.round(order.totalPrice * 100), // paise
+      amount: Math.round(order.totalPrice * 100),
       currency: "INR",
       receipt: order.orderId,
     });
 
-    order.razorpay = {
-      orderId: razorpayOrder.id,
-    };
+    order.razorpay = { orderId: razorpayOrder.id };
     await order.save();
 
     return {
@@ -532,31 +483,98 @@ export const placeOrderService = async ({
     };
   }
 
-  if (isCouponed) {
-    const couponUsage = await couponChecks.applyCouponUsage(
-      couponCode,
-      user_id,
+  // ── COD / Wallet — with transaction ──────────────────────────────────────
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const [order] = await Order.create(
+      [
+        {
+          orderId,
+          user_id,
+          products,
+          shippingAddress: {
+            full_name: address.full_name,
+            phone_no: address.phone_no,
+            address_line: address.address_line,
+            city: address.city,
+            state: address.state,
+            zip_code: address.zip_code,
+            country: address.country,
+          },
+          paymentMethod,
+          paymentStatus: "Pending",
+          paidAt: null,
+          itemsPrice,
+          shippingCharge: userConstants.SHIPPING_CHARGE,
+          totalGST: gstAmount,
+          totalPrice,
+          totalDiscount,
+          is_couponed: isCouponed,
+          coupon: isCouponed ? coupon : null,
+          orderStatus: "Placed",
+        },
+      ],
+      { session },
     );
 
-    if (couponUsage?.error) {
-      return { error: couponUsage.error };
+    // Deduct stock
+    for (const item of items) {
+      await Variant.updateOne(
+        { _id: item.variant_id },
+        { $inc: { stock: -item.quantity } },
+        { session },
+      );
     }
+
+    // Wallet debit
+    if (paymentMethod === "Wallet") {
+      const wallet = await walletHandler.debitWallet(
+        user_id,
+        order.totalPrice,
+        "SUCCESS",
+        "Order Payment",
+        order._id,
+        session,
+      );
+      if (wallet?.error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: wallet.error };
+      }
+    }
+
+    // Coupon usage
+    if (isCouponed) {
+      const couponUsage = await couponChecks.applyCouponUsage(
+        couponCode,
+        user_id,
+        session,
+      );
+      if (couponUsage?.error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: couponUsage.error };
+      }
+    }
+
+    // Clear cart
+    await Cart.deleteOne({ user_id }, { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      success: true,
+      paymentMethod,
+      orderId: order._id,
+    };
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
   }
-
-  for (const item of items) {
-    await Variant.updateOne(
-      { _id: item.variant_id },
-      { $inc: { stock: -item.quantity } },
-    );
-  }
-
-  await Cart.deleteOne({ user_id });
-
-  return {
-    success: true,
-    paymentMethod,
-    orderId: order._id,
-  };
 };
 
 //
@@ -615,18 +633,31 @@ export const orderCancelReturnService = async (
   }
 
   if (finalAction.includes("cancel")) {
-    await handleReturnCancel.handleCancel(order, finalAction, items, reason);
+    const cancelResult = await handleReturnCancel.handleCancel(
+      order,
+      finalAction,
+      items,
+      reason,
+    );
+
+    if (cancelResult?.error) {
+      return { error: cancelResult.error };
+    }
 
     await order.save();
 
-    return { success: Responses.orderCancelReturn.CANCEL_SUCCESS };
+    return {
+      success: { ...Responses.orderCancelReturn.CANCEL_SUCCESS, data: order },
+    };
   }
 
   if (finalAction.includes("return")) {
     await handleReturnCancel.handleReturn(order, finalAction, items, reason);
 
     await order.save();
-    return { success: Responses.orderCancelReturn.RETURN_SUCCESS };
+    return {
+      success: { ...Responses.orderCancelReturn.RETURN_SUCCESS, data: order },
+    };
   }
 
   return { error: Responses.orderCancelReturn.INVALID_ACTION };

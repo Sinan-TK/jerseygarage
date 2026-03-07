@@ -161,72 +161,107 @@ placeOrderBtn.addEventListener("click", async () => {
       couponCode,
     });
 
-    if (res.data.data?.waring) {
-      toastr.waring(res.data.data.waring, "warning");
-    }
+    console.log(res.data.data);
 
-    if (res.data.success) {
-      const data = res.data.data;
-      console.log(data);
-      if (data.paymentMethod === "Razorpay") {
-        const order = data;
+    if (res.data.data?.warnings?.length > 0) {
+      toastr.warning(res.data.message, "Sorry");
+      const summaryCard = document.querySelector(".summary-card");
+      const existing = summaryCard.querySelector(".warning-message");
+      if (existing) existing.remove();
+      const waringMess = document.createElement("div");
+      waringMess.className = "warning-message";
+      waringMess.innerHTML = `<h3><i class="fa-solid fa-triangle-exclamation"></i>Sorry</h3>`;
+      const waringList = document.createElement("ul");
+      const warns = res.data.data.warnings;
+      console.log(warns);
+      warns.forEach((warn) => {
+        const li = document.createElement("li");
+        li.innerHTML = warn;
+        waringList.appendChild(li);
+      });
+      waringMess.appendChild(waringList);
+      summaryCard.prepend(waringMess);
+    } else {
+      if (res.data.success) {
+        const data = res.data.data;
+        if (data.paymentMethod === "Razorpay") {
+          const order = data;
 
-        const options = {
-          key: order.key,
+          const options = {
+            key: order.key,
 
-          amount: order.amount,
-          currency: order.currency,
+            amount: order.amount,
+            currency: order.currency,
 
-          name: order.name,
-          description: order.description,
+            name: order.name,
+            description: order.description,
 
-          order_id: order.orderId,
+            order_id: order.orderId,
 
-          handler: async function (response) {
-            /* =========================
+            handler: async function (response) {
+              /* =========================
            3. VERIFY PAYMENT
         ========================= */
 
-            try {
-              const verifyRes = await axios.post("/user/payment/verify", {
-                ...response,
-              });
+              try {
+                const verifyRes = await axios.post("/user/payment/verify", {
+                  ...response,
+                });
 
-              const verifyResult = verifyRes.data;
+                const verifyResult = verifyRes.data;
 
-              if (verifyRes.data.success) {
-                toastr.success(verifyRes.data.message, "Paid");
-                setTimeout(() => {
-                  window.location.href = verifyRes.data.redirect;
-                }, 1500);
+                if (verifyRes.data.success) {
+                  toastr.success(verifyRes.data.message, "Paid");
+                  setTimeout(() => {
+                    window.location.href = verifyRes.data.redirect;
+                  }, 1500);
+                }
+              } catch (err) {
+                const error = err.response?.data;
+                toastr.error(
+                  error?.message || "Payment verification failed",
+                  "Failed",
+                );
+                resetBtn();
               }
-            } catch (err) {
-              const error = err.response?.data;
-              toastr.error(
-                error?.message || "Payment verification failed",
-                "Failed",
-              );
-              resetBtn();
-            }
-          },
-
-          modal: {
-            ondismiss: function () {
-              resetBtn();
             },
-          },
 
-          theme: {
-            color: "#000",
-          },
-        };
+            modal: {
+              ondismiss: function () {
+                resetBtn();
+                axios
+                  .post("/user/payment/failed")
+                  .then((res) => {
+                    if (res.data.success) {
+                      toastr.info(res.data.message, "Cancelled");
+                      setTimeout(() => {
+                        window.location.href = res.data.redirect;
+                      }, 1500);
+                    }
+                  })
+                  .catch((err) => {
+                    const error = err.response?.data;
+                    console.error(error);
+                    console.error(
+                      error?.message || "Something went wrong",
+                      err,
+                    );
+                  });
+              },
+            },
 
-        new Razorpay(options).open();
-      } else {
-        toastr.success(res.data.message, "Success");
-        setTimeout(() => {
-          window.location.href = res.data.redirect;
-        }, 1000);
+            theme: {
+              color: "#000",
+            },
+          };
+
+          new Razorpay(options).open();
+        } else {
+          toastr.success(res.data.message, "Success");
+          setTimeout(() => {
+            window.location.href = res.data.redirect;
+          }, 1000);
+        }
       }
     }
   } catch (err) {

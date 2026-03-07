@@ -107,6 +107,7 @@ export const couponApply = async (userId, couponCode, total) => {
     discountType: coupon.discountType,
     discountValue: coupon.discountValue,
     discountAmount: discount,
+    minPurchaseAmount: coupon.minPurchaseAmount,
     finalAmount: total - discount,
   };
 };

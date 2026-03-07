@@ -1,26 +1,102 @@
-const updateStatus = document.getElementById("updateStatus");
-updateStatus.addEventListener("click", async () => {
-  const orderStatus = document.getElementById("orderStatus").value;
-  const paymentStatus = document.getElementById("paymentStatus").value;
-  const orderId = updateStatus.dataset.orderId;
+const updateStatus = document?.getElementById("updateStatus");
+if (updateStatus) {
+  updateStatus.addEventListener("click", async () => {
+    const orderStatus = document.getElementById("orderStatus").value;
+    const paymentStatus = document.getElementById("paymentStatus").value;
+    const orderId = updateStatus.dataset.orderId;
 
-  console.log(orderId)
+    console.log(orderId);
 
-  console.log(orderStatus, paymentStatus, orderId);
+    console.log(orderStatus, paymentStatus, orderId);
 
+    try {
+      const res = await axios.patch("/admin/orders/change-status", {
+        orderStatus,
+        paymentStatus,
+        orderId,
+      });
+
+      if (res.data.success) {
+        toastr.success(res.data.message, "success");
+      }
+    } catch (err) {
+      const error = err.response?.data;
+      console.log(error);
+      toastr.error(error?.message || "Something went wrong", "Failed");
+    }
+  });
+}
+
+let returnModalType = null;
+let returnModalReturnId = null;
+
+function openReturnModal(type, returnId) {
+  const modal = document.getElementById("returnModal");
+  const title = document.getElementById("returnModalTitle");
+  const message = document.getElementById("returnModalMessage");
+  const confirmBtn = document.getElementById("returnModalConfirm");
+
+  if (type === "accept") {
+    title.innerHTML = "Accept Return";
+    message.innerHTML =
+      "Are you sure you want to <strong>accept</strong> this return request?";
+    confirmBtn.textContent = "Accept";
+    confirmBtn.className = "accept";
+  } else {
+    title.innerHTML = "Reject Return";
+    message.innerHTML =
+      "Are you sure you want to <strong>reject</strong> this return request?";
+    confirmBtn.textContent = "Reject";
+    confirmBtn.className = "";
+  }
+
+  returnModalType = type;
+  returnModalReturnId = returnId;
+  modal.style.display = "flex";
+}
+
+function closeReturnModal() {
+  document.getElementById("returnModal").style.display = "none";
+  returnModalType = null;
+  returnModalReturnId = null;
+}
+
+document
+  .getElementById("returnModalConfirm")
+  .addEventListener("click", function () {
+    returnModalAxios(returnModalType, returnModalReturnId);
+    closeReturnModal();
+  });
+
+document.querySelectorAll(".accept").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const returnId = btn.dataset.returnId;
+    openReturnModal("accept", returnId);
+  });
+});
+
+document.querySelectorAll(".reject").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const returnId = btn.dataset.returnId;
+    openReturnModal("reject", returnId);
+  });
+});
+
+async function returnModalAxios(type, returnId) {
+  const tr = document.getElementById("itemCard");
+  const orderId = tr.dataset.orderId;
   try {
-    const res = await axios.patch("/admin/orders/change-status", {
-      orderStatus,
-      paymentStatus,
+    const res = await axios.patch("/admin/orders/return", {
+      type,
+      returnId,
       orderId,
     });
 
-    if (res.data.success) {
-      toastr.success(res.data.message, "success");
-    }
+    console.log(res);
+    toastr.success(res.data.message, "Success");
   } catch (err) {
     const error = err.response?.data;
-    console.log(error);
-    toastr.error(error?.message || "Something went wrong", "Failed");
+    console.error(error);
+    toastr.error(error?.message || "Something went wrong", "error");
   }
-});
+}

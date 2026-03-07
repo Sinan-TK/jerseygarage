@@ -34,8 +34,9 @@
         <div class="order-left">
 
             <!-- Order Items -->
-            <div class="card">
+            <div class="card" id="itemCard" data-order-id="<%= order._id %>">
                 <h3>Order Items</h3>
+                <h4>Active</h4>
 
                 <table class="items-table">
 
@@ -45,7 +46,7 @@
                             <th>Unit Price</th>
                             <th>GST rate</th>
                             <th>Total</th>
-                            <th>Action</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
 
@@ -79,75 +80,161 @@
                                     </span></td>
                             </tr>
 
+
+
                             <% }) %>
 
                     </tbody>
-
                 </table>
             </div>
 
-            <!-- Financials -->
-            <div class="card">
-                <h3>Order Financials</h3>
+            <% if(order.returnHistory.length !==0){ %>
+                <% order.returnHistory.forEach(returnEntry=> { %>
+                    <div class="card">
+                        <h3>Order Items</h3>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Unit Price</th>
+                                    <th>GST rate</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItems">
+                                <% returnEntry.items.forEach((itemId)=> {
+                                    const product = order.products.find(p => p._id.toString() === itemId.toString())
+                                    if(!product) return;
+                                    %>
+                                    <tr>
+                                        <td>
+                                            <div class="product-box">
+                                                <img src="<%= product.image %>">
+                                                <div>
+                                                    <div class="product-name">
+                                                        <%= product.name %>
+                                                    </div>
+                                                    <div class="product-size">Size: <%= product.size %> | Qty: <%=
+                                                                product.quantity %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>₹<%= product.price %> × <%= product.quantity %>
+                                        </td>
+                                        <td>
+                                            <%= product.gst_rate %>% (₹<%= product.unit_gst %> × <%= product.quantity %>
+                                                        )
+                                        </td>
+                                        <td>₹<%= product.subtotal.toFixed(2) %>
+                                        </td>
+                                        <td><span class="order-badge">
+                                                <%= product.status %>
+                                            </span></td>
+                                    </tr>
 
-                <div class="finance-row">
-                    <span>Subtotal</span>
-                    <span id="subTotal">₹<%= (order.itemsPrice).toFixed(2) %></span>
-                </div>
 
-                <div class="finance-row">
-                    <span>Shipping</span>
-                    <span id="shipping">₹<%= (order.shippingCharge).toFixed(2) %></span>
-                </div>
 
-                <div class="finance-row">
-                    <span>GST</span>
-                    <span id="discount">₹<%= (order.totalGST).toFixed(2) %></span>
-                </div>
+                                    <% }) %>
+                                        <tr class="return-table">
+                                            <td>Reason:</td>
+                                            <td colspan="3" class="action-reason">
+                                                <p>
+                                                    <%= returnEntry.reason %>
+                                                </p>
+                                            </td>
+                                            <td class="action-btns">
+                                                <% if(returnEntry.status==="Pending" ){ %>
+                                                    <button type="button" class="accept"
+                                                        data-return-id="<%= returnEntry._id %>">
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </button>
+                                                    <button type="button" class="reject"
+                                                        data-return-id="<%= returnEntry._id %>">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </button>
+                                                    <% }else{ %>
 
-                <hr>
+                                                        <span class="return-badge <%= returnEntry.status %>">
+                                                            <%= returnEntry.status %>
+                                                        </span>
+                                            </td>
 
-                <div class="finance-row total">
-                    <span>Grand Total</span>
-                    <span id="grandTotal">₹<%= (order.totalPrice).toFixed(2) %></span>
-                </div>
-            </div>
+                                            <% } %>
 
-            <% if(order.is_couponed){%>
-                <div class="card">
-                    <h3>Coupon Applied</h3>
-
-                    <div class="finance-row">
-                        <span>Coupon Code</span>
-                        <span id="couponCode">
-                            <%= order.coupon.code %>
-                        </span>
+                                                </td>
+                                        </tr>
+                            </tbody>
+                        </table>
                     </div>
+                    <% }) %>
+                        <% } %>
 
-                    <div class="finance-row">
-                        <span>Coupon Discount Type</span>
-                        <span id="">
-                            <%= order.coupon.discountType %>
-                        </span>
-                    </div>
-                    <% let disValue=`₹${order.coupon.discountValue}` ; if (order.coupon && order.coupon.discountType==="percentage" ) {
-                        disValue=`${order.coupon.discountValue}%`; } %>
 
-                        <div class="finance-row">
-                            <span>Coupon Discount Value</span>
-                            <span>
-                                <%= disValue %>
-                            </span>
-                        </div>
+                            <!-- Financials -->
+                            <div class="card">
+                                <h3>Order Financials</h3>
 
-                        <hr>
+                                <div class="finance-row">
+                                    <span>Subtotal</span>
+                                    <span id="subTotal">₹<%= (order.itemsPrice).toFixed(2) %></span>
+                                </div>
 
-                        <div class="finance-row total">
-                            <span>Discount Amount</span>
-                            <span id="">₹<%= order.coupon.discountAmount %></span>
-                        </div>
-                </div>
-                <%}%>
+                                <div class="finance-row">
+                                    <span>Shipping</span>
+                                    <span id="shipping">₹<%= (order.shippingCharge).toFixed(2) %></span>
+                                </div>
+
+                                <div class="finance-row">
+                                    <span>GST</span>
+                                    <span id="discount">₹<%= (order.totalGST).toFixed(2) %></span>
+                                </div>
+
+                                <hr>
+
+                                <div class="finance-row total">
+                                    <span>Grand Total</span>
+                                    <span id="grandTotal">₹<%= (order.totalPrice).toFixed(2) %></span>
+                                </div>
+                            </div>
+
+                            <% if(order.is_couponed){%>
+                                <div class="card">
+                                    <h3>Coupon Applied</h3>
+
+                                    <div class="finance-row">
+                                        <span>Coupon Code</span>
+                                        <span id="couponCode">
+                                            <%= order.coupon.code %>
+                                        </span>
+                                    </div>
+
+                                    <div class="finance-row">
+                                        <span>Coupon Discount Type</span>
+                                        <span id="">
+                                            <%= order.coupon.discountType %>
+                                        </span>
+                                    </div>
+                                    <% let disValue=`₹${order.coupon.discountValue}` ; if (order.coupon &&
+                                        order.coupon.discountType==="percentage" ) {
+                                        disValue=`${order.coupon.discountValue}%`; } %>
+
+                                        <div class="finance-row">
+                                            <span>Coupon Discount Value</span>
+                                            <span>
+                                                <%= disValue %>
+                                            </span>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="finance-row total">
+                                            <span>Discount Amount</span>
+                                            <span id="">₹<%= order.coupon.discountAmount %></span>
+                                        </div>
+                                </div>
+                                <%}%>
 
         </div>
 
@@ -159,26 +246,40 @@
                 <h3>Manage Order</h3>
 
                 <label>Order Status</label>
-                <select id="orderStatus">
-                    <option value="Placed" <%=order.orderStatus==="Placed" ? "selected" :"" %> >Placed</option>
-                    <option value="Confirmed" <%=order.orderStatus==="Confirmed" ? "selected" :"" %> >Confirmed</option>
-                    <option value="Packed" <%=order.orderStatus==="Packed" ? "selected" :"" %> >Packed</option>
-                    <option value="Shipped" <%=order.orderStatus==="Shipped" ? "selected" :"" %> >Shipped</option>
-                    <option value="OutForDelivery" <%=order.orderStatus==="OutForDelivery" ? "selected" :"" %> >Out for
-                        delivery</option>
-                    <option value="Delivered" <%=order.orderStatus==="Delivered" ? "selected" :"" %> >Delivered</option>
-                    <option value="Cancelled" <%=order.orderStatus==="Cancelled" ? "selected" :"" %> >Cancelled</option>
-                    <option value="Returned" <%=order.orderStatus==="Returned" ? "selected" :"" %> >Returned</option>
-                </select>
+                <% if (order.products.some(i=> i.status === "Active")){ %>
+                    <select id="orderStatus">
+                        <option value="Pending" <%=order.orderStatus==="Placed" ? "selected" :"" %> >Pending</option>
+                        <option value="Placed" <%=order.orderStatus==="Placed" ? "selected" :"" %> >Placed</option>
+                        <option value="Confirmed" <%=order.orderStatus==="Confirmed" ? "selected" :"" %> >Confirmed
+                        </option>
+                        <option value="Packed" <%=order.orderStatus==="Packed" ? "selected" :"" %> >Packed</option>
+                        <option value="Shipped" <%=order.orderStatus==="Shipped" ? "selected" :"" %> >Shipped</option>
+                        <option value="OutForDelivery" <%=order.orderStatus==="OutForDelivery" ? "selected" :"" %> >Out
+                            for
+                            delivery</option>
+                        <option value="Delivered" <%=order.orderStatus==="Delivered" ? "selected" :"" %> >Delivered
+                        </option>
 
-                <label>Payment Status</label>
-                <select id="paymentStatus">
-                    <option <%=order.paymentStatus==="Pending" ? "selected" :"" %> >Pending</option>
-                    <option <%=order.paymentStatus==="Paid" ? "selected" :"" %> >Paid</option>
-                    <option <%=order.paymentStatus==="Failed" ? "selected" :"" %> >Failed</option>
-                </select>
+                    </select>
+                    <% }else{ %>
+                        <span class="order-badge status-<%= order.orderStatus %> span-status">
+                            <%= order.orderStatus %>
+                        </span>
+                        <% } %>
 
-                <button class="btn-primary" data-order-id="<%= order._id %>" id="updateStatus">Update Status</button>
+                            <% if (order.products.some(i=> i.status === "Active")){ %>
+
+                                <label>Payment Status</label>
+                                <select id="paymentStatus">
+                                    <option <%=order.paymentStatus==="Pending" ? "selected" :"" %> >Pending</option>
+                                    <option <%=order.paymentStatus==="Paid" ? "selected" :"" %> >Paid</option>
+                                    <option <%=order.paymentStatus==="Failed" ? "selected" :"" %> >Failed</option>
+                                </select>
+
+                                <button class="btn-primary" data-order-id="<%= order._id %>" id="updateStatus">Update
+                                    Status</button>
+                                <% } %>
+
             </div>
 
             <!-- Customer -->
@@ -226,4 +327,17 @@
 
     </div>
 
+</div>
+
+
+<!-- Return Action Modal -->
+<div id="returnModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 id="returnModalTitle">Confirm Action</h3>
+        <p id="returnModalMessage">Are you sure you want to proceed?</p>
+        <div class="modal-actions">
+            <button id="returnModalCancel" onclick="closeReturnModal()">Cancel</button>
+            <button id="returnModalConfirm">Confirm</button>
+        </div>
+    </div>
 </div>

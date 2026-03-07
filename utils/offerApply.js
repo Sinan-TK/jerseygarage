@@ -79,6 +79,7 @@ export const applyOffer = async (products) => {
       }
 
       product.unit_price = unitPrice;
+      product.offerDiscount = product.subtotal - unitPrice * product.quantity;
       product.subtotal = unitPrice * product.quantity;
     }
   }

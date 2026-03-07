@@ -35,7 +35,7 @@ function loadWallet(data) {
         <p>${formatDate(item.date)}</p>
       </div>
 
-      <div class="amount ${item.type === "credit" ? "credit" : "debit"}">
+      <div class="amount ${item.type === "credit" ? (item.status === "PENDING" ? "status-pending" : "credit") : (item.status === "PENDING" ? "status-pending" : "debit")} ">
 
         ${item.type === "credit" ? "+ ₹" + item.amount.toFixed(2) : "- ₹" + item.amount.toFixed(2)}
 

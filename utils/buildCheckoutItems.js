@@ -25,8 +25,10 @@ const buildCheckoutItems = async (items) => {
       warning.push(` ${product.name} not available.`);
     }
 
-    if (variant.stock < item.quantity && variant.is_available) {
-      warning.push(`${product.name} Only ${variant.stock} items left`);
+    const availableStock = variant.stock - (variant.lockedStock || 0);
+
+    if (availableStock < item.quantity && variant.is_available) {
+      warning.push(`${product.name} Only ${availableStock} items left`);
     }
 
     checkoutItems.push({

@@ -22,6 +22,7 @@ import * as authServices from "../../services/user/authServices.js";
 import * as userConstants from "../../constants/userConstants.js";
 import Offer from "../../models/offerModel.js";
 import WalletTransaction from "../../models/walletTransactionModel.js";
+import * as walletHandler from "../../utils/walletHandler.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -141,27 +142,16 @@ export const otpVerification = wrapAsync(async (req, res) => {
 
       referredBy.save();
 
-      let wallet = await Wallet.findOne({ user: referredBy._id });
       const amount = Number(userConstants.REFERRAL_BONUS);
 
-      // Auto-create (safety)
-      if (!wallet) {
-        wallet = await Wallet.create({
-          user: referredBy._id,
-        });
-      }
+      let wallet = await Wallet.findOne({ user: referredBy._id });
 
-      await WalletTransaction.create({
-        wallet:wallet._id,
-        user:wallet.user,
-        type:"credit",
-        reason:"Referral Bouns",
+      await walletHandler.creditWallet(
+        referredBy._id,
         amount,
-      })   
-
-      wallet.balance += amount;
-
-      await wallet.save();
+        "SUCCESS",
+        "Referral Bouns",
+      );
 
       newUser.referred_by = userData.referredBy;
     }

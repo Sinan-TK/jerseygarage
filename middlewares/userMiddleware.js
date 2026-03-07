@@ -56,3 +56,12 @@ export const cartItemsCount = wrapAsync(async (req, res, next) => {
 
   next();
 });
+
+export const checkOrder = wrapAsync(async (req, res, next) => {
+  console.log("working")
+  if (!req.session.orderId) {
+    return res.redirect("/user/cart");
+  } else {
+    next();
+  }
+});

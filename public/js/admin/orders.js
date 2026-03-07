@@ -20,7 +20,7 @@ function renderOrders(data) {
         </span>
       </td>
 
-      <td>₹${order.totalPrice}</td>
+      <td>₹${order.totalPrice.toFixed(2)}</td>
       <td>${order.products.length}</td>
 
       <td>
@@ -104,12 +104,12 @@ async function loadOrders() {
 loadOrders();
 
 function pagination(data) {
-  const backward = data.currentPage > 1 ? true : false;
-  const forward = data.currentPage < data.totalPages ? true : false;
+  const backward = data.page > 1 ? true : false;
+  const forward = data.page < data.totalPages ? true : false;
   return `${
     backward
       ? `<button onclick="loadFilter(${
-          data.currentPage - 1
+          data.page - 1
         })" class="arrow-btn">
       <i class="fa-solid fa-chevron-left"></i>
   </button>`
@@ -117,12 +117,12 @@ function pagination(data) {
   }
 
   <span class="current-page-display">
-      ${data.currentPage}
+      ${data.page}
   </span>
     ${
       forward
         ? `<button onclick="loadFilter(${
-            data.currentPage + 1
+            data.page + 1
           })" class="arrow-btn">
       <i class="fa-solid fa-chevron-right"></i>
   </button>`

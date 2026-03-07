@@ -1,0 +1,159 @@
+<div class="sales-report-page">
+    <div class="page-header">
+        <div>
+            <h1>Sales Report</h1>
+            <p>Track revenue, discounts, and order performance</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <h3><i class="fa-solid fa-filter"></i> &nbsp;Filters</h3>
+        <div class="quick-filters">
+            <button class="qf-btn active" onclick="setQuickFilter('all', this)">All Time</button>
+            <button class="qf-btn" onclick="setQuickFilter('1day', this)">Today</button>
+            <button class="qf-btn" onclick="setQuickFilter('1week', this)">This Week</button>
+            <button class="qf-btn" onclick="setQuickFilter('1month', this)">This Month</button>
+            <button class="qf-btn" onclick="setQuickFilter('1year', this)">This Year</button>
+            <button class="qf-btn" onclick="setQuickFilter('custom', this)">Custom Range</button>
+        </div>
+        <div class="filter-row">
+            <div class="filter-group" id="customDateGroup" style="display:none;">
+                <label>From Date</label>
+                <input type="date" id="fromDate" />
+            </div>
+            <div class="filter-group" id="customDateGroup2" style="display:none;">
+                <label>To Date</label>
+                <input type="date" id="toDate" />
+            </div>
+            <div class="filter-group">
+                <label>Payment Status</label>
+                <select id="paymentFilter">
+                    <option value="">All</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Refunded">Refunded</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Order Status</label>
+                <select id="statusFilter">
+                    <option value="">All</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Returned">Returned</option>
+                </select>
+            </div>
+            <div class="filter-group product-search-group">
+                <label>Product Name</label>
+                <input type="text" id="productSearch" placeholder="Search product..." oninput="onProductInput(this)" />
+                <button class="clear-btn" id="clearProduct" onclick="clearProduct()"><i
+                        class="fa-solid fa-xmark"></i></button>
+                <div class="suggestions-dropdown" id="suggestionsDropdown"></div>
+                <div id="productTag" style="display:none;">
+                    <span class="product-tag">
+                        <span id="productTagText"></span>
+                        <button onclick="clearProduct()"><i class="fa-solid fa-xmark"></i></button>
+                    </span>
+                </div>
+            </div>
+            <div class="filter-group" style="justify-content:flex-end;">
+                <label>&nbsp;</label>
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Apply
+                </button>
+                <button class="btn btn-clear" onclick="clearAllFilters()">
+                    <i class="fa-solid fa-rotate-left"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card red">
+            <i class="fa-solid fa-bag-shopping stat-icon"></i>
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value" id="totalOrders">0</div>
+            <div class="stat-sub">In selected period</div>
+        </div>
+        <div class="stat-card green">
+            <i class="fa-solid fa-indian-rupee-sign stat-icon"></i>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="totalRevenue">₹0</div>
+            <div class="stat-sub">After discounts</div>
+        </div>
+        <div class="stat-card yellow">
+            <i class="fa-solid fa-tag stat-icon"></i>
+            <div class="stat-label">Total Discount</div>
+            <div class="stat-value" id="totalDiscount">₹0</div>
+            <div class="stat-sub">Offers + Coupons</div>
+        </div>
+        <div class="stat-card blue">
+            <i class="fa-solid fa-rotate-left stat-icon"></i>
+            <div class="stat-label">Total Refunds</div>
+            <div class="stat-value" id="totalRefunds">₹0</div>
+            <div class="stat-sub">Returned & Cancelled</div>
+        </div>
+        <div class="stat-card purple">
+            <i class="fa-solid fa-percent stat-icon"></i>
+            <div class="stat-label">Total GST</div>
+            <div class="stat-value" id="totalGST">₹0</div>
+            <div class="stat-sub">Tax collected</div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-header-left">
+                <h3>Order Details</h3>
+                <span id="productFilterBadge" style="display:none;" class="badge badge-red"></span>
+            </div>
+            <div class="download-btns">
+                <button class="btn btn-green" onclick="downloadExcel()">
+                    <i class="fa-solid fa-file-excel"></i> Excel
+                </button>
+                <button class="btn btn-blue" onclick="downloadPDF()">
+                    <i class="fa-solid fa-file-pdf"></i> PDF
+                </button>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table id="reportTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Subtotal</th>
+                        <th>Discount</th>
+                        <th>Coupon</th>
+                        <th>GST</th>
+                        <th>Grand Total</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="reportBody">
+                    <tr>
+                        <td colspan="11">
+                            <div class="empty-state">
+                                <i class="fa-solid fa-chart-bar"></i>
+                                Apply filters to load the sales report
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="paginationBar" style="display:none;">
+            <span id="paginationInfo">Showing 0 of 0 results</span>
+            <div class="page-btns" id="pageButtons"></div>
+        </div>
+    </div>
+</div>

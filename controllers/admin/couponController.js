@@ -14,14 +14,14 @@ import Coupon from "../../models/couponModel.js";
 
 //
 
-export const couponPage = wrapAsync(async (req, res) => {
+export const couponPage = (req, res) => {
   res.render("admin/pages/coupons", {
     title: "Coupons",
     showLayout: true,
     cssFile: "/css/admin/coupons.css",
     pageJS: "coupons.js",
   });
-});
+};
 
 //
 
