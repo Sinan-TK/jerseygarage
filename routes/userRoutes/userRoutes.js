@@ -109,6 +109,8 @@ router.get(
   userController.orderListingPage,
 );
 
+router.get("/orders/data", userController.orderListingData);
+
 router.get("/orders/:id", userController.orderDetailsPage);
 
 router.get("/orders/invoice/:orderId", userController.downloadInvoice);

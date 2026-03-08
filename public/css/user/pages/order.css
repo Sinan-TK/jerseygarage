@@ -109,3 +109,62 @@
   }
 }
 
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  /* border-top: 1px solid #e5e7eb; */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#paginationInfo {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.arrow-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.current-page-display {
+  min-width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #000000;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-page{
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
+}

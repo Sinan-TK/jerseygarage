@@ -177,3 +177,6 @@ document.querySelectorAll(".toggle-password").forEach((icon) => {
     }
   });
 });
+
+
+// document.getElementById("userAvatar").addEventListener("hover")

@@ -734,27 +734,44 @@ export const orderPayFailed = wrapAsync(async (req, res) => {
 //
 //
 
-// ======================================================================
-// 6. ORDER LISTING PAGE
-// ======================================================================
-
-export const orderListingPage = wrapAsync(async (req, res) => {
-  const user_id = req.session.user.id;
-
-  const orders = await Order.find({ user_id })
-    .select("orderId createdAt products totalPrice orderStatus")
-    .sort({ createdAt: -1 });
-
+export const orderListingPage = (req, res) => {
   res.render("user/layouts/profilelayout", {
     title: "User Orders",
     pageCSS: "order",
     view: "order",
     profile: true,
     showHeader: true,
-    orders,
     showFooter: true,
-    pageJS: "",
+    pageJS: "order.js",
   });
+};
+
+// ======================================================================
+// 6. ORDER LISTING PAGE
+// ======================================================================
+
+export const orderListingData = wrapAsync(async (req, res) => {
+  const { page } = req.query;
+  const user_id = req.session.user.id;
+
+  const result = await paginate(Order, page, 5, { user_id });
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Orders rendered successfully",
+    data: { orders: result.data, pagination: result.meta },
+  });
+
+  // res.render("user/layouts/profilelayout", {
+  //   title: "User Orders",
+  //   pageCSS: "order",
+  //   view: "order",
+  //   profile: true,
+  //   showHeader: true,
+  //   orders: result.data,
+  //   showFooter: true,
+  //   pageJS: "order.js",
+  // });
 });
 
 // ======================================================================

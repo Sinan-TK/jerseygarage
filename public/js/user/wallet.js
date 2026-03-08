@@ -35,7 +35,7 @@ function loadWallet(data) {
         <p>${formatDate(item.date)}</p>
       </div>
 
-      <div class="amount ${item.type === "credit" ? (item.status === "PENDING" ? "status-pending" : "credit") : (item.status === "PENDING" ? "status-pending" : "debit")} ">
+      <div class="amount ${item.type === "credit" ? (item.status === "PENDING" ? "status-pending" : "credit") : item.status === "PENDING" ? "status-pending" : "debit"} ">
 
         ${item.type === "credit" ? "+ ₹" + item.amount.toFixed(2) : "- ₹" + item.amount.toFixed(2)}
 
@@ -45,30 +45,37 @@ function loadWallet(data) {
 
     list.appendChild(div);
   });
-  document.querySelector(".pagination").innerHTML = pagination(page);
+  pagination(page);
 }
 
-function pagination(data) {
-  const backward = data.page > 1 ? true : false;
-  const forward = data.page < data.totalPages ? true : false;
-  return `${
-    backward
-      ? `<button onclick="walletData(${data.page - 1})" class="arrow-btn">
-      <i class="fa-solid fa-chevron-left"></i>
-  </button>`
-      : ""
-  }
+function pagination(pagination) {
+  const { page, totalPages, totalDocuments, limit } = pagination;
 
-  <span class="current-page-display">
-      ${data.page}
-  </span>
+  const from = totalDocuments === 0 ? 0 : (page - 1) * limit + 1;
+  const to = Math.min(page * limit, totalDocuments);
+
+  document.getElementById("paginationInfo").textContent =
+    totalDocuments === 0
+      ? "No transaction found"
+      : `Showing ${from}–${to} of ${totalDocuments} transactions`;
+
+  document.getElementById("pagination").innerHTML = `
     ${
-      forward
-        ? `<button onclick="walletData(${data.page + 1})" class="arrow-btn">
-      <i class="fa-solid fa-chevron-right"></i>
-  </button>`
+      page > 1
+        ? `<button class="arrow-btn" onclick="walletData(${page - 1})">
+           <i class="fa-solid fa-chevron-left"></i>
+         </button>`
         : ""
-    }`;
+    }
+    <span class="current-page-display">${page}</span>
+    ${
+      page < totalPages
+        ? `<button class="arrow-btn" onclick="walletData(${page + 1})">
+           <i class="fa-solid fa-chevron-right"></i>
+         </button>`
+        : ""
+    }
+  `;
 }
 
 function formatDate(dateString) {

@@ -1,28 +1,8 @@
-<div class="order-list">
-
-    <!-- Order Card -->
-    <% orders.forEach((order)=>{ %>
-        <div class="order-card">
-            <div class="order-left">
-                <h4>
-                    <%= order.orderId %>
-                </h4>
-                <p class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString("en-US", {
-                        month: "long" , day: "2-digit" , year: "numeric" , }) %>
-                </p>
-                <p class="order-items">
-                    <%= order.products.length %> items • ₹<%= order.totalPrice %>
-                </p>
-            </div>
-
-            <div class="order-right">
-                <span class="status status-<%= order.orderStatus %>">
-                    <%= order.orderStatus %>
-                </span>
-                <a href="/user/orders/<%= order._id %>" class="order-link">View Details</a>
-            </div>
-        </div>
-
-        <% }) %>
-
+<div class="order-page">
+    <div class="order-list" id="orderList">
+    </div>
+    <div class="pagination-bar">
+        <span id="paginationInfo"></span>
+        <div class="pagination-btns" id="pagination"></div>
+    </div>
 </div>

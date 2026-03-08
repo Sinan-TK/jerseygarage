@@ -23,7 +23,7 @@
   flex-wrap: wrap;
   gap: 15px;
 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 25px;
 }
 
@@ -68,13 +68,15 @@
   background: #fff;
   padding: 20px;
   border-radius: 10px;
-
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .transactions h2 {
   margin-bottom: 20px;
   font-size: 20px;
+
 }
 
 
@@ -122,7 +124,7 @@
   color: red;
 }
 
-.status-pending{
+.status-pending {
   color: rgb(198, 198, 0);
 }
 
@@ -187,7 +189,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
 
   display: none;
   justify-content: center;
@@ -219,6 +221,7 @@
     transform: scale(0.9);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -272,7 +275,7 @@
 
 .quick-amounts {
   display: grid;
-  grid-template-columns: repeat(4,1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 
   margin: 12px 0;
@@ -350,7 +353,8 @@
 
 .modal-body input {
   width: 100%;
-  box-sizing: border-box;   /* IMPORTANT */
+  box-sizing: border-box;
+  /* IMPORTANT */
 }
 
 
@@ -365,32 +369,56 @@
   margin: 0;
 }
 
-.pagination {
-    margin-top: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#paginationInfo {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .arrow-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background: #f7f7f7;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 .current-page-display {
-    background: #000;
-    color: #fff;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #000000;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
