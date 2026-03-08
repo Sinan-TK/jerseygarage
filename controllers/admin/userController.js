@@ -1,72 +1,90 @@
 import User from "../../models/userModel.js";
+import Order from "../../models/orderModel.js";
 import * as Responses from "../../utils/responses/admin/admin.response.js";
 import sendResponse from "../../utils/sendResponse.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import paginate from "../../utils/pagination.js";
 
-export const getUsers = wrapAsync(async (req, res) => {
-  let page = req.query.page || 1;
+// ======================================================================
+// 1.USER LISTING
+// ======================================================================
 
-  const result = await paginate(User, page, 5);
-
+export const getUsers = (req, res) => {
   res.render("admin/pages/user", {
     title: "Users",
     showLayout: true,
     cssFile: "/css/admin/user.css",
-    users: result.data,
-    pagination: result.meta,
     pageJS: "user.js",
   });
-});
+};
 
 // ======================================================================
-// 4. BLOCK USER
+// 4. BLOCK & UNBLOCK USER
 // ======================================================================
-export const blockUser = wrapAsync(async (req, res) => {
-  const id = req.params.id;
-  const updatedUser = await User.findByIdAndUpdate(
-    id,
-    { is_blocked: true },
-    { new: true },
-  );
+export const statusAction = wrapAsync(async (req, res) => {
+  const { action, id } = req.params;
 
-  return sendResponse(res, {
-    ...Responses.userStatus.USER_BLOCK,
-    data: updatedUser,
-  });
-});
+  if (!action || !id) {
+    return sendResponse(res, { code: 400, message: "Invalid request" });
+  }
 
-// ======================================================================
-// 5. UNBLOCK USER
-// ======================================================================
-export const unblockUser = wrapAsync(async (req, res) => {
-  const id = req.params.id;
-  const updatedUser = await User.findByIdAndUpdate(
-    id,
-    { is_blocked: false },
-    { new: true },
-  );
+  if (action !== "block" && action !== "unblock") {
+    return sendResponse(res, { code: 400, message: "Invalid action" });
+  }
 
-  return sendResponse(res, {
-    ...Responses.userStatus.USER_UNBLOCK,
-    data: updatedUser,
-  });
+  const user = await User.findById(id);
+
+  if (!user) {
+    return sendResponse(res, { code: 404, message: "User not found" });
+  }
+
+  if (action === "block") {
+    if (user.is_blocked) {
+      return sendResponse(res, {
+        code: 400,
+        message: "User is Already Blocked",
+      });
+    }
+
+    user.is_blocked = true;
+    user.save();
+
+    return sendResponse(res, {
+      ...Responses.userStatus.USER_BLOCK,
+      data: user,
+    });
+  } else {
+    if (!user.is_blocked) {
+      return sendResponse(res, {
+        code: 400,
+        message: "User is Already Unblocked",
+      });
+    }
+
+    user.is_blocked = false;
+    user.save();
+
+    return sendResponse(res, {
+      ...Responses.userStatus.USER_UNBLOCK,
+      data: user,
+    });
+  }
 });
 
 // ======================================================================
 // 6.SEARCH USER
 // ======================================================================
 
-export const searchUser = wrapAsync(async (req, res) => {
-  let page = req.query.page || 1;
-  const search = req.query.searchContent || "";
-  const status = req.query.userStatus || "all";
+export const userData = wrapAsync(async (req, res) => {
+  const page = req.query.page || 1;
+  const search = req.query.search || "";
+  const status = req.query.status || "all";
 
-  let filter = {};
+  const filter = {};
 
   if (search) {
     filter.$or = [
-      { name: { $regex: search, $options: "i" } },
+      { full_name: { $regex: search, $options: "i" } },
       { email: { $regex: search, $options: "i" } },
     ];
   }
@@ -76,14 +94,39 @@ export const searchUser = wrapAsync(async (req, res) => {
 
   const result = await paginate(User, page, 5, filter);
 
-  res.render("admin/pages/user", {
-    title: "Users",
-    showLayout: true,
-    cssFile: "/css/admin/user.css",
-    users: result.data,
-    pagination: result.meta,
-    userStatus: req.query.userStatus || "all",
-    searchContent: req.query.searchContent,
-    pageJS: "user.js",
+  const shapedUsers = await Promise.all(
+    result.data.map(async (user) => {
+      const orderCount = await Order.countDocuments({ user_id: user._id });
+
+      const totalSpentResult = await Order.aggregate([
+        {
+          $match: {
+            user_id: user._id,
+            paymentStatus: "Paid",
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalSpent: { $sum: "$totalPrice" },
+          },
+        },
+      ]);
+
+      return {
+        ...user,
+        orderCount: orderCount || 0,
+        totalSpent: totalSpentResult[0]?.totalSpent || 0,
+      };
+    }),
+  );
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Users data rendered",
+    data: {
+      users: shapedUsers,
+      pagination: result.meta,
+    },
   });
 });

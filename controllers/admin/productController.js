@@ -32,7 +32,7 @@ export const productsPageRender = wrapAsync(async (req, res) => {
 
   const productsWithVariants = result.data.map((product) => {
     return {
-      ...product.toObject(),
+      ...product,
       variants: variants.filter(
         (v) => v.product_id.toString() === product._id.toString(),
       ),

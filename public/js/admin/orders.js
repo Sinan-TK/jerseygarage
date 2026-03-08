@@ -97,7 +97,9 @@ async function loadOrders() {
 
     renderOrders(res.data.data);
   } catch (err) {
-    console.log(err);
+    const error = err.response?.data;
+    console.log(error);
+    toastr.error(error?.message || "Something went wrong", "Failed");
   }
 }
 
@@ -108,9 +110,7 @@ function pagination(data) {
   const forward = data.page < data.totalPages ? true : false;
   return `${
     backward
-      ? `<button onclick="loadFilter(${
-          data.page - 1
-        })" class="arrow-btn">
+      ? `<button onclick="loadFilter(${data.page - 1})" class="arrow-btn">
       <i class="fa-solid fa-chevron-left"></i>
   </button>`
       : ""
@@ -121,9 +121,7 @@ function pagination(data) {
   </span>
     ${
       forward
-        ? `<button onclick="loadFilter(${
-            data.page + 1
-          })" class="arrow-btn">
+        ? `<button onclick="loadFilter(${data.page + 1})" class="arrow-btn">
       <i class="fa-solid fa-chevron-right"></i>
   </button>`
         : ""

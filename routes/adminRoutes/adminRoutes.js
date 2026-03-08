@@ -21,8 +21,17 @@ router.post("/login",adminMiddleware.adminExists , adminController.loginAdmin);
 
 router.use(adminMiddleware.isLoggedIn);
 
-router.get("/dashboard",adminController.featureNotAvailable);
+router.get("/dashboard",adminController.dashboardPage);
 
+router.get("/dashboard/stats",adminController.dashboardStats);
+
+router.get("/dashboard/top",adminController.dashboardTopThrees);
+
+router.get("/dashboard/chart",adminController.dashboardChart);
+
+router.get("/dashboard/status",adminController.dashboardDonut);
+
+router.get("/ledger/download",adminController.downloadLedger);
 
 router.use('/users',adminUserRoutes);
 
@@ -38,17 +47,6 @@ router.use("/coupons",couponRoutes);
 
 router.use("/sales-report",salesReportRoutes);
 
-
-router.get("/payments",adminController.featureNotAvailable);
-
-router.get("/refunds",adminController.featureNotAvailable);
-
-router.get("/reviews",adminController.featureNotAvailable);
-
 router.get('/logout', adminController.logOut );
-
-
-
-// router.get('/featureNotAvailable',adminController.featureNotAvailable);
 
 export default router;

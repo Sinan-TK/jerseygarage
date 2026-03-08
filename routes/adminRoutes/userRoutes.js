@@ -6,10 +6,8 @@ const router = express.Router();
 
 router.get("/", userController.getUsers);
 
-router.patch("/block/:id", userController.blockUser);
+router.get("/data", userController.userData);
 
-router.patch("/unblock/:id", userController.unblockUser);
-
-router.get("/search", userController.searchUser);
+router.patch("/:action/:id", userController.statusAction);
 
 export default router;

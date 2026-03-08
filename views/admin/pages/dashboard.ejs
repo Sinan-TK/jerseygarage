@@ -1,0 +1,112 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="dashboard-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Here's what's happening with JerseyGarage today.</p>
+        </div>
+        <div class="header-date" id="headerDate"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-icon red"><i class="fa-solid fa-bag-shopping"></i></div>
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value" id="statOrders">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="statRevenue">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon yellow"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-label">Total Customers</div>
+            <div class="stat-value" id="statCustomers">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon blue"><i class="fa-solid fa-box"></i></div>
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value" id="statProducts">—</div>
+        </div>
+    </div>
+
+    <!-- Chart + Donut -->
+    <div class="main-grid">
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3><i class="fa-solid fa-chart-bar" style="color:var(--accent);"></i> Revenue Overview</h3>
+                <div class="chart-filters">
+                    <button class="cf-btn active" onclick="setChartFilter('weekly', this)">Weekly</button>
+                    <button class="cf-btn" onclick="setChartFilter('monthly', this)">Monthly</button>
+                    <button class="cf-btn" onclick="setChartFilter('yearly', this)">Yearly</button>
+                </div>
+            </div>
+            <div class="dash-card-body">
+                <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3><i class="fa-solid fa-circle-half-stroke" style="color:var(--blue);"></i> Order Status</h3>
+            </div>
+            <div class="dash-card-body">
+                <div class="donut-wrap"><canvas id="statusChart"></canvas></div>
+                <div class="donut-legend" id="donutLegend"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 3 + Ledger -->
+    <div class="bottom-grid">
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3><i class="fa-solid fa-shirt" style="color:var(--accent);"></i> Top Products</h3>
+                <span style="font-size:0.75rem;color:var(--muted);">by sales</span>
+            </div>
+            <div class="dash-card-body">
+                <div class="podium-wrap" id="productPodium"></div>
+                <div class="top-rows" id="productRows"></div>
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3><i class="fa-solid fa-tags" style="color:var(--blue);"></i> Top Categories</h3>
+                <span style="font-size:0.75rem;color:var(--muted);">by sales</span>
+            </div>
+            <div class="dash-card-body">
+                <div class="podium-wrap" id="categoryPodium"></div>
+                <div class="top-rows" id="categoryRows"></div>
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3><i class="fa-solid fa-book" style="color:var(--green);"></i> Ledger Book</h3>
+            </div>
+            <div class="dash-card-body">
+                <p style="font-size:0.82rem;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+                    Download a full financial ledger with all credits and debits for any date range.
+                </p>
+                <div class="ledger-group">
+                    <label>From Date</label>
+                    <input type="date" id="ledgerFrom" />
+                </div>
+                <div class="ledger-group">
+                    <label>To Date</label>
+                    <input type="date" id="ledgerTo" />
+                </div>
+                <button class="btn btn-green" onclick="downloadLedger()"
+                    style="width:100%;justify-content:center;margin-top:4px;">
+                    <i class="fa-solid fa-file-excel"></i> Download Ledger
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
