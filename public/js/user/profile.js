@@ -212,10 +212,10 @@ document
     try {
       const res = await axios.delete("/user/profile/avatar");
       if (res.data.success) {
-        const defaultAvatar = "/images/default-avatar.png";
-        userAvatar.src = defaultAvatar;
-        avatarPreview.src = defaultAvatar;
-        toastr.success("Profile picture removed", "Success");
+        // const defaultAvatar = "/images/default-avatar.png";
+        userAvatar.src = res.data.data.avatar;
+        avatarPreview.src = res.data.data.avatar;
+        toastr.success(res.data.message, "Success");
         closeAvatarModal();
       }
     } catch (err) {
@@ -293,9 +293,9 @@ document.getElementById("cropSaveBtn").addEventListener("click", async () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
         if (res.data.success) {
-          toastr.success(res.data.message, "Success");
           document.getElementById("userAvatar").src = res.data.data.avatar;
           document.getElementById("avatarPreview").src = res.data.data.avatar;
+          toastr.success(res.data.message, "Success");
         }
       } catch (err) {
         const error = err.response?.data;

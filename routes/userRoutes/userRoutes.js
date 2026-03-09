@@ -35,6 +35,8 @@ router.patch(
 
 router.patch("/profile/avatar", userMiddleware.uploadAvatar, userController.changeAvatar);
 
+router.delete("/profile/avatar", userController.deleteDp);
+
 router.get("/email-verify", userController.emailOtpVerify);
 
 router.post("/email-verify", userController.emailVerification);

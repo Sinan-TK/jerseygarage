@@ -192,6 +192,24 @@ export const changeAvatar = wrapAsync(async (req, res) => {
 // 3. EDIT PERSONAL INFORMATION
 // ======================================================================
 
+export const deleteDp = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  await User.updateOne({ _id: user_id }, { $unset: { avatar: "" } });
+
+  const user = await User.findById(user_id);
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Profile picture removed",
+    data: { avatar: user.avatar },
+  });
+});
+
+// ======================================================================
+// 3. EDIT PERSONAL INFORMATION
+// ======================================================================
+
 export const emailVerification = wrapAsync(async (req, res) => {
   const email = req.session.emailVerify;
   const purpose = userConstants.OTPPURPOSE.CHANGEEMAIL;
