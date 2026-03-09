@@ -2,9 +2,17 @@
 
   <aside class="account-sidebar">
     <div class="user-card">
-      <div class="avatar" id="userAvatar"><img src="<%= userDetails.avatar %>" alt="dp"></div>
-      <h4><%= userDetails.full_name %></h4>
-      <p><%= userDetails.email %></p>
+      <div class="avatar">
+        <img src="<%= userDetails.avatar %>" id="userAvatar"
+          title="<%= title === 'User Profile'?'Update dp':'' %>" alt="dp">
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+      <h4>
+        <%= userDetails.full_name %>
+      </h4>
+      <p>
+        <%= userDetails.email %>
+      </p>
     </div>
 
     <ul class="profile-menu">
@@ -22,7 +30,7 @@
       </li>
       <li class="logout">
         <form action="/user/logout" method="post">
-        <button id="logoutBtn" type="submit"><strong>Logout</strong></button>
+          <button id="logoutBtn" type="submit"><strong>Logout</strong></button>
         </form>
       </li>
     </ul>

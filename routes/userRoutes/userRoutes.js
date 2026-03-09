@@ -33,6 +33,8 @@ router.patch(
   userController.editPersonalInfo,
 );
 
+router.patch("/profile/avatar", userMiddleware.uploadAvatar, userController.changeAvatar);
+
 router.get("/email-verify", userController.emailOtpVerify);
 
 router.post("/email-verify", userController.emailVerification);

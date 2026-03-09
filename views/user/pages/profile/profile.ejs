@@ -56,7 +56,8 @@
         <span>Wallet Balance</span>
         <a href="/user/wallet" class="link">See details →</a>
       </div>
-      <h2>₹<%= (userDetails.wallet.balance).toFixed(2) %></h2>
+      <h2>₹<%= (userDetails.wallet.balance).toFixed(2) %>
+      </h2>
     </div>
 
     <div class="card stat-card">
@@ -64,7 +65,9 @@
         <span>Total Referrals</span>
         <a href="/user/referral" class="link">See details →</a>
       </div>
-      <h2><%= userDetails.referral_count %></h2>
+      <h2>
+        <%= userDetails.referral_count %>
+      </h2>
     </div>
 
   </section>
@@ -130,4 +133,48 @@
 
   </div>
 
+</div>
+
+
+<div id="avatarModal" class="avatar-modal-overlay">
+  <div class="avatar-modal-box">
+
+    <button id="avatarModalClose" class="avatar-modal-close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <h3 class="avatar-modal-title">Profile Picture</h3>
+
+    <img id="avatarPreview" src="<%= user.avatar %>" class="avatar-modal-preview">
+
+    <button id="changeAvatarBtn" class="avatar-change-btn">
+      <i class="fa-solid fa-camera"></i> Change Photo
+    </button>
+
+    <button id="removeAvatarBtn" class="avatar-remove-btn">
+      <i class="fa-solid fa-trash"></i> Remove Photo
+    </button>
+
+  </div>
+</div>
+
+
+<div id="cropModal" class="avatar-modal-overlay">
+  <div class="avatar-modal-box crop-modal-wrap">
+
+    <button id="cropModalClose" class="avatar-modal-close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <h3 class="avatar-modal-title">Crop Photo</h3>
+
+    <div class="crop-image-container">
+      <img id="cropImage">
+    </div>
+
+    <button id="cropSaveBtn" class="crop-save-btn">
+      <i class="fa-solid fa-check"></i> Save Photo
+    </button>
+
+  </div>
 </div>

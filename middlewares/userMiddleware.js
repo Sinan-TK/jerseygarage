@@ -3,6 +3,8 @@ import sendResponse from "../utils/sendResponse.js";
 import Cart from "../models/cartModel.js";
 import wrapAsync from "../utils/wrapAsync.js";
 import User from "../models/userModel.js";
+import { avatarUpload } from "./multer.js";
+import multer from "multer";
 
 export const Userdetails = async (req, res, next) => {
   try {
@@ -58,10 +60,26 @@ export const cartItemsCount = wrapAsync(async (req, res, next) => {
 });
 
 export const checkOrder = wrapAsync(async (req, res, next) => {
-  console.log("working")
   if (!req.session.orderId) {
     return res.redirect("/user/cart");
   } else {
     next();
   }
 });
+
+export const uploadAvatar = (req, res, next) => {
+  avatarUpload.single("avatar")(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return sendResponse(res, {
+          code: 400,
+          message: "Avatar must be under 2MB",
+        });
+      }
+      return sendResponse(res, { code: 400, message: err.message });
+    } else if (err) {
+      return sendResponse(res, { code: 400, message: err.message });
+    }
+    next();
+  });
+};

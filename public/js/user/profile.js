@@ -178,5 +178,135 @@ document.querySelectorAll(".toggle-password").forEach((icon) => {
   });
 });
 
+const avatarModal = document.getElementById("avatarModal");
+const avatarPreview = document.getElementById("avatarPreview");
+const userAvatar = document.getElementById("userAvatar");
 
-// document.getElementById("userAvatar").addEventListener("hover")
+// Open modal
+userAvatar.addEventListener("click", () => {
+  avatarPreview.src = userAvatar.src;
+  avatarModal.style.display = "flex";
+});
+
+// Close modal
+document
+  .getElementById("avatarModalClose")
+  .addEventListener("click", closeAvatarModal);
+avatarModal.addEventListener("click", (e) => {
+  if (e.target === avatarModal) closeAvatarModal();
+});
+
+function closeAvatarModal() {
+  avatarModal.style.display = "none";
+}
+
+// Change photo
+document.getElementById("changeAvatarBtn").addEventListener("click", () => {
+  document.getElementById("avatarInput").click();
+});
+
+// Remove photo
+document
+  .getElementById("removeAvatarBtn")
+  .addEventListener("click", async () => {
+    try {
+      const res = await axios.delete("/user/profile/avatar");
+      if (res.data.success) {
+        const defaultAvatar = "/images/default-avatar.png";
+        userAvatar.src = defaultAvatar;
+        avatarPreview.src = defaultAvatar;
+        toastr.success("Profile picture removed", "Success");
+        closeAvatarModal();
+      }
+    } catch (err) {
+      toastr.error("Failed to remove profile picture", "Error");
+    }
+  });
+
+////////////////////////////////////////////////////////////////////////////////////
+
+let cropper = null;
+
+// When file is selected → open cropper modal
+document.getElementById("avatarInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    // Close avatar modal, open crop modal
+    closeAvatarModal();
+    document.getElementById("cropModal").style.display = "flex";
+
+    const cropImage = document.getElementById("cropImage");
+    cropImage.src = ev.target.result;
+
+    // Destroy previous cropper if exists
+    if (cropper) cropper.destroy();
+
+    cropper = new Cropper(cropImage, {
+      aspectRatio: 1, // square crop for profile pic
+      viewMode: 1,
+      autoCropArea: 1,
+      movable: true,
+      zoomable: true,
+      rotatable: false,
+    });
+  };
+  reader.readAsDataURL(file);
+
+  // Reset input so same file can be selected again
+  e.target.value = "";
+});
+
+// Close crop modal
+document.getElementById("cropModalClose").addEventListener("click", () => {
+  document.getElementById("cropModal").style.display = "none";
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+});
+
+// Save cropped image
+document.getElementById("cropSaveBtn").addEventListener("click", async () => {
+  if (!cropper) return;
+
+  // Get cropped canvas
+  const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+
+  // Close crop modal
+  document.getElementById("cropModal").style.display = "none";
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  // Convert canvas to blob and upload
+  canvas.toBlob(
+    async (blob) => {
+      const formData = new FormData();
+      formData.append("avatar", blob, "avatar.jpg");
+
+      try {
+        const res = await axios.patch("/user/profile/avatar", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (res.data.success) {
+          toastr.success(res.data.message, "Success");
+          document.getElementById("userAvatar").src = res.data.data.avatar;
+          document.getElementById("avatarPreview").src = res.data.data.avatar;
+        }
+      } catch (err) {
+        const error = err.response?.data;
+        console.error(error);
+        toastr.error(
+          error?.message || "Failed to update profile picture",
+          "Error",
+        );
+      }
+    },
+    "image/jpeg",
+    0.9,
+  );
+});

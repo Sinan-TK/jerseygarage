@@ -4,12 +4,12 @@ import Variant from "../../models/variantModel.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import cloudinary from "../../config/cloudinary.js";
-import upload from "../../middlewares/multer.js";
+// import upload from "../../middlewares/multer.js";
 import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/product.response.js";
 
-const uploadImages = upload.array("images", 5);
+// const uploadImages = upload.array("images", 5);
 
 // ======================================================================
 // 1.PRODUCT PAGE RENDER

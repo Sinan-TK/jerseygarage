@@ -1,7 +1,7 @@
 import express from "express";
 import * as adminController from "../../controllers/admin/adminController.js";
 import * as adminMiddleware from "../../middlewares/adminMiddleware.js";
-import upload from "../../middlewares/multer.js";
+// import upload from "../../middlewares/multer.js";
 import { adminLayout } from "../../middlewares/layoutMiddleware.js";
 import adminUserRoutes from "./userRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";

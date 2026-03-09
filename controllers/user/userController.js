@@ -28,6 +28,7 @@ import gstCalculator from "../../utils/gstCalculator.js";
 import Coupon from "../../models/couponModel.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
 import paginate from "../../utils/pagination.js";
+import cloudinary from "../../config/cloudinary.js";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -146,6 +147,45 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
     );
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_CHANGE);
   }
+});
+
+// ======================================================================
+// 3. EDIT PERSONAL INFORMATION
+// ======================================================================
+
+export const changeAvatar = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+
+  if (!req.file) {
+    return sendResponse(res, { code: 400, message: "No image provided" });
+  }
+
+  // Upload to cloudinary
+  const result = await new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: "jerseygarage/avatars",
+          transformation: [
+            { width: 300, height: 300, crop: "fill", gravity: "face" },
+          ],
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        },
+      )
+      .end(req.file.buffer);
+  });
+
+  await User.updateOne({ _id: user_id }, { avatar: result.secure_url });
+
+  return sendResponse(res, {
+    code: 200,
+    success: true,
+    message: "Profile picture updated",
+    data: { avatar: result.secure_url },
+  });
 });
 
 // ======================================================================
@@ -761,17 +801,6 @@ export const orderListingData = wrapAsync(async (req, res) => {
     message: "Orders rendered successfully",
     data: { orders: result.data, pagination: result.meta },
   });
-
-  // res.render("user/layouts/profilelayout", {
-  //   title: "User Orders",
-  //   pageCSS: "order",
-  //   view: "order",
-  //   profile: true,
-  //   showHeader: true,
-  //   orders: result.data,
-  //   showFooter: true,
-  //   pageJS: "order.js",
-  // });
 });
 
 // ======================================================================
