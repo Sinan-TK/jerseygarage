@@ -2,18 +2,15 @@ import express from "express";
 import * as userMiddleware from "../../middlewares/userMiddleware.js";
 import * as authMiddleware from "../../middlewares/authMiddleware.js";
 import * as userController from "../../controllers/user/userController.js";
-import { userLayout } from "../../middlewares/layoutMiddleware.js";
-import { sidebarData } from "../../middlewares/sidebarMiddleware.js";
-import { checkBlockedUser } from "../../middlewares/userBlockMiddleware.js";
 import wishlistRoutes from "./wishlistRoutes.js";
 
 const router = express.Router();
 
-router.use(userLayout);
+router.use(authMiddleware.userLayout);
 
-router.use(sidebarData);
+router.use(authMiddleware.sidebarData);
 
-router.use(checkBlockedUser);
+router.use(authMiddleware.checkBlockedUser);
 
 router.use(userMiddleware.cartItemsCount);
 
@@ -33,7 +30,11 @@ router.patch(
   userController.editPersonalInfo,
 );
 
-router.patch("/profile/avatar", userMiddleware.uploadAvatar, userController.changeAvatar);
+router.patch(
+  "/profile/avatar",
+  userMiddleware.uploadAvatar,
+  userController.changeAvatar,
+);
 
 router.delete("/profile/avatar", userController.deleteDp);
 

@@ -1,124 +1,206 @@
-:root {
-      --bg: #f9fafb;
-      --text: #111;
-      --muted: #6b6b6b;
-      --accent: #000;
-      --gray: #e5e7eb;
-      --shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
-      --radius: 14px;
+    :root {
+      --black: #0d0d0d;
+      --white: #ffffff;
+      --gray: #f4f5f7;
+      --border: #e5e7eb;
+      --text-muted: #6b7280;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    .body {
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--black);
       min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg);
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color: var(--text);
-      text-align: center;
+      flex-direction: column;
     }
 
-    .error-box {
-      background: #fff;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 80px 36px;
-      max-width: 560px;
-      width: 90%;
+    /* NAVBAR */
+
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-left a {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--black);
+      text-decoration: none;
+    }
+
+    .nav-logo {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 3px;
+      color: var(--black);
+      text-decoration: none;
+    }
+
+    .login-btn {
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      padding: 10px 22px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* PAGE */
+    .page {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 0.6s ease;
+      justify-content: center;
+      padding: 60px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* GHOST 404 */
+    .ghost-num {
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(160px, 28vw, 320px);
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.05);
+      letter-spacing: 10px;
+      user-select: none;
+      pointer-events: none;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
     }
 
-    .error-icon {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: #f4f4f5;
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      box-shadow: inset 0 0 0 2px #e5e7eb;
+      gap: 10px;
     }
 
-    .error-icon h2 {
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--accent);
+    .label::before,
+    .label::after {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: var(--border);
     }
 
-    .error-title {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 10px;
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(44px, 7vw, 80px);
+      line-height: 1;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
     }
 
-    .error-sub {
-      color: var(--muted);
-      font-size: 16px;
-      max-width: 400px;
+    p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 380px;
       margin-bottom: 36px;
-      line-height: 1.6;
     }
 
-    .actions {
+    .btns {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
+      margin-bottom: 48px;
     }
 
     .btn {
-      padding: 12px 28px;
-      border: none;
-      border-radius: 8px;
+      padding: 13px 28px;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
       font-weight: 600;
-      font-size: 15px;
       cursor: pointer;
-      transition: all 0.25s ease;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .btn.primary {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .btn.primary:hover {
-      background: #333;
+    .btn:hover {
+      opacity: 0.82;
       transform: translateY(-1px);
     }
 
-    .btn.secondary {
-      background: #f3f4f6;
-      color: #111;
+    .btn-primary {
+      background: var(--black);
+      color: var(--white);
+      border: none;
     }
 
-    .btn.secondary:hover {
-      background: #e5e7eb;
+    .btn-outline {
+      background: transparent;
+      color: var(--black);
+      border: 1.5px solid var(--border);
     }
 
-    @media (max-width: 480px) {
-      .error-box {
-        padding: 60px 20px;
-      }
-      .error-title {
-        font-size: 22px;
-      }
-      .error-icon {
-        width: 80px;
-        height: 80px;
-      }
-      .error-icon h2 {
-        font-size: 30px;
-      }
+    .btn-outline:hover {
+      border-color: #999;
+    }
+
+    .quick-links {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .quick-link {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+    }
+
+    .quick-link:hover {
+      color: var(--black);
+      border-bottom-color: var(--black);
     }

@@ -24,7 +24,7 @@ import userApp from "./apps/userApp.js";
 import adminApp from "./apps/adminApp.js";
 
 // Global Middleware
-import { errorHandler } from "./middlewares/errorHandler.js";
+import { PageNotFound, errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 app.use(nocache());
@@ -52,6 +52,9 @@ app.use(toastHandler);
 app.use("/admin", adminApp);
 app.use("/", userApp);
 
+// 404 error
+app.use(PageNotFound);
+
 // Error Handler
 app.use(errorHandler);
 
@@ -59,6 +62,6 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(
-    `-----------------Server running on port ${PORT}------------------`
+    `-----------------Server running on port ${PORT}------------------`,
   );
 });

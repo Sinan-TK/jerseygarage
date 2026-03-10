@@ -1,9 +1,5 @@
 import User from "../models/userModel.js";
-
-// export const userLayout = (req, res, next) => {
-//   res.locals.layout = "user/layouts/layout";
-//   next();
-// };
+import Category from "../models/categoryModel.js";
 
 export const isLoggedIn = (req, res, next) => {
   if (req.session.user) {
@@ -11,6 +7,11 @@ export const isLoggedIn = (req, res, next) => {
       return res.redirect("/");
     }
   }
+  next();
+};
+
+export const userLayout = (req, res, next) => {
+  res.locals.layout = "user/layouts/layout";
   next();
 };
 
@@ -31,4 +32,39 @@ export const noMailFound = (req, res, next) => {
 export const profileIcon = (req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
+};
+
+export const checkBlockedUser = async (req, res, next) => {
+  try {
+    if (!req.session.user?.id) return next();
+
+    const user = await User.findById(req.session.user.id).select("is_blocked");
+
+    if (!user || user.is_blocked) {
+      return req.session.destroy(() => {
+        res.redirect("/login?blocked=true");
+      });
+    }
+
+    // User is active → continue
+    next();
+  } catch (error) {
+    console.error("checkBlockedUser error:", error);
+    res.status(500).send("Server Error");
+  }
+};
+
+export const sidebarData = async (req, res, next) => {
+  try {
+    const categories = await Category.find({ is_active: true })
+      .select("name")
+      .lean();
+
+    res.locals.sideBarCategories = categories;
+    next();
+  } catch (error) {
+    console.error("Sidebar middleware error:", error);
+    res.locals.categories = [];
+    next();
+  }
 };
