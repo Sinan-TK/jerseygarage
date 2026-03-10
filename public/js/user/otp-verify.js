@@ -40,10 +40,11 @@ if (inputs && inputs.length) {
 // ------------------------------
 async function verifyOtp() {
   const otpInputs = document.querySelectorAll(
-    '.otp-inputs input[type="number"]'
+    '.otp-inputs input[type="number"]',
   );
   const errorBox = document.getElementById("otpError");
   const errorMessage = document.getElementById("otpErrorText");
+  btnControl(true);
 
   errorBox.style.display = "none";
   errorMessage.innerText = "";
@@ -66,18 +67,26 @@ async function verifyOtp() {
       }, 1000);
     }
   } catch (err) {
+    btnControl(false);
     const error = err.response?.data;
-
     console.log(error);
 
     errorBox.style.display = "flex";
     errorMessage.innerText = error?.message || "Something went wrong!";
-
-    setTimeout(() => {
-      errorBox.style.display = "none";
-    }, 3000);
   }
 }
+
+function btnControl(state) {
+  const btn = document.querySelector(".verify-btn");
+  btn.disabled = state;
+  btn.innerText = state ? "Verifing..." : "Verify OTP";
+}
+
+document.querySelectorAll("input").forEach((input) => {
+  input.addEventListener("input", () => {
+    document.getElementById("otpError").style.display = "none";
+  });
+});
 
 // ------------------------------
 // START OTP EXPIRE TIMER (uses end timestamp)
@@ -167,6 +176,7 @@ function startResendTimer(endTime) {
 // RESEND OTP (single correct function)
 // ------------------------------
 async function resendOtp() {
+  btnControlResend(true);
   try {
     const res = await axios.post("/resend-otp");
 
@@ -183,12 +193,16 @@ async function resendOtp() {
       startOtpExpireTimer(otpEnd);
 
       toastr.success(res.data.message || "OTP resent", "Success");
+      btnControlResend(false);
     } else {
       toastr.error(res.data.message || "Failed to resend", "Error");
     }
   } catch (err) {
-    console.error("resendOtp error:", err);
-    toastr.error("Something went wrong", "Error");
+    btnControlResend(false);
+    const error = err.response?.data;
+
+    console.error(error);
+    toastr.error(error?.message || "Something went wrong", "Error");
   }
 }
 
@@ -196,10 +210,15 @@ async function resendOtp() {
 if (resendBtn) {
   resendBtn.addEventListener("click", (e) => {
     e.preventDefault?.();
-    // if disabled, don't call
     if (resendBtn.style.pointerEvents === "none") return;
     resendOtp();
   });
+}
+
+function btnControlResend(state) {
+  const btn = document.getElementById("resend-link");
+  btn.disabled = state;
+  btn.innerText = state ? "Resending... OTP" : "Resend OTP";
 }
 
 // ------------------------------

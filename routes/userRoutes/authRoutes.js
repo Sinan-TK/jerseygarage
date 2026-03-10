@@ -27,13 +27,9 @@ router.get('/login' ,authMiddleware.isLoggedIn , authController.loginPage);
 
 router.post('/login',authMiddleware.isLoggedIn,authController.userVerification);
 
-router.get('/signup',authMiddleware.isLoggedIn,authMiddleware.isMailFound,authController.signUpPage);
+router.get('/signup',authMiddleware.isLoggedIn,authController.signUpPage);
 
 router.post('/signup',authMiddleware.isLoggedIn, authController.signupVerification);
-
-// router.get('/register',authMiddleware.isLoggedIn,authMiddleware.isMailFound, authController.renderSignupDetails);
-
-// router.post('/register',authMiddleware.isLoggedIn,authController.saveSignupDetails);
 
 router.get('/forgotpassword',authMiddleware.isLoggedIn ,authController.renderForgetPasswordPage);
 
@@ -45,7 +41,7 @@ router.post('/verify-otp', authMiddleware.noMailFound,authController.otpVerifica
 
 router.post('/resend-otp', authMiddleware.noMailFound,authController.resendOtp);
 
-router.get('/newpassword',authMiddleware.isMailFound ,authController.renderNewPassPage);
+router.get('/newpassword',authMiddleware.noMailFound ,authController.renderNewPassPage);
 
 router.post('/newpassword',authController.newPassValidation);
 
@@ -56,5 +52,18 @@ router.get('/shop',authController.renderShopPage);
 router.get('/shop/data',authController.shopPageProducts);
 
 router.get('/product/:id',authController.productDetailPage);
+
+router.get('/about',authController.aboutPage);
+
+router.get('/contact',authController.contactPage);
+
+router.get('/privacy-policy',authController.privacyPage);
+
+router.get('/terms-conditions',authController.termsPage);
+
+router.get('/return-cancellation-policy',authController.returnPolicy);
+
+router.get('/faqs',authController.faqPage);
+
 
 export default router;

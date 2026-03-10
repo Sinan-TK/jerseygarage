@@ -708,3 +708,87 @@ export const productDetailPage = wrapAsync(async (req, res) => {
     breadcrumbs,
   });
 });
+
+// ======================================================================
+// 1. LOGIN PAGE
+// ======================================================================
+
+export const aboutPage = wrapAsync((req, res) => {
+  res.render("user/pages/about", {
+    title: "About-JerseyGarage",
+    pageCSS: "about",
+    showHeader: true,
+    showFooter: true,
+    pageJS: "",
+  });
+});
+
+// ======================================================================
+// 1. LOGIN PAGE
+// ======================================================================
+
+export const contactPage = wrapAsync((req, res) => {
+  res.render("user/pages/contact", {
+    title: "Contact-JerseyGarage",
+    pageCSS: "contact",
+    showHeader: true,
+    showFooter: true,
+    pageJS: "contact.js",
+  });
+});
+
+// ======================================================================
+// 1. LOGIN PAGE
+// ======================================================================
+
+export const privacyPage = wrapAsync((req, res) => {
+  res.render("user/pages/privacy", {
+    title: "Privacy And Policy-JerseyGarage",
+    pageCSS: "privacy",
+    showHeader: true,
+    showFooter: true,
+    pageJS: "",
+  });
+});
+
+// ======================================================================
+// 1. LOGIN PAGE
+// ======================================================================
+
+export const termsPage = wrapAsync((req, res) => {
+  res.render("user/pages/terms", {
+    title: "Terms And Conditions-JerseyGarage",
+    pageCSS: "terms",
+    showHeader: true,
+    showFooter: true,
+    pageJS: "",
+  });
+});
+
+// ======================================================================
+// 1. LOGIN PAGE
+// ======================================================================
+
+export const returnPolicy = wrapAsync((req, res) => {
+  res.render("user/pages/returnpolicy", {
+    title: "Return And Cancellation Policy-JerseyGarage",
+    pageCSS: "returnpolicy",
+    showHeader: true,
+    showFooter: true,
+    pageJS: "",
+  });
+});
+
+// ======================================================================
+// 1. LOGIN PAGE
+// ======================================================================
+
+export const faqPage = wrapAsync((req, res) => {
+  res.render("user/pages/faq", {
+    title: "FAQs-JerseyGarage",
+    pageCSS: "faq",
+    showHeader: true,
+    showFooter: true,
+    pageJS: "faq.js",
+  });
+});

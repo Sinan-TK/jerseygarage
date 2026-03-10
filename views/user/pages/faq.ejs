@@ -1,0 +1,479 @@
+<div class="hero">
+    <div class="hero-tag">Help Center</div>
+    <h1>Frequently Asked <span>Questions</span></h1>
+    <p>Everything you need to know about orders, shipping, returns, and more.</p>
+    <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search your question..." oninput="handleSearch()" />
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- CATEGORY NAV -->
+    <nav class="cat-nav">
+        <h3>Categories</h3>
+        <button class="cat-btn active" onclick="filterCategory('all', this)">
+            <span class="cat-icon"><i class="fa-solid fa-folder"></i></span> All Topics
+            <span class="cat-count" id="count-all">20</span>
+        </button>
+        <button class="cat-btn" onclick="filterCategory('orders', this)">
+            <span class="cat-icon"><i class="fa-solid fa-box"></i></span> Orders
+            <span class="cat-count">5</span>
+        </button>
+        <button class="cat-btn" onclick="filterCategory('shipping', this)">
+            <span class="cat-icon"><i class="fa-solid fa-truck-fast"></i></span> Shipping
+            <span class="cat-count">4</span>
+        </button>
+        <button class="cat-btn" onclick="filterCategory('returns', this)">
+            <span class="cat-icon"><i class="fa-solid fa-rotate-right"></i></span> Returns
+            <span class="cat-count">4</span>
+        </button>
+        <button class="cat-btn" onclick="filterCategory('payments', this)">
+            <span class="cat-icon"><i class="fa-solid fa-credit-card"></i></span> Payments
+            <span class="cat-count">4</span>
+        </button>
+        <button class="cat-btn" onclick="filterCategory('products', this)">
+            <span class="cat-icon"><i class="fa-solid fa-shirt"></i></span> Products
+            <span class="cat-count">3</span>
+        </button>
+    </nav>
+
+    <!-- FAQ SECTIONS -->
+    <div class="faq-content">
+
+        <div class="no-results" id="noResults">
+            <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <p>No results found. Try a different search term.</p>
+        </div>
+
+        <!-- ORDERS -->
+        <div class="faq-section" data-category="orders" id="sec-orders">
+            <div class="section-label">
+                <span class="icon"><i class="fa-solid fa-box"></i></span>
+                <h2>Orders</h2>
+                <span class="count">5 questions</span>
+            </div>
+            <div class="accordion">
+
+                <div class="acc-item" data-text="how do i place an order">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>How do I place an order?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Browse our catalogue, select your size and quantity, and add items to your cart. When you're
+                            ready, go to the cart and proceed to checkout. Choose your delivery address, select a
+                            payment method, and confirm your order.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="can i modify my order after placing it">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Can I modify my order after placing it?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Order modifications (size, quantity, address) are only possible before the order is packed.
+                            Contact our support team as soon as possible at <a
+                                href="mailto:support@jerseygarage.in">support@jerseygarage.in</a> if you need to make a
+                            change.
+                            <div class="note">Once an order is packed or shipped, modifications are no longer possible.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="how do i track my order">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>How do I track my order?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Go to <strong>My Account → My Orders</strong> to see the live status of your order. Once
+                            shipped, a tracking ID and courier link will be available on the order details page.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="why was my order cancelled automatically">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Why was my order cancelled automatically?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Orders placed via Razorpay that are not paid within 15 minutes are automatically cancelled
+                            and stock is released. This can happen if the payment window was closed without completing
+                            the transaction. You can place the order again — your cart items are saved.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="can i place a bulk order for a team or group">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Can I place a bulk order for a team or group?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Yes! For bulk orders of 10+ jerseys, contact us at <a
+                                href="mailto:support@jerseygarage.in">support@jerseygarage.in</a> with the details and
+                            we'll provide a custom quote with discounts.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SHIPPING -->
+        <div class="faq-section" data-category="shipping" id="sec-shipping">
+            <div class="section-label">
+                <span class="icon"><i class="fa-solid fa-truck-fast"></i></span>
+                <h2>Shipping</h2>
+                <span class="count">4 questions</span>
+            </div>
+            <div class="accordion">
+
+                <div class="acc-item" data-text="how long does delivery take">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>How long does delivery take?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Orders are dispatched within 2–3 business days. Delivery typically takes 5–10 business days
+                            depending on your location across India. Metro cities are usually faster (3–5 days).
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="do you offer free shipping">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Do you offer free shipping?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Yes, free shipping is available on orders above a certain amount. The applicable threshold
+                            and current shipping charges are displayed at checkout based on your cart value and delivery
+                            location.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="do you ship outside india international shipping">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Do you ship outside India?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Currently, we only ship within India. International shipping is on our roadmap — follow us
+                            on social media for updates.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="my order shows delivered but i haven't received it">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>My order shows "Delivered" but I haven't received it.</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            First, check with neighbours or the building reception as couriers sometimes leave packages
+                            there. If still unresolved, contact us within <strong>48 hours</strong> of the delivery
+                            status update with your order ID. We'll investigate with the courier and resolve it
+                            promptly.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RETURNS -->
+        <div class="faq-section" data-category="returns" id="sec-returns">
+            <div class="section-label">
+                <span class="icon"><i class="fa-solid fa-rotate-right"></i></span>
+                <h2>Returns & Refunds</h2>
+                <span class="count">4 questions</span>
+            </div>
+            <div class="accordion">
+
+                <div class="acc-item" data-text="how do i return an item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>How do I return an item?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Go to <strong>My Account → My Orders</strong>, select the order and tap <strong>Request
+                                Return</strong> on the item you want to return. Fill in the reason and submit. Our team
+                            will review within 1–2 business days and schedule a free pickup if approved.
+                            <div class="note">Returns must be requested within 7 days of delivery.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="how long does a refund take">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>How long does a refund take?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Refund timelines depend on your payment method:
+                            <ul>
+                                <li>JerseyGarage Wallet — Instant</li>
+                                <li>UPI / Net Banking — 3–5 business days</li>
+                                <li>Credit / Debit Card — 5–7 business days</li>
+                                <li>COD — Credited to Wallet within 24 hours</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="can i exchange a jersey for a different size">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Can I exchange a jersey for a different size?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            We currently don't support direct exchanges. You can return the item for a refund and place
+                            a new order in the correct size. Wallet refunds are instant, making this process quick and
+                            seamless.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="i received a wrong or damaged item">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>I received a wrong or damaged item. What do I do?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Contact us within 48 hours of delivery at <a
+                                href="mailto:support@jerseygarage.in">support@jerseygarage.in</a> with your order ID and
+                            clear photos. We'll arrange a free pickup and send a replacement or issue a full refund —
+                            whichever you prefer.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PAYMENTS -->
+        <div class="faq-section" data-category="payments" id="sec-payments">
+            <div class="section-label">
+                <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
+                <h2>Payments</h2>
+                <span class="count">4 questions</span>
+            </div>
+            <div class="accordion">
+
+                <div class="acc-item" data-text="what payment methods do you accept">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>What payment methods do you accept?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            We accept the following payment methods:
+                            <ul>
+                                <li>UPI (GPay, PhonePe, Paytm, etc.)</li>
+                                <li>Credit & Debit Cards (Visa, Mastercard, RuPay)</li>
+                                <li>Net Banking</li>
+                                <li>JerseyGarage Wallet</li>
+                                <li>Cash on Delivery (COD) — select pincodes</li>
+                            </ul>
+                            All online payments are securely processed via Razorpay.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="is it safe to pay on jerseygarage">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Is it safe to pay on JerseyGarage?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Absolutely. All transactions are processed through Razorpay, which is PCI-DSS compliant and
+                            uses 256-bit SSL encryption. We never store your full card details on our servers.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="my payment failed but money was deducted">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>My payment failed but money was deducted. What now?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            This can happen due to a bank or network glitch. In most cases, the amount is automatically
+                            reversed to your account within 5–7 business days. If it isn't, contact us with your order
+                            ID and bank transaction reference and we'll resolve it with Razorpay.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="how does the jersey garage wallet work">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>How does the JerseyGarage Wallet work?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Your wallet is credited when you receive a refund. The balance can be used to pay for future
+                            orders at checkout. Wallet balance never expires and can cover partial or full order
+                            amounts.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div class="faq-section" data-category="products" id="sec-products">
+            <div class="section-label">
+                <span class="icon"><i class="fa-solid fa-shirt"></i></span>
+                <h2>Products</h2>
+                <span class="count">3 questions</span>
+            </div>
+            <div class="accordion">
+
+                <div class="acc-item" data-text="are the jerseys authentic official">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Are the jerseys authentic / official?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            We clearly mention on each product page whether it is an official licensed jersey or a
+                            high-quality replica/fan version. Each listing includes fabric details and quality grade so
+                            you can make an informed purchase.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="how do i find the right size">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>How do I find the right size?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Each product page has a <strong>Size Guide</strong> button with chest, waist, and length
+                            measurements. If you're between sizes, we recommend going one size up for a comfortable fit.
+                            Jersey sizing can vary by brand, so always check the guide before ordering.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acc-item" data-text="can i get custom name and number printing">
+                    <button class="acc-trigger" onclick="toggleAcc(this)">
+                        <span>Can I get custom name and number printing?</span>
+                        <div class="acc-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg></div>
+                    </button>
+                    <div class="acc-body">
+                        <div class="acc-body-inner">
+                            Yes! Select jerseys support custom printing. Look for the <strong>"Add Name &
+                                Number"</strong> option on the product page. Please note that custom-printed jerseys are
+                            non-returnable unless they arrive defective.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STILL NEED HELP -->
+        <div class="help-card">
+            <h3>Still Need <span>Help?</span></h3>
+            <p>Can't find what you're looking for? Our support team is just a message away.</p>
+            <div class="help-btns">
+                <a href="/contact" class="help-btn help-btn-primary">Contact Support</a>
+                <a href="mailto:support@jerseygarage.in" class="help-btn help-btn-outline">Email Us</a>
+            </div>
+        </div>
+
+    </div>
+</div>

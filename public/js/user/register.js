@@ -1,6 +1,5 @@
 async function registerData() {
-  const btn = document.querySelector(".register-btn");
-  btn.disabled = true;
+  btnControl(true);
 
   const email = document.getElementById("email").value.trim();
   const fullName = document.getElementById("fullname").value.trim();
@@ -31,14 +30,25 @@ async function registerData() {
       }, 3000);
     }
   } catch (err) {
+    btnControl(false);
     const error = err.response?.data;
-    btn.disabled = false;
-
     console.log(error);
 
     errorBox.style.display = "flex";
     errorText.innerText = error.message || "Something went wrong!";
   }
+}
+
+document.querySelectorAll("input").forEach((input) => {
+  input.addEventListener("input", () => {
+    document.getElementById("registerError").style.display = "none";
+  });
+});
+
+function btnControl(state) {
+  const btn = document.querySelector(".register-btn");
+  btn.disabled = state;
+  btn.innerText = state ? "Signing up..." : "Sign Up";
 }
 
 const passwordInput = document.getElementById("password");
