@@ -101,27 +101,54 @@ th {
   display: inline-block;
 }
 
-.status-Cancelled {
-  background: #fee2e2;
-  color: #991b1b;
+.status-Pending {
+  background: #fef9c3;
+  color: #854d0e;
 }
 
 .status-Placed {
-  background: #fef9c3;
-  /* light yellow */
-  color: #854d0e;
-  /* dark golden brown */
+  background: #dbeafe;
+  color: #1e40af;
 }
 
 .status-Confirmed {
+  background: #e0f2fe;
+  color: #0c4a6e;
+}
+
+.status-Packed {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.status-Shipped {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.status-OutForDelivery {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.status-Delivered {
   background: #dcfce7;
   color: #166534;
 }
 
-/* Partially Cancelled */
-.status-Partially-Cancelled {
-  background: #fffbeb; /* light amber */
-  color: #92400e;      /* dark orange/brown */
+.status-Failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-Cancelled {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.status-Returned {
+  background: #fef3c7;
+  color: #92400e;
 }
 
 

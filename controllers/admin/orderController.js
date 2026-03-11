@@ -4,10 +4,10 @@ import User from "../../models/userModel.js";
 import sendResponse from "../../utils/sendResponse.js";
 import * as walletHandler from "../../utils/walletHandler.js";
 import paginate from "../../utils/pagination.js";
-import { processRefundReturn } from "../../utils/handleReturnCancel.js";
+import * as handleReturnCancel from "../../utils/handleReturnCancel.js";
 
 // ======================================================================
-// 6. ORDER PAGE
+// 1. ORDER PAGE
 // ======================================================================
 
 export const orderPageRender = (req, res) => {
@@ -98,7 +98,7 @@ export const orderDetailsPageRender = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const changeStatus = wrapAsync(async (req, res) => {
-  const { orderId, orderStatus, paymentStatus } = req.body;
+  let { orderId, orderStatus, paymentStatus } = req.body;
 
   const order = await Order.findById(orderId);
 
@@ -109,15 +109,16 @@ export const changeStatus = wrapAsync(async (req, res) => {
     });
   }
 
-  if (orderStatus) {
-    // Prevent invalid jumps
+  if (orderStatus && orderStatus !== order.orderStatus) {
     const validStatuses = [
+      "Pending",
       "Placed",
       "Confirmed",
       "Packed",
       "Shipped",
       "OutForDelivery",
       "Delivered",
+      "Failed",
       "Cancelled",
       "Returned",
     ];
@@ -129,16 +130,103 @@ export const changeStatus = wrapAsync(async (req, res) => {
       });
     }
 
-    order.orderStatus = orderStatus;
+    const terminalStatuses = ["Cancelled", "Failed"];
 
-    // Set delivered time
-    if (orderStatus === "Delivered") {
-      order.deliveredAt = new Date();
+    if (terminalStatuses.includes(order.orderStatus)) {
+      return sendResponse(res, {
+        code: 400,
+        message: `Order is already ${order.orderStatus}. Status cannot be changed.`,
+      });
+    }
+
+    if (["Cancelled", "Returned"].includes(orderStatus)) {
+      const nonCancellableStatuses = [
+        "OutForDelivery",
+        "Delivered",
+        "Cancelled",
+        "Returned",
+      ];
+
+      if (
+        nonCancellableStatuses.includes(order.orderStatus) &&
+        orderStatus === "Cancelled"
+      ) {
+        return {
+          error: {
+            code: 400,
+            message: "Order cannot be cancelled at this stage",
+          },
+        };
+      }
+
+      const eligibleProducts = order.products.filter((p) =>
+        ["Active", "Cancel-Requested", "Return-Requested"].includes(p.status),
+      );
+
+      const itemIds = eligibleProducts.map((p) => p._id.toString());
+
+      if (order.paymentStatus === "Paid" && itemIds.length > 0) {
+        paymentStatus = null;
+
+        const refundAmount = eligibleProducts.reduce(
+          (total, p) => total + p.totalPrice,
+          0,
+        );
+
+        if (orderStatus === "Cancelled") {
+          await handleReturnCancel.processRefundCancel(
+            order,
+            refundAmount,
+            itemIds,
+          );
+        } else {
+          await handleReturnCancel.processRefundReturn(
+            order,
+            refundAmount,
+            itemIds,
+          );
+        }
+      } else {
+        eligibleProducts.forEach((product) => {
+          product.status =
+            orderStatus === "Cancelled" ? "Cancelled" : "Returned";
+          product.requestStatus = "Approved";
+          product.statusChangedAt = new Date();
+        });
+
+        order.orderStatus = orderStatus;
+      }
+    } else {
+      const statusOrder = [
+        "Pending",
+        "Placed",
+        "Confirmed",
+        "Packed",
+        "Shipped",
+        "OutForDelivery",
+        "Delivered",
+      ];
+
+      const currentIndex = statusOrder.indexOf(order.orderStatus);
+      const newIndex = statusOrder.indexOf(orderStatus);
+
+      if (currentIndex !== -1 && newIndex !== -1 && newIndex <= currentIndex) {
+        return sendResponse(res, {
+          code: 400,
+          message: `Cannot change status from ${order.orderStatus} to ${orderStatus}`,
+        });
+      }
+
+      order.orderStatus = orderStatus;
+
+      if (orderStatus === "Delivered") {
+        order.deliveredAt = new Date();
+      }
     }
   }
 
   if (paymentStatus) {
-    const validPayments = ["Pending", "Paid", "Refunded"];
+    const validPayments = ["Pending", "Paid", "Failed"];
 
     if (!validPayments.includes(paymentStatus)) {
       return sendResponse(res, {
@@ -147,9 +235,29 @@ export const changeStatus = wrapAsync(async (req, res) => {
       });
     }
 
+    if (order.paymentStatus === "Refunded") {
+      return sendResponse(res, {
+        code: 400,
+        message: "Payment is already refunded. Status cannot be changed.",
+      });
+    }
+
+    if (order.paymentStatus === "Failed") {
+      return sendResponse(res, {
+        code: 400,
+        message: "Payment is already failed. Status cannot be changed.",
+      });
+    }
+
+    if (order.paymentStatus === "Paid" && paymentStatus === "Pending") {
+      return sendResponse(res, {
+        code: 400,
+        message: "Cannot change payment status from Paid to Pending",
+      });
+    }
+
     order.paymentStatus = paymentStatus;
 
-    // Set paid time
     if (paymentStatus === "Paid") {
       order.paidAt = new Date();
     }
@@ -160,6 +268,10 @@ export const changeStatus = wrapAsync(async (req, res) => {
   return sendResponse(res, {
     code: 200,
     message: "Status updated successfully!",
+    data: {
+      orderStatus: order.orderStatus,
+      paymentStatus: order.paymentStatus,
+    },
   });
 });
 
@@ -234,7 +346,11 @@ export const returnRequest = wrapAsync(async (req, res) => {
     returnEntry.status = "Approved";
 
     // Process refund
-    await processRefundReturn(order, refund, returnEntry.items);
+    await handleReturnCancel.processRefundReturn(
+      order,
+      refund,
+      returnEntry.items,
+    );
   } else if (type === "reject") {
     // Revert product statuses back to Active
     for (const itemId of returnEntry.items) {

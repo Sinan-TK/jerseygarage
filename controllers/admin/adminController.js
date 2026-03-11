@@ -10,7 +10,7 @@ import { adminSchema } from "../../validators/adminValidators.js";
 import paginate from "../../utils/pagination.js";
 import * as adminService from "../../services/admin/adminService.js";
 import Order from "../../models/orderModel.js";
-import XLSX from "xlsx"
+import XLSX from "xlsx";
 
 // ======================================================================
 // 1. RENDER LOGIN PAGE
@@ -66,7 +66,6 @@ export const logOut = wrapAsync((req, res) => {
     return res.redirect("/admin/login");
   });
 });
-
 
 // ======================================================================
 // 4.DASHBOARD
@@ -355,9 +354,7 @@ export const dashboardDonut = wrapAsync(async (req, res) => {
     OutForDelivery: "#8b5cf6",
     Delivered: "#16a34a",
     Cancelled: "#e53935",
-    "Partially-Cancelled": "#f87171",
     Returned: "#7c3aed",
-    "Partially-Returned": "#a78bfa",
   };
 
   const labels = result.map((r) => r._id);

@@ -23,7 +23,7 @@ function renderOrders(orders) {
           day: "2-digit",
           year: "numeric",
         })}</p>
-        <p class="order-items">${order.products.length} items • ₹${order.totalPrice}</p>
+        <p class="order-items">${order.products.length} items • ₹${order.totalPrice.toFixed(2)}</p>
       </div>
       <div class="order-right">
         <span class="status status-${order.orderStatus}">${order.orderStatus}</span>

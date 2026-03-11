@@ -54,7 +54,6 @@ document
   });
 
 function openAddAddressModal() {
-  console.log("running");
   document.getElementById("addAddressModal").style.display = "flex";
 }
 
@@ -119,7 +118,6 @@ document
       is_default: form.is_default.checked,
     };
 
-    // console.log(formData);
     try {
       const res = await axios.patch(
         `/user/address/edit/${addressId}`,
@@ -155,15 +153,15 @@ placeOrderBtn.addEventListener("click", async () => {
   const paymentMethod = selectedValue("payment");
 
   try {
+    showLoading("Placing your order...");
     const res = await axios.post("/user/place-order", {
       addressId,
       paymentMethod,
       couponCode,
     });
 
-    console.log(res.data.data);
-
     if (res.data.data?.warnings?.length > 0) {
+      hideLoading();
       toastr.warning(res.data.message, "Sorry");
       const summaryCard = document.querySelector(".summary-card");
       const existing = summaryCard.querySelector(".warning-message");
@@ -184,31 +182,24 @@ placeOrderBtn.addEventListener("click", async () => {
     } else {
       if (res.data.success) {
         const data = res.data.data;
+
         if (data.paymentMethod === "Razorpay") {
           const order = data;
 
           const options = {
             key: order.key,
-
             amount: order.amount,
             currency: order.currency,
-
             name: order.name,
             description: order.description,
-
             order_id: order.orderId,
 
             handler: async function (response) {
-              /* =========================
-           3. VERIFY PAYMENT
-        ========================= */
-
               try {
+                showLoading("Verifying payment...");
                 const verifyRes = await axios.post("/user/payment/verify", {
                   ...response,
                 });
-
-                const verifyResult = verifyRes.data;
 
                 if (verifyRes.data.success) {
                   toastr.success(verifyRes.data.message, "Paid");
@@ -223,11 +214,13 @@ placeOrderBtn.addEventListener("click", async () => {
                   "Failed",
                 );
                 resetBtn();
+                hideLoading();
               }
             },
 
             modal: {
               ondismiss: function () {
+                hideLoading();
                 resetBtn();
                 axios
                   .post("/user/payment/failed")
@@ -241,7 +234,6 @@ placeOrderBtn.addEventListener("click", async () => {
                   })
                   .catch((err) => {
                     const error = err.response?.data;
-                    console.error(error);
                     console.error(
                       error?.message || "Something went wrong",
                       err,
@@ -250,23 +242,23 @@ placeOrderBtn.addEventListener("click", async () => {
               },
             },
 
-            theme: {
-              color: "#000",
-            },
+            theme: { color: "#000" },
           };
 
+          hideLoading();
           new Razorpay(options).open();
         } else {
           toastr.success(res.data.message, "Success");
           setTimeout(() => {
             window.location.href = res.data.redirect;
-          }, 1000);
+          }, 1500);
         }
       }
     }
   } catch (err) {
     const error = err.response?.data;
     resetBtn();
+    hideLoading();
     console.log(error);
     toastr.error(error?.message || "Something went wrong", "Failed");
   }
@@ -285,7 +277,7 @@ document.getElementById("applyPromoBtn").addEventListener("click", async () => {
     if (res.data.success) {
       const data = res.data.data;
       document.getElementById("totalAmount").innerHTML = data.total.toFixed(2);
-      if (data.total < 500) {
+      if (data.total < 1000) {
         document.getElementById("codLabel").classList.remove("disabled");
         document.querySelector("input[value='COD']").disabled = true;
         document.getElementById("codText").classList.replace("small", "hidden");
@@ -307,4 +299,15 @@ document.getElementById("applyPromoBtn").addEventListener("click", async () => {
 function resetBtn() {
   placeOrderBtn.disabled = false;
   placeOrderBtn.innerText = "PLACE ORDER";
+}
+
+const loadingOverlay = document.getElementById("loadingOverlay");
+
+function showLoading(message = "Placing your order...") {
+  loadingOverlay.querySelector("p").textContent = message;
+  loadingOverlay.classList.add("show");
+}
+
+function hideLoading() {
+  loadingOverlay.classList.remove("show");
 }

@@ -1,6 +1,10 @@
 import Variant from "../models/variantModel.js";
 import * as walletHandler from "../utils/walletHandler.js";
 
+// ======================================================================
+// 1. HANDLE CANCEL
+// ======================================================================
+
 export const handleCancel = async (order, action, items, reason) => {
   let refund = 0;
   let cancelledCount = 0;
@@ -40,14 +44,17 @@ export const handleCancel = async (order, action, items, reason) => {
       }
     }
 
-    item.status = "Cancel-Requested";
     item.requestStatus = "Approved";
     item.statusChangedAt = new Date();
     order.totalPrice -= price;
 
     if (order.paymentStatus === "Paid") {
       refund += price;
+      item.status = "Cancel-Requested";
+    } else {
+      item.status = "Cancelled";
     }
+
     cancelledCount++;
 
     historyItems.push(item._id);
@@ -58,8 +65,15 @@ export const handleCancel = async (order, action, items, reason) => {
   }
 
   const allCancelled = order.products.every(
-    (p) => p.status === "Cancelled" || p.status === "Cancel-Requested",
+    (p) =>
+      p.status === "Cancelled" ||
+      p.status === "Cancel-Requested" ||
+      p.status === "Returned",
   );
+
+  if (allCancelled && order.paymentStatus !== "Paid") {
+    order.orderStatus = "Cancelled";
+  }
 
   if (allCancelled) {
     if (order.is_couponed) {
@@ -76,10 +90,15 @@ export const handleCancel = async (order, action, items, reason) => {
     reason,
     status: "Approved",
   });
-  if (refund) {
-    await processRefundCancel(order, refund, items);
+
+  if (order.paymentStatus === "Paid") {
+    await processRefundCancel(order, refund, historyItems);
   }
 };
+
+// ======================================================================
+// 2. HANDLE RETURN
+// ======================================================================
 
 export const handleReturn = async (order, action, items, reason) => {
   let returnCount = 0;
@@ -125,22 +144,28 @@ export const handleReturn = async (order, action, items, reason) => {
   });
 };
 
+// ======================================================================
+// 3. CANCEL REFUND
+// ======================================================================
+
 export const processRefundCancel = async (order, amount, items) => {
   if (order.paymentStatus !== "Paid") return;
 
-  walletHandler.creditWallet(
+  await walletHandler.creditWallet(
     order.user_id,
     amount,
     "SUCCESS",
     "Refund for cancelled item",
     null,
-    order._id,
+    order.orderId,
   );
 
   order.refundAmount += amount;
 
+  const itemStrings = items.map((id) => id.toString());
+
   for (const item of order.products) {
-    if (!items.includes(item._id.toString())) {
+    if (!itemStrings.includes(item._id.toString())) {
       continue;
     }
 
@@ -150,34 +175,29 @@ export const processRefundCancel = async (order, amount, items) => {
   }
 
   const allCancelledOrReturned = order.products.every(
-    (p) => p.status === "Cancelled" && p.status === "Returned",
+    (p) => p.status === "Cancelled" || p.status === "Returned",
   );
 
   if (allCancelledOrReturned) {
     order.paymentStatus = "Refunded";
-  }
-
-  const allCancelled = order.products.every(
-    (p) => p.status === "Cancelled" && p.requestStatus === "Approved",
-  );
-
-  if (allCancelled) {
     order.orderStatus = "Cancelled";
-  } else {
-    order.orderStatus = "Partially-Cancelled";
   }
 };
+
+// ======================================================================
+// 4. REFUND RETURN
+// ======================================================================
 
 export const processRefundReturn = async (order, amount, items) => {
   if (order.paymentStatus !== "Paid") return;
 
-  walletHandler.creditWallet(
+  await walletHandler.creditWallet(
     order.user_id,
     amount,
     "SUCCESS",
     "Refund for return order",
     null,
-    order._id,
+    order.orderId,
   );
 
   order.refundAmount += amount;
@@ -192,21 +212,14 @@ export const processRefundReturn = async (order, amount, items) => {
     item.statusChangedAt = new Date();
   }
 
-  const allCancelledOrReturned = order.products.every(
-    (p) => p.status === "Cancelled" && p.status === "Returned",
-  );
-
-  if (allCancelledOrReturned) {
-    order.paymentStatus = "Refunded";
-  }
-
   const allReturned = order.products.every(
-    (p) => p.status === "Returned" && p.requestStatus === "Approved",
+    (p) =>
+      (p.status === "Returned" || p.status === "Cancelled") &&
+      p.requestStatus === "Approved",
   );
 
   if (allReturned) {
+    order.paymentStatus = "Refunded";
     order.orderStatus = "Returned";
-  } else {
-    order.orderStatus = "Partially-Returned";
   }
 };

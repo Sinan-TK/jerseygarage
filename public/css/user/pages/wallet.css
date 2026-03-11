@@ -68,15 +68,18 @@
   background: #fff;
   padding: 20px;
   border-radius: 10px;
-  width: 100%;
-  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .transactions h2 {
   margin-bottom: 20px;
   font-size: 20px;
+}
 
+.wallet-card,
+.transactions {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 
@@ -104,6 +107,16 @@
 }
 
 .left p {
+  font-size: 13px;
+  color: #777;
+}
+
+.center h4 {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.center p {
   font-size: 13px;
   color: #777;
 }

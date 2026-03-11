@@ -578,7 +578,7 @@ export const userLogout = (req, res) => {
 export const orderSuccess = wrapAsync(async (req, res) => {
   const orderId = req.session.orderId;
   const user_id = req.session.user.id;
-  delete req.session.orderid;
+  delete req.session.orderId;
 
   const order = await Order.findOne({
     _id: orderId,
@@ -614,7 +614,7 @@ export const orderSuccess = wrapAsync(async (req, res) => {
 //
 
 export const orderFailed = (req, res) => {
-  delete req.session.orderid;
+  delete req.session.orderId;
   res.render("user/pages/paymentfailed", {
     title: "Order Failed",
     pageJS: "",
@@ -749,7 +749,7 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
 });
 
 //
-
+//
 //
 
 export const orderPayFailed = wrapAsync(async (req, res) => {

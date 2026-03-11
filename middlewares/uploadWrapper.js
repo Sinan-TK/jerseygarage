@@ -1,5 +1,5 @@
 import sendResponse from "../utils/sendResponse.js";
-import upload from "./multer.js";
+import upload from "../config/multer.js";
 
 export const uploadImages = (req, res, next) => {
   upload.array("images", 5)(req, res, (err) => {

@@ -170,7 +170,6 @@ async function applyFilters(page = 1) {
     totalItems = data.pagination.totalItems;
     console.log(4);
 
-
     renderStats(data.summary);
     renderTable();
     renderPagination();
@@ -237,8 +236,6 @@ function statusBadge(s) {
     Confirmed: "yellow",
     Cancelled: "red",
     Returned: "red",
-    "Partially-Cancelled": "yellow",
-    "Partially-Returned": "yellow",
   };
   return `<span class="badge badge-${map[s] || "blue"}">${s}</span>`;
 }

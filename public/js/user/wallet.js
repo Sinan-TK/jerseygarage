@@ -3,7 +3,6 @@ async function walletData(page = 1) {
     const res = await axios.get("/user/wallet/data", {
       params: { page },
     });
-    console.log(res.data.data);
     loadWallet(res.data.data);
   } catch (err) {
     const error = err.response?.data;
@@ -34,6 +33,13 @@ function loadWallet(data) {
         <h4>${item.reason}</h4>
         <p>${formatDate(item.date)}</p>
       </div>
+
+      ${item.orderId ? `
+        <div class='center'>
+          <h4>Order ID: </h4>
+          <p>${item.orderId}</p>
+        </div>
+      ` : ""}
 
       <div class="amount ${item.type === "credit" ? (item.status === "PENDING" ? "status-pending" : "credit") : item.status === "PENDING" ? "status-pending" : "debit"} ">
 

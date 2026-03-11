@@ -73,8 +73,8 @@
                 </div>
             </label>
 
-            <label id="codLabel" class="radio-card <%= total > 500 ? 'disabled' : '' %>">
-                <input type="radio" name="payment" value="COD" <%=total> 500 ? 'disabled' : '' %>
+            <label id="codLabel" class="radio-card <%= total > 1000 ? 'disabled' : '' %>">
+                <input type="radio" name="payment" value="COD" <%=total> 1000 ? 'disabled' : '' %>
                 />
                 <div class="radio-content">
                     <div class="title">COD</div>
@@ -83,8 +83,8 @@
             </label>
 
 
-            <p id="codText" class="muted <%= total > 500 ? 'small':'hidden' %> ">
-                COD available only for orders above ₹500
+            <p id="codText" class="muted <%= total > 1000 ? 'small':'hidden' %> ">
+                COD available only for orders below ₹1000
             </p>
         </section>
 
@@ -323,4 +323,11 @@
             </div>
         </form>
     </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <p>Placing your order...</p>
+  </div>
 </div>

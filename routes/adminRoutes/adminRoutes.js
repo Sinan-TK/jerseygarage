@@ -1,8 +1,6 @@
 import express from "express";
 import * as adminController from "../../controllers/admin/adminController.js";
 import * as adminMiddleware from "../../middlewares/adminMiddleware.js";
-// import upload from "../../middlewares/multer.js";
-import { adminLayout } from "../../middlewares/layoutMiddleware.js";
 import adminUserRoutes from "./userRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
 import orderRoutes from "./orderRoutes.js";
@@ -13,7 +11,7 @@ import productRoutes from "../adminRoutes/productRoutes.js";
 
 const router = express.Router();
 
-router.use(adminLayout);
+router.use(adminMiddleware.adminLayout);
 
 router.get("/login",adminMiddleware.adminExists, adminController.renderLoginPage);
 

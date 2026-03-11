@@ -1,7 +1,6 @@
 import express from "express";
 import * as productController from "../../controllers/admin/productController.js";
 import * as adminMiddleware from "../../middlewares/adminMiddleware.js";
-// import { uploadImages } from "../../middlewares/uploadWrapper.js";
 
 const router = express.Router();
 

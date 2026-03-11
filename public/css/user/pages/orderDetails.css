@@ -1,9 +1,11 @@
 /* Main Container */
 .order-details-container {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 0 15px;
+    margin: 30px auto;
+    background-color: white;
+    padding: 20px 35px;
     font-family: Arial, sans-serif;
+    border-radius: 20px;
 }
 
 /* Header */
@@ -226,19 +228,11 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-
-    gap: 10px;
-
+    gap: 3px;
     font-size: 15px;
-    /* Bigger text */
     font-weight: 600;
-    /* Bold */
-
     color: #4b5563;
-    /* Soft dark gray */
-
     margin: 20px 0 16px;
-    /* Good spacing top/bottom */
 }
 
 /* Links */

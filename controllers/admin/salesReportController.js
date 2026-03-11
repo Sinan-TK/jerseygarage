@@ -207,11 +207,11 @@ export const downloadSalesExcel = wrapAsync(async (req, res) => {
   const ws = XLSX.utils.json_to_sheet(rows);
 
   // ── Column widths ────────────────────────────────────────────────────────
-  ws['!cols'] = [
+  ws["!cols"] = [
     { wch: 28 }, // Order ID
     { wch: 12 }, // Date
     { wch: 20 }, // Customer
-    { wch: 8  }, // Items
+    { wch: 8 }, // Items
     { wch: 14 }, // Subtotal
     { wch: 14 }, // Discount
     { wch: 14 }, // Coupon
@@ -220,7 +220,6 @@ export const downloadSalesExcel = wrapAsync(async (req, res) => {
     { wch: 12 }, // Payment
     { wch: 20 }, // Status
   ];
-
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Sales Report");
@@ -428,10 +427,9 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
     Cancelled: "#e53935",
     Returned: "#e53935",
     Pending: "#d97706",
-    "Partially-Cancelled": "#d97706",
-    "Partially-Returned": "#d97706",
     Placed: "#2563eb",
   };
+
   const payColors = {
     Paid: "#16a34a",
     Pending: "#d97706",

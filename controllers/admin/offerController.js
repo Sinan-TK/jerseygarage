@@ -3,7 +3,6 @@ import Offer from "../../models/offerModel.js";
 import Product from "../../models/productModel.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
-
 import offerSchema from "../../validators/offerValidator.js";
 import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
@@ -90,6 +89,13 @@ export const addOffer = wrapAsync(async (req, res) => {
     isActive,
   } = req.body;
 
+  if (discountType === "percentage" && discountValue > 100) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Percentage discount cannot exceed 100%",
+    });
+  }
+
   if (offerApplyType === "product") {
     const validProducts = await Product.find({
       _id: { $in: productIds },
@@ -163,9 +169,7 @@ export const editOffer = wrapAsync(async (req, res) => {
     });
   }
 
-  const { error } = offerSchema.validate(req.body, {
-    abortEarly: false,
-  });
+  const { error } = offerSchema.validate(req.body);
 
   if (error) {
     return sendResponse(res, {
@@ -185,6 +189,13 @@ export const editOffer = wrapAsync(async (req, res) => {
     endDate,
     isActive,
   } = req.body;
+
+  if (discountType === "percentage" && discountValue > 100) {
+    return sendResponse(res, {
+      code: 400,
+      message: "Percentage discount cannot exceed 100%",
+    });
+  }
 
   if (offerApplyType === "product") {
     const validProducts = await Product.find({

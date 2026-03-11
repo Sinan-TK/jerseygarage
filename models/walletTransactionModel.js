@@ -30,8 +30,7 @@ const walletTransactionSchema = new mongoose.Schema(
     },
 
     orderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Order",
+      type: String,
       default: null,
     },
 
@@ -52,12 +51,12 @@ const walletTransactionSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const WalletTransaction = mongoose.model(
   "WalletTransaction",
-  walletTransactionSchema
+  walletTransactionSchema,
 );
 
 export default WalletTransaction;

@@ -1,13 +1,9 @@
 const updateStatus = document?.getElementById("updateStatus");
 if (updateStatus) {
   updateStatus.addEventListener("click", async () => {
-    const orderStatus = document.getElementById("orderStatus").value;
+    const orderStatus = document.getElementById("orderStatusChange").value;
     const paymentStatus = document.getElementById("paymentStatus").value;
     const orderId = updateStatus.dataset.orderId;
-
-    console.log(orderId);
-
-    console.log(orderStatus, paymentStatus, orderId);
 
     try {
       const res = await axios.patch("/admin/orders/change-status", {
@@ -17,6 +13,7 @@ if (updateStatus) {
       });
 
       if (res.data.success) {
+        document.getElementById("orderStatus").innerText = res.data.data.orderStatus;
         toastr.success(res.data.message, "success");
       }
     } catch (err) {

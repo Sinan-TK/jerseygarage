@@ -123,7 +123,7 @@
             <div class="item">
                 <img src="<%= product.image %>" />
                 <div class="item-info">
-                    <h4>₹<%= product.name %>
+                    <h4><%= product.name %>
                     </h4>
                     <p>Size: <%= product.size %> • Qty: <%= product.quantity %>
                     </p>
@@ -208,7 +208,7 @@
             </p>
         </div>
 
-        <% if(order.products.some(i=> i.status === "Active")){ %>
+        <% if(order.products.some(i=> i.status === "Active") && !["Returned","Cancelled","Failed"].includes(order.orderStatus) ){ %>
             <div class="cancel-box">
                 <button class="cancel-btn" id="openOrderModal">
                     <%= order.orderStatus==="Delivered" ? "Return" : "Cancel" %> Order
@@ -276,7 +276,7 @@
                 Close
             </button>
 
-            <button class="btn-danger" onclick="submitAction()">
+            <button id="submitBtn" class="btn-danger" onclick="submitAction()">
                 Submit
             </button>
         </div>

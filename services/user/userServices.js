@@ -397,11 +397,11 @@ export const placeOrderService = async ({
 
   const totalPrice = price + userConstants.SHIPPING_CHARGE + gstAmount;
 
-  if (paymentMethod === "COD" && totalPrice > 500) {
+  if (paymentMethod === "COD" && totalPrice > 1000) {
     return {
       error: {
         code: 403,
-        message: "Cash on Delivery is not available for orders above ₹500",
+        message: "Cash on Delivery is not available for orders above ₹1000",
       },
     };
   }
@@ -535,9 +535,11 @@ export const placeOrderService = async ({
         order.totalPrice,
         "SUCCESS",
         "Order Payment",
-        order._id,
+        order.orderId,
         session,
       );
+      order.paymentStatus = "Paid";
+      order.save();
       if (wallet?.error) {
         await session.abortTransaction();
         session.endSession();

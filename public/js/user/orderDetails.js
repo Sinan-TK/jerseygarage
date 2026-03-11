@@ -62,8 +62,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // From: data-order-status=""
   ORDER_STATUS = modal.dataset.orderStatus;
 
+  const products = JSON.parse(modal.dataset.products || "[]");
+
+  const finalProducts = products.filter(
+    (p) =>
+      p.status !== "Cancelled" &&
+      p.status !== "Returned" &&
+      p.status !== "Return-Requested" &&
+      p.status !== "Cancel-Requested",
+  );
+
   // From: data-products=""
-  ORDER_PRODUCTS = JSON.parse(modal.dataset.products || "[]");
+  ORDER_PRODUCTS = finalProducts;
 });
 
 /* =====================================
@@ -132,11 +142,6 @@ function setupItemList() {
 
   box.innerHTML = "";
 
-  /*
-    ORDER_PRODUCTS comes from:
-    data-products="<%- JSON.stringify(order.products) %>"
-  */
-
   ORDER_PRODUCTS.forEach((item) => {
     box.innerHTML += `
       <label class="item-check">
@@ -168,6 +173,7 @@ function handleActionChange() {
 ===================================== */
 
 async function submitAction() {
+  btnSubmit(true);
   const action = document.getElementById("actionType").value;
 
   const reason =
@@ -204,18 +210,28 @@ async function submitAction() {
 
   try {
     const res = await axios.patch("/user/orders/order-action", payload);
-    console.log(res);
-    loadItems(res.data.data);
+    const order = res.data.data;
+    loadItems(order);
+    ORDER_PRODUCTS = order.products.filter(
+      (p) =>
+        p.status !== "Cancelled" &&
+        p.status !== "Returned" &&
+        p.status !== "Return-Requested" &&
+        p.status !== "Cancel-Requested",
+    );
     closeModal();
+    if (["Cancelled", "Returned"].includes(order.orderStatus)) {
+      document.querySelectorAll(".cancel-box").style.display = "none";
+    }
     toastr.success(res.data.message, "Success");
   } catch (err) {
     const error = err.response?.data;
     console.error(error);
-    const errorBox = document.getElementById("errorBox")
+    btnSubmit(false);
+    const errorBox = document.getElementById("errorBox");
     const errorText = document.getElementById("errorText");
     errorBox.style.display = "flex";
-    errorText.innerHTML = error?.message||"Something went wrong!!"
-    // toastr.error(error?.message || "Something went wrong", "Failed");
+    errorText.innerHTML = error?.message || "Something went wrong!!";
   }
 }
 
@@ -230,14 +246,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadItems(data) {
-  console.log(data);
   document.getElementById("itemsPrice").innerHTML =
     `₹${data.itemsPrice.toFixed(2)}`;
-  console.log("working 1");
 
   document.getElementById("gstAmount").innerHTML =
     `₹${data.totalGST.toFixed(2)}`;
-  console.log("working 2");
 
   // Remove old refund div if it exists
   const existingRefund = document.getElementById("refundAmountDiv");
@@ -252,12 +265,9 @@ function loadItems(data) {
     <span id="refundAmount">-₹${data.refundAmount.toFixed(2)}</span>`;
     gstAmountDiv.insertAdjacentElement("afterend", newDiv);
   }
-  console.log("working 4");
 
   document.getElementById("totalPrice").innerHTML =
     `₹${data.totalPrice.toFixed(2)}`;
-  // document.getElementById()
-  // document.getElementById()
   const card = document.getElementById("orderItems");
   card.innerHTML = "";
   const h3 = document.createElement("h3");
@@ -278,4 +288,10 @@ function loadItems(data) {
 
     card.append(div);
   });
+}
+
+function btnSubmit(loading) {
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = loading;
+  btn.innerText = loading ? "Submitting..." : "Submit";
 }

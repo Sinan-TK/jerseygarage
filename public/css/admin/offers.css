@@ -252,6 +252,8 @@
     border-radius: 10px;
     padding: 25px;
     animation: fadeIn 0.2s ease;
+    max-height: 90vh;        /* ← add */
+    overflow-y: auto;        /* ← add */
 }
 
 @keyframes fadeIn {
@@ -350,7 +352,7 @@
     transform: translateX(20px);
 }
 
-.status-toggle {
+.offer-status-toggle {
     display: flex;
     align-items: center;
     gap: 10px;
