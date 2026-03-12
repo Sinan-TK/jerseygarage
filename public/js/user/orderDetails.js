@@ -223,6 +223,7 @@ async function submitAction() {
     if (["Cancelled", "Returned"].includes(order.orderStatus)) {
       document.querySelectorAll(".cancel-box").style.display = "none";
     }
+    btnSubmit(false);
     toastr.success(res.data.message, "Success");
   } catch (err) {
     const error = err.response?.data;

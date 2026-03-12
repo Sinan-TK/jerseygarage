@@ -113,7 +113,10 @@ export const getSalesReport = wrapAsync(async (req, res) => {
       (o.is_couponed ? o.coupon?.discountAmount || 0 : 0),
     0,
   );
+  
   const totalGST = allOrders.reduce((s, o) => s + (o.totalGST || 0), 0);
+
+
   const totalRefunds = allOrders
     .filter(
       (o) => o.orderStatus === "Returned" || o.orderStatus === "Cancelled",
@@ -388,7 +391,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
   });
 
   // ── Table ────────────────────────────────────────────────────────────────
-  const tableY = cardY + cardH + 16;
   const rowH = 20;
 
   const cols = [
@@ -404,21 +406,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
     { label: "Payment", w: 52 },
     { label: "Status", w: 75 },
   ];
-
-  // Header
-  doc.rect(startX, tableY, pageW, rowH).fill("#e53935");
-  let cx = startX;
-  cols.forEach((col) => {
-    doc
-      .fontSize(7.5)
-      .font("Helvetica-Bold")
-      .fillColor("#ffffff")
-      .text(col.label, cx + 3, tableY + 6, {
-        width: col.w - 6,
-        lineBreak: false,
-      });
-    cx += col.w;
-  });
 
   const statusColors = {
     Delivered: "#16a34a",
@@ -436,18 +423,42 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
     Refunded: "#2563eb",
   };
 
+  // ── Draw Header ───────────────────────────────────────────────────────────
+  function drawTableHeader(y) {
+    doc.rect(startX, y, pageW, rowH).fill("#e53935");
+    let cx = startX;
+    cols.forEach((col) => {
+      doc
+        .fontSize(7.5)
+        .font("Helvetica-Bold")
+        .fillColor("#ffffff")
+        .text(col.label, cx + 3, y + 6, {
+          width: col.w - 6,
+          lineBreak: false,
+        });
+      cx += col.w;
+    });
+  }
+
+  const tableY = cardY + cardH + 16;
+  drawTableHeader(tableY);
+
+  let currentY = tableY + rowH;
+
   orders.forEach((o, i) => {
-    const rowY = tableY + rowH + i * rowH;
-
-    if (rowY + rowH > doc.page.height - 30) {
+    // ── Page Break ──────────────────────────────────────────────────────────
+    if (currentY + rowH > doc.page.height - 30) {
       doc.addPage();
+      currentY = 30;
+      drawTableHeader(currentY);
+      currentY += rowH;
     }
 
+    // ── Row Background ──────────────────────────────────────────────────────
     if (i % 2 === 0) {
-      doc.rect(startX, rowY, pageW, rowH).fill("#f9fafb");
+      doc.rect(startX, currentY, pageW, rowH).fill("#f9fafb");
     }
-
-    doc.rect(startX, rowY, pageW, rowH).stroke("#e5e7eb");
+    doc.rect(startX, currentY, pageW, rowH).stroke("#e5e7eb");
 
     const couponAmt = o.is_couponed ? o.coupon?.discountAmount || 0 : 0;
 
@@ -465,7 +476,7 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
       o.orderStatus,
     ];
 
-    cx = startX;
+    let cx = startX;
     row.forEach((val, j) => {
       let color = "#1a1a1a";
       let font = "Helvetica";
@@ -486,7 +497,7 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
         .fontSize(7.5)
         .font(font)
         .fillColor(color)
-        .text(val, cx + 3, rowY + 6, {
+        .text(val, cx + 3, currentY + 6, {
           width: cols[j].w - 6,
           lineBreak: false,
           ellipsis: true,
@@ -494,6 +505,8 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
 
       cx += cols[j].w;
     });
+
+    currentY += rowH;
   });
 
   doc.end();

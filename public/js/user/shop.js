@@ -14,6 +14,7 @@ window.loadFilter = async function (page = 1, search = "") {
   const user = res.data.data.user;
   const products = res.data.data.products;
   const wishlist = res.data.data.wishlist;
+  const offers = res.data.data.offers;
 
   if (products.length === 0) {
     document.querySelector(".shop-body").innerHTML = noProducts();
@@ -22,7 +23,7 @@ window.loadFilter = async function (page = 1, search = "") {
   } else {
     document.querySelector(".shop-body").innerHTML = "";
     document.querySelector(".shop-grid").innerHTML = products
-      .map((product) => loadProducts(product, user, wishlist))
+      .map((product) => loadProducts(product, user, wishlist, offers))
       .join("");
 
     document.querySelector(".pagination").innerHTML = pagination(
@@ -40,31 +41,69 @@ function noProducts() {
   `;
 }
 
-function loadProducts(product, user, wishlist) {
+function loadProducts(product, user, wishlist, offers) {
   const variant = product.variants[0];
   let wishlisted = false;
+  const applicableOffers = [];
+
+  for (let i = 0; i < offers.length; i++) {
+    const offer = offers[i];
+
+    if (
+      offer.offerApplyType === "product" &&
+      offer.productIds &&
+      offer.productIds.find(function (id) {
+        return id.toString() === product._id.toString();
+      })
+    ) {
+      applicableOffers.push(offer);
+      continue;
+    }
+    if (
+      offer.offerApplyType === "category" &&
+      offer.categoryIds &&
+      offer.categoryIds.find(function (id) {
+        return id.toString() === product.category.toString();
+      })
+    ) {
+      applicableOffers.push(offer);
+    }
+  }
+
   if (user && wishlist && variant) {
     wishlisted = wishlist.items.some(
       (item) => item.variant_id.toString() === variant._id.toString(),
     );
   }
 
+
   return `
     <div class="product-item">
+
+    ${
+      applicableOffers.length !== 0
+        ? `
+    <div class="offer-div">
+      <span>Offer</span>
+    </div>
+  `
+        : ""
+    }
+
     ${
       user
         ? `
-  <div class="product-actions">
-    <button
-      data-variant="${variant._id}"
-      class="wishlist-btn ${
-        wishlisted ? `isWishlistedTrue` : `isWishlistedFalse`
-      }"
-      title="Add to Wishlist">
-      <i class="fa-regular fa-heart"></i>
-    </button>
-  </div>
-`
+          <div class="product-actions">
+            <button
+              data-variant="${variant._id}"
+              class="wishlist-btn ${
+                wishlisted ? `isWishlistedTrue` : `isWishlistedFalse`
+              }"
+              title="Add to Wishlist">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
+        `
         : ""
     }
             <a href="/product/${product._id}">

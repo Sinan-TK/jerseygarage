@@ -2,8 +2,10 @@ import User from "../../models/userModel.js";
 import * as Responses from "../../utils/responses/user/auth.responses.js";
 import generateOtp from "../../utils/GenerateOtp.js";
 import Otp from "../../models/otpModel.js";
+import * as userConstants from "../../constants/userConstants.js";
 
 //=============================================================================
+// 1.USER LOGIN VERIFICATION
 //=============================================================================
 
 export const verifyUserLogin = async (email, password) => {
@@ -31,6 +33,7 @@ export const verifyUserLogin = async (email, password) => {
 };
 
 //=============================================================================
+// 2. SAVE NEW USER
 //=============================================================================
 
 export const signupVerificationService = async (email, referralCode) => {
@@ -52,18 +55,23 @@ export const signupVerificationService = async (email, referralCode) => {
     }
   }
 
-  await generateOtp(email, "signup", "SignUp OTP. ");
+  await generateOtp(
+    email,
+    userConstants.OTPPURPOSE.SIGNUP,
+    userConstants.OTP_MESSAGES.SIGNUP,
+  );
 
   return {
     data: {
       email,
-      purpose: "signup",
+      purpose: userConstants.OTPPURPOSE.SIGNUP,
       ...(referredBy && { referredBy: referredBy._id }),
     },
   };
 };
 
 //=============================================================================
+// 3.OTP VERIFICATION
 //=============================================================================
 
 export const otpVerify = async (email, purpose, otpValue) => {

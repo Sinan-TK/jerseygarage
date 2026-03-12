@@ -46,6 +46,7 @@ export const handleCancel = async (order, action, items, reason) => {
 
     item.requestStatus = "Approved";
     item.statusChangedAt = new Date();
+    order.totalGST -= item.total_gst;
     order.totalPrice -= price;
 
     if (order.paymentStatus === "Paid") {

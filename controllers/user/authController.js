@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import User from "../../models/userModel.js";
 import Otp from "../../models/otpModel.js";
 import Product from "../../models/productModel.js";
@@ -16,7 +15,6 @@ import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import { createUniqueReferralCode } from "../../utils/referralCodeGenerator.js";
-import productBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import * as authServices from "../../services/user/authServices.js";
 import * as userConstants from "../../constants/userConstants.js";
@@ -80,7 +78,7 @@ export const userVerification = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. RENDER OTP PAGE
+// 4. RENDER OTP PAGE
 // ======================================================================
 
 export const renderOtpPage = wrapAsync((req, res) => {
@@ -94,7 +92,7 @@ export const renderOtpPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 7. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
+// 5. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
 // ======================================================================
 
 export const otpVerification = wrapAsync(async (req, res) => {
@@ -149,8 +147,8 @@ export const otpVerification = wrapAsync(async (req, res) => {
       await walletHandler.creditWallet(
         referredBy._id,
         amount,
-        "SUCCESS",
-        "Referral Bouns",
+        userConstants.TRANSACTION_STATUS.SUCCESS,
+        userConstants.TRANSACTION_REASON.REF,
       );
 
       newUser.referred_by = userData.referredBy;
@@ -175,7 +173,7 @@ export const otpVerification = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 8. RESEND OTP
+// 6. RESEND OTP
 // ======================================================================
 
 export const resendOtp = wrapAsync(async (req, res) => {
@@ -186,13 +184,17 @@ export const resendOtp = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.resendOtp.DATA_NOT_FOUND);
   }
 
-  await generateOtp(email, purpose, "Resend OTP. ");
+  await generateOtp(
+    email,
+    purpose,
+    `Resend OTP - ${purpose === userConstants.OTPPURPOSE.SIGNUP ? userConstants.OTP_MESSAGES.SIGNUP : userConstants.OTP_MESSAGES.FORGOTPASSWORD} `,
+  );
 
   return sendResponse(res, Responses.resendOtp.RESEND_OTP);
 });
 
 // ======================================================================
-// 9. SHOW REGISTER PAGE
+// 7. SHOW REGISTER PAGE
 // ======================================================================
 
 export const signUpPage = wrapAsync((req, res) => {
@@ -206,7 +208,7 @@ export const signUpPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 10. SAVE NEW USER (FINAL REGISTER PAGE)
+// 8. SAVE NEW USER (FINAL REGISTER PAGE)
 // ======================================================================
 
 export const signupVerification = wrapAsync(async (req, res) => {
@@ -244,7 +246,7 @@ export const signupVerification = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 11. FORGET PASSWORD PAGE
+// 9. FORGET PASSWORD PAGE
 // ======================================================================
 
 export const renderForgetPasswordPage = wrapAsync((req, res) => {
@@ -258,7 +260,7 @@ export const renderForgetPasswordPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 12. EMAIL SUBMIT (FORGOT PASSWORD)
+// 10. EMAIL SUBMIT (FORGOT PASSWORD)
 // ======================================================================
 
 export const emailVerification = wrapAsync(async (req, res) => {
@@ -276,16 +278,20 @@ export const emailVerification = wrapAsync(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) return sendResponse(res, Responses.forgetPass.NOT_FOUND);
 
-  await generateOtp(email, "forget_password", "Forget password OTP. ");
+  await generateOtp(
+    email,
+    userConstants.OTPPURPOSE.FORGOTPASSWORD,
+    userConstants.OTP_MESSAGES.FORGOTPASSWORD,
+  );
 
   req.session.tempEmail = email;
-  req.session.otpPurpose = "forget_password";
+  req.session.otpPurpose = userConstants.OTPPURPOSE.FORGOTPASSWORD;
 
   return sendResponse(res, Responses.forgetPass.OTP_GENERATED);
 });
 
 // ======================================================================
-// 13. NEW PASSWORD PAGE
+// 11. NEW PASSWORD PAGE
 // ======================================================================
 
 export const renderNewPassPage = (req, res) => {
@@ -299,7 +305,7 @@ export const renderNewPassPage = (req, res) => {
 };
 
 // ======================================================================
-// 14. UPDATE PASSWORD
+// 12. UPDATE PASSWORD
 // ======================================================================
 
 export const newPassValidation = wrapAsync(async (req, res) => {
@@ -330,7 +336,7 @@ export const newPassValidation = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 15.HOME PAGE
+// 13.HOME PAGE
 // ======================================================================
 
 export const renderHomePage = wrapAsync(async (req, res) => {
@@ -373,8 +379,6 @@ export const renderHomePage = wrapAsync(async (req, res) => {
     endDate: { $gte: now },
   }).lean();
 
-  // console.log(offers)
-
   res.render("user/pages/home", {
     title: "Home",
     pageCSS: "home",
@@ -388,7 +392,7 @@ export const renderHomePage = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 16.SHOP PAGE
+// 14.SHOP PAGE
 // ======================================================================
 
 export const renderShopPage = wrapAsync(async (req, res) => {
@@ -414,7 +418,7 @@ export const renderShopPage = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 16.SHOP PAGE
+// 15.SHOP PAGE DATA
 // ======================================================================
 
 export const shopPageProducts = wrapAsync(async (req, res) => {
@@ -546,6 +550,7 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
       products,
       user: Boolean(req.session.user),
       wishlist,
+      offers,
       pagination: {
         currentPage,
         totalPages,
@@ -553,8 +558,9 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
     },
   });
 });
+
 // ======================================================================
-// 17.PRODUCT DETAIL PAGE RENDER
+// 16.PRODUCT DETAIL PAGE RENDER
 // ======================================================================
 
 export const productDetailPage = wrapAsync(async (req, res) => {
@@ -710,7 +716,7 @@ export const productDetailPage = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 1. LOGIN PAGE
+// 17.ABOUT PAGE
 // ======================================================================
 
 export const aboutPage = wrapAsync((req, res) => {
@@ -724,7 +730,7 @@ export const aboutPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 1. LOGIN PAGE
+// 18. CONTACT PAGE
 // ======================================================================
 
 export const contactPage = wrapAsync((req, res) => {
@@ -738,7 +744,7 @@ export const contactPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 1. LOGIN PAGE
+// 19. PRIVACY AND POLICY PAGE
 // ======================================================================
 
 export const privacyPage = wrapAsync((req, res) => {
@@ -752,7 +758,7 @@ export const privacyPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 1. LOGIN PAGE
+// 20. TERMS AND CONDITIONS PAGE
 // ======================================================================
 
 export const termsPage = wrapAsync((req, res) => {
@@ -766,7 +772,7 @@ export const termsPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 1. LOGIN PAGE
+// 21. RETURN POLICY PAGE
 // ======================================================================
 
 export const returnPolicy = wrapAsync((req, res) => {
@@ -780,7 +786,7 @@ export const returnPolicy = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 1. LOGIN PAGE
+// 22. FAQS PAGE
 // ======================================================================
 
 export const faqPage = wrapAsync((req, res) => {

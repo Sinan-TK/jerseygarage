@@ -14,7 +14,7 @@ import razorpay from "../../config/razorpay.js";
 import Order from "../../models/orderModel.js";
 import { ObjectId } from "mongodb";
 import buildCheckoutItems from "../../utils/buildCheckoutItems.js";
-import generateInvoice from "../../utils/generateInvoice.js";
+import { generateInvoice } from "../../utils/generateInvoice.js";
 import bcrypt from "bcrypt";
 import generateOtp from "../../utils/GenerateOtp.js";
 import Wallet from "../../models/walletModel.js";
@@ -29,6 +29,7 @@ import Coupon from "../../models/couponModel.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
 import paginate from "../../utils/pagination.js";
 import cloudinary from "../../config/cloudinary.js";
+import PDFDocument from "pdfkit";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -143,7 +144,7 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
     await generateOtp(
       result.email,
       userConstants.OTPPURPOSE.CHANGEEMAIL,
-      "Change Mail Address",
+      "Email verification OTP.",
     );
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_CHANGE);
   }
@@ -849,15 +850,10 @@ export const downloadInvoice = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
   const orderId = req.params.orderId;
 
-  const order = await Order.findOne({
-    orderId,
-    user_id,
-  });
+  const order = await Order.findOne({ orderId, user_id }).lean();
 
   if (!order) {
-    return res.status(404).json({
-      message: "Order not found",
-    });
+    return res.status(404).json({ message: "Order not found" });
   }
 
   generateInvoice(order, res);
