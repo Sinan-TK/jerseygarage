@@ -11,10 +11,10 @@ export const personalInfoEdit = Object.freeze({
     code: 409,
     message: "An account with this email already exists.",
   },
-  // INFO_EDITED: {
-  //   code: 200,
-  //   message: "Personal Info edited",
-  // },
+  NO_IMAGE: {
+    code: 400,
+    message: "No image provided",
+  },
   EMAIL_CHANGE: {
     code: 200,
     message: "Email change",
@@ -30,6 +30,10 @@ export const addAddress = Object.freeze({
 });
 
 export const editAddress = Object.freeze({
+  NOT_FOUND: {
+    code: 404,
+    message: "Address not found",
+  },
   ADDRESS_EDITED: {
     code: 201,
     message: "Address edited successfully!!",
@@ -84,14 +88,6 @@ export const addToCart = Object.freeze({
     code: 400,
     message: "Invalid cart data",
   },
-  // NO_VARIANT: {
-  //   code: 404,
-  //   message: "Variant not available",
-  // },
-  // SUCCESS: {
-  //   code: 200,
-  //   message: "Item added to cart",
-  // },
 });
 
 export const cartQuantity = Object.freeze({
@@ -164,6 +160,25 @@ export const editPassword = Object.freeze({
   },
 });
 
+export const order = Object.freeze({
+  NO_ORDER: {
+    code: 404,
+    message: "Order not found",
+  },
+  RAZORPAY_FAILED: {
+    code: 200,
+    message: "Razorpay payment Failed",
+    redirectToFrontend: "/user/order/failed",
+  },
+});
+
+export const wallet = Object.freeze({
+  PROCESSED: {
+    code: 409,
+    message: "Wallet top-up already processed",
+  },
+});
+
 export const deleteCartItem = Object.freeze({
   NO_VARIANT_ID: {
     code: 400,
@@ -203,6 +218,10 @@ export const placeOrder = Object.freeze({
   PAY_VERIFY_FAILED: {
     code: 400,
     message: "Payment verification failed",
+  },
+  COD_NOT_AVAILABLE: {
+    code: 403,
+    message: "Cash on Delivery is not available for orders above ₹1000",
   },
   SUCCESS: {
     code: 201,

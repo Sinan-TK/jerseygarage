@@ -117,6 +117,7 @@ export const handleReturn = async (order, action, items, reason) => {
     const price = item.subtotal + item.total_gst;
 
     if (action === "partial-return" && order.is_couponed) {
+      console.log("working");
       const coupon = order.coupon;
       const totalAfterReturn = order.totalPrice - price;
       if (coupon.minPurchaseAmount > totalAfterReturn) {

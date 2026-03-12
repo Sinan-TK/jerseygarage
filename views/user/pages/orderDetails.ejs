@@ -37,7 +37,7 @@
     <div class="card">
         <h3 data-status="<%= order.orderStatus %>" id="orderstatus">Order Status</h3>
 
-        <% if(order.orderStatus==="Cancelled" ){ %>
+        <% if(["Cancelled","Returned"].includes(order.orderStatus) ){ %>
 
             <div class="order-cancelled-box">
 
@@ -45,10 +45,10 @@
                     <i class="fa-solid fa-circle-xmark"></i>
                 </div>
 
-                <h2>Order Cancelled</h2>
+                <h2>Order <%= order.orderStatus %></h2>
 
                 <p class="cancel-text">
-                    This order has been cancelled successfully.
+                    This order has been <%= order.orderStatus.toLowerCase() %> successfully.
                 </p>
 
 

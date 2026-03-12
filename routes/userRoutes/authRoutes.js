@@ -89,7 +89,11 @@ router.get("/shop", authController.renderShopPage);
 
 router.get("/shop/data", authController.shopPageProducts);
 
-router.get("/product/:id", authController.productDetailPage);
+router.get(
+  "/product/:id",
+  authMiddleware.productNotFound,
+  authController.productDetailPage,
+);
 
 router.get("/about", authController.aboutPage);
 

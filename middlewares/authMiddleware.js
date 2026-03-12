@@ -1,5 +1,7 @@
 import User from "../models/userModel.js";
 import Category from "../models/categoryModel.js";
+import Product from "../models/productModel.js";
+import wrapAsync from "../utils/wrapAsync.js";
 
 export const isLoggedIn = (req, res, next) => {
   if (req.session.user) {
@@ -15,12 +17,18 @@ export const userLayout = (req, res, next) => {
   next();
 };
 
-// export const isMailFound = (req, res, next) => {
-//   if (req.session.tempEmail) {
-//     return res.redirect("/");
-//   }
-//   next();
-// };
+export const productNotFound = wrapAsync(async (req, res, next) => {
+  const productId = req.params.id;
+
+  const product = await Product.findById(productId);
+
+  if (!product || !product.is_active) {
+    return next({ status: 404 });
+  }
+
+  req.product = product;
+  next();
+});
 
 export const noMailFound = (req, res, next) => {
   if (!req.session.tempEmail) {

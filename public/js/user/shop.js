@@ -76,7 +76,6 @@ function loadProducts(product, user, wishlist, offers) {
     );
   }
 
-
   return `
     <div class="product-item">
 
@@ -283,4 +282,31 @@ document.getElementById("search-apply").addEventListener("click", () => {
 document.querySelector(".clear-btn").addEventListener("click", () => {
   document.getElementById("search").value = "";
   loadFilter(1, "");
+});
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".wishlist-btn");
+
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const variantId = btn.dataset.variant;
+
+  try {
+    const res = await axios.post(`/user/wishlist`, { variantId });
+
+    if (res.data.data) {
+      toastr.success(res.data.message, "Added!!");
+      btn.classList.replace("isWishlistedFalse", "isWishlistedTrue");
+    } else {
+      toastr.success(res.data.message, "Removed!!");
+      btn.classList.replace("isWishlistedTrue", "isWishlistedFalse");
+    }
+  } catch (err) {
+    const error = err.response?.data;
+    console.error(error);
+    toastr.error(error?.message, "Error!!");
+  }
 });

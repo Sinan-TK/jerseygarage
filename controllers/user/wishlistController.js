@@ -10,25 +10,11 @@ import * as Responses from "../../utils/responses/user/user.response.js";
 // 1. WISHLIST PAGE RENDER
 // ======================================================================
 export const wishlistRender = wrapAsync(async (req, res) => {
-  //   const user_id = new ObjectId(req.session.user.id);
-
-  //   const wishlist = await Wishlist.findOne({ user_id })
-  //     .populate({
-  //       path: "items.variant_id",
-  //       populate: {
-  //         path: "product_id",
-  //         select: "name images teamName",
-  //       },
-  //     })
-  //     .lean();
-
-  //   const items = wishlist ? wishlist.items : [];
 
   res.render("user/layouts/profilelayout", {
     title: "User Wishlist",
     pageCSS: "wishlist",
     view: "wishlist",
-    // products: items,
     profile: true,
     showHeader: true,
     showFooter: true,
@@ -36,7 +22,7 @@ export const wishlistRender = wrapAsync(async (req, res) => {
   });
 });
 // ======================================================================
-// 2. WISHLIST --> PRODUCT ADDING
+// 2. WISHLIST DATA
 // ======================================================================
 
 export const wishlistData = wrapAsync(async (req, res) => {
@@ -94,7 +80,7 @@ export const addWishlist = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 3. REMOVE ITEM FROM WISHLIST
+// 4. REMOVE ITEM FROM WISHLIST
 // ======================================================================
 
 export const removeWishlist = wrapAsync(async (req, res) => {

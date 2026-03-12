@@ -31,7 +31,13 @@ export const cartQuantityService = async ({
   value,
   quantity,
 }) => {
-  if (!variant_id || !["plus", "minus"].includes(value)) {
+  if (
+    !variant_id ||
+    ![
+      userConstants.CART_QUANTITY.PLUS,
+      userConstants.CART_QUANTITY.MINUS,
+    ].includes(value)
+  ) {
     return { error: Responses.cartQuantity.INVALID };
   }
 
@@ -47,7 +53,7 @@ export const cartQuantityService = async ({
     return { error: Responses.cartQuantity.ITEM_NOT_FOUND };
   }
 
-  if (value === "plus") {
+  if (value === userConstants.CART_QUANTITY.PLUS) {
     if (itemVariant.stock > item.quantity) {
       item.quantity += 1;
     } else {
@@ -55,7 +61,7 @@ export const cartQuantityService = async ({
     }
   }
 
-  if (value === "minus") {
+  if (value === userConstants.CART_QUANTITY.MINUS) {
     if (item.quantity === 1 || parseInt(quantity) === 1) {
       return { error: Responses.cartQuantity.QUANTITY_ZERO };
     } else {
@@ -397,12 +403,9 @@ export const placeOrderService = async ({
 
   const totalPrice = price + userConstants.SHIPPING_CHARGE + gstAmount;
 
-  if (paymentMethod === "COD" && totalPrice > 1000) {
+  if (paymentMethod === userConstants.PAY_METHOD.COD && totalPrice > 1000) {
     return {
-      error: {
-        code: 403,
-        message: "Cash on Delivery is not available for orders above ₹1000",
-      },
+      error: Responses.placeOrder.COD_NOT_AVAILABLE,
     };
   }
 
@@ -424,7 +427,7 @@ export const placeOrderService = async ({
   const orderId = await generateOrderId();
 
   // ── Razorpay — no transaction, stock locked, paid later ─────────────────
-  if (paymentMethod === "Razorpay") {
+  if (paymentMethod === userConstants.PAY_METHOD.RAZORPAY) {
     const order = await Order.create({
       orderId,
       user_id,
@@ -439,7 +442,7 @@ export const placeOrderService = async ({
         country: address.country,
       },
       paymentMethod,
-      paymentStatus: "Pending",
+      paymentStatus: userConstants.ORDER_PAY_STATUS.PENDING,
       paidAt: null,
       itemsPrice,
       shippingCharge: userConstants.SHIPPING_CHARGE,
@@ -448,7 +451,7 @@ export const placeOrderService = async ({
       totalDiscount,
       is_couponed: isCouponed,
       coupon: isCouponed ? coupon : null,
-      orderStatus: "Pending",
+      orderStatus: userConstants.ORDER_STATUS.PENDING,
     });
 
     // Lock stock
@@ -461,7 +464,7 @@ export const placeOrderService = async ({
 
     const razorpayOrder = await razorpay.orders.create({
       amount: Math.round(order.totalPrice * 100),
-      currency: "INR",
+      currency: userConstants.PAY_DETAILS.CURRENCY,
       receipt: order.orderId,
     });
 
@@ -470,14 +473,14 @@ export const placeOrderService = async ({
 
     return {
       success: true,
-      paymentMethod: "Razorpay",
+      paymentMethod: userConstants.PAY_METHOD.RAZORPAY,
       razorpay: {
         key: process.env.RAZORPAY_KEY,
         orderId: razorpayOrder.id,
         amount: razorpayOrder.amount,
-        currency: "INR",
-        name: "JerseyGarage",
-        description: "Order Payment",
+        currency: userConstants.PAY_DETAILS.CURRENCY,
+        name: userConstants.PAY_DETAILS.NAME,
+        description: userConstants.PAY_DETAILS.DES,
       },
       orderId: order._id,
     };
@@ -504,7 +507,7 @@ export const placeOrderService = async ({
             country: address.country,
           },
           paymentMethod,
-          paymentStatus: "Pending",
+          paymentStatus: userConstants.ORDER_STATUS.PENDING,
           paidAt: null,
           itemsPrice,
           shippingCharge: userConstants.SHIPPING_CHARGE,
@@ -513,7 +516,7 @@ export const placeOrderService = async ({
           totalDiscount,
           is_couponed: isCouponed,
           coupon: isCouponed ? coupon : null,
-          orderStatus: "Placed",
+          orderStatus: userConstants.ORDER_STATUS.PLACED,
         },
       ],
       { session },
@@ -529,16 +532,16 @@ export const placeOrderService = async ({
     }
 
     // Wallet debit
-    if (paymentMethod === "Wallet") {
+    if (paymentMethod === userConstants.PAY_METHOD.WALLET) {
       const wallet = await walletHandler.debitWallet(
         user_id,
         order.totalPrice,
-        "SUCCESS",
-        "Order Payment",
+        userConstants.TRANSACTION_STATUS.SUCCESS,
+        userConstants.TRANSACTION_REASON.ORDER,
         order.orderId,
         session,
       );
-      order.paymentStatus = "Paid";
+      order.paymentStatus = userConstants.ORDER_PAY_STATUS.PAID;
       order.save();
       if (wallet?.error) {
         await session.abortTransaction();
@@ -595,7 +598,8 @@ export const orderCancelReturnService = async (
   }
 
   if (
-    (action === "partial-cancel" || action === "partial-return") &&
+    (action === userConstants.ACTION_TYPE.PARTIALCANCEL ||
+      action === userConstants.ACTION_TYPE.PARTIALRETURN) &&
     items.length === 0
   ) {
     return { error: Responses.orderCancelReturn.NO_ITEMS };
@@ -614,27 +618,34 @@ export const orderCancelReturnService = async (
     return { error: Responses.orderCancelReturn.NO_ORDER };
   }
 
-  const isDelivered = order.orderStatus === "Delivered";
+  const isDelivered =
+    order.orderStatus === userConstants.ORDER_STATUS.DELIVERED;
 
-  if (action.includes("cancel") && isDelivered) {
+  if (action.includes(userConstants.ACTION_TYPE.CANCEL) && isDelivered) {
     return { error: Responses.orderCancelReturn.NO_ORDER };
   }
 
-  if (action.includes("return") && !isDelivered) {
+  if (action.includes(userConstants.ACTION_TYPE.RETURN) && !isDelivered) {
     return { error: Responses.orderCancelReturn.NO_RETURN };
   }
 
   let finalAction = action;
 
-  if (action === "partial-cancel" && items.length === order.products.length) {
-    finalAction = "full-cancel";
+  if (
+    action === userConstants.ACTION_TYPE.PARTIALCANCEL &&
+    items.length === order.products.length
+  ) {
+    finalAction = userConstants.ACTION_TYPE.FULLCANCEL;
   }
 
-  if (action === "partial-return" && items.length === order.products.length) {
-    finalAction = "full-return";
+  if (
+    action === userConstants.ACTION_TYPE.PARTIALRETURN &&
+    items.length === order.products.length
+  ) {
+    finalAction = userConstants.ACTION_TYPE.FULLRETURN;
   }
 
-  if (finalAction.includes("cancel")) {
+  if (finalAction.includes(userConstants.ACTION_TYPE.CANCEL)) {
     const cancelResult = await handleReturnCancel.handleCancel(
       order,
       finalAction,
@@ -653,8 +664,17 @@ export const orderCancelReturnService = async (
     };
   }
 
-  if (finalAction.includes("return")) {
-    await handleReturnCancel.handleReturn(order, finalAction, items, reason);
+  if (finalAction.includes(userConstants.ACTION_TYPE.RETURN)) {
+    const returnResult = await handleReturnCancel.handleReturn(
+      order,
+      finalAction,
+      items,
+      reason,
+    );
+
+    if (returnResult?.error) {
+      return { error: returnResult.error };
+    }
 
     await order.save();
     return {
@@ -664,3 +684,7 @@ export const orderCancelReturnService = async (
 
   return { error: Responses.orderCancelReturn.INVALID_ACTION };
 };
+
+//
+
+//

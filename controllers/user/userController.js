@@ -29,7 +29,6 @@ import Coupon from "../../models/couponModel.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
 import paginate from "../../utils/pagination.js";
 import cloudinary from "../../config/cloudinary.js";
-import PDFDocument from "pdfkit";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -103,7 +102,7 @@ export const cartQuantity = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 2. PROFILE PAGE RENDER
+// 3. PROFILE PAGE RENDER
 // ======================================================================
 export const profileRender = (req, res) => {
   res.render("user/layouts/profilelayout", {
@@ -118,7 +117,7 @@ export const profileRender = (req, res) => {
 };
 
 // ======================================================================
-// 3. EDIT PERSONAL INFORMATION
+// 4. EDIT PERSONAL INFORMATION
 // ======================================================================
 export const editPersonalInfo = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
@@ -144,21 +143,21 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
     await generateOtp(
       result.email,
       userConstants.OTPPURPOSE.CHANGEEMAIL,
-      "Email verification OTP.",
+      userConstants.OTP_MESSAGES.CHANGEEMAIL,
     );
     return sendResponse(res, Responses.personalInfoEdit.EMAIL_CHANGE);
   }
 });
 
 // ======================================================================
-// 3. EDIT PERSONAL INFORMATION
+// 5. EDIT PROFILE AVATAR
 // ======================================================================
 
 export const changeAvatar = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
   if (!req.file) {
-    return sendResponse(res, { code: 400, message: "No image provided" });
+    return sendResponse(res, Responses.personalInfoEdit.NO_IMAGE);
   }
 
   // Upload to cloudinary
@@ -183,14 +182,13 @@ export const changeAvatar = wrapAsync(async (req, res) => {
 
   return sendResponse(res, {
     code: 200,
-    success: true,
     message: "Profile picture updated",
     data: { avatar: result.secure_url },
   });
 });
 
 // ======================================================================
-// 3. EDIT PERSONAL INFORMATION
+// 6. DELETE AVATAR
 // ======================================================================
 
 export const deleteDp = wrapAsync(async (req, res) => {
@@ -208,7 +206,7 @@ export const deleteDp = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 3. EDIT PERSONAL INFORMATION
+// 7. EMAIL VERIFICATION
 // ======================================================================
 
 export const emailVerification = wrapAsync(async (req, res) => {
@@ -233,8 +231,9 @@ export const emailVerification = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. EMAIL OTP VERIFICATION PAGE RENDER
+// 8. EMAIL OTP VERIFICATION PAGE RENDER
 // ======================================================================
+
 export const emailOtpVerify = wrapAsync(async (req, res) => {
   res.render("user/pages/profile/emailVerify", {
     title: "OTP Verification",
@@ -246,8 +245,9 @@ export const emailOtpVerify = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. EDIT PASSWORD
+// 9. EDIT PASSWORD
 // ======================================================================
+
 export const editPassword = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
@@ -261,8 +261,9 @@ export const editPassword = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. ADDRESS PAGE RENDER
+// 10. ADDRESS PAGE RENDER
 // ======================================================================
+
 export const addressPageRender = wrapAsync(async (req, res) => {
   res.render("user/layouts/profilelayout", {
     title: "User Addresses",
@@ -274,8 +275,9 @@ export const addressPageRender = wrapAsync(async (req, res) => {
     pageJS: "address.js",
   });
 });
+
 // ======================================================================
-// 4. ADDRESS ADD
+// 11. ADDRESS DATA
 // ======================================================================
 
 export const addressData = wrapAsync(async (req, res) => {
@@ -295,7 +297,7 @@ export const addressData = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. ADDRESS ADD
+// 12. ADDRESS ADD
 // ======================================================================
 
 export const addAddress = wrapAsync(async (req, res) => {
@@ -323,7 +325,7 @@ export const addAddress = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. ADDRESS DELETE
+// 13. ADDRESS DELETE
 // ======================================================================
 
 export const removeAddress = wrapAsync(async (req, res) => {
@@ -335,7 +337,7 @@ export const removeAddress = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 5.  EDIT ADDRESS
+// 14. EDIT ADDRESS
 // ======================================================================
 
 export const editAddress = wrapAsync(async (req, res) => {
@@ -366,17 +368,14 @@ export const editAddress = wrapAsync(async (req, res) => {
   );
 
   if (result.matchedCount === 0) {
-    return sendResponse(res, {
-      code: 404,
-      message: "Address not found",
-    });
+    return sendResponse(res, Responses.editAddress.NOT_FOUND);
   }
 
   return sendResponse(res, Responses.editAddress.ADDRESS_EDITED);
 });
 
 // ======================================================================
-// 6. CHECKOUT PAGE
+// 15. CHECKOUT PAGE
 // ======================================================================
 
 export const checkoutPage = wrapAsync(async (req, res) => {
@@ -437,7 +436,7 @@ export const checkoutPage = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. APPLY COUPON
+// 16. APPLY COUPON
 // ======================================================================
 
 export const applyCoupon = wrapAsync(async (req, res) => {
@@ -477,8 +476,9 @@ export const applyCoupon = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. ADD TO CART
+// 17. ADD TO CART
 // ======================================================================
+
 export const addToCart = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
   const { product_id, variant_id, quantity } = req.body;
@@ -502,8 +502,9 @@ export const addToCart = wrapAsync(async (req, res) => {
     },
   });
 });
+
 // ======================================================================
-// 6. CHECKOUT RECHECKING THE CART PRODUCT BEFORE THE CHECKOUT
+// 18. CHECKOUT RECHECKING THE CART PRODUCT BEFORE THE CHECKOUT
 // ======================================================================
 export const proceedToCheckout = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
@@ -532,8 +533,9 @@ export const proceedToCheckout = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. CART ITEM REMOVE
+// 19. CART ITEM REMOVE
 // ======================================================================
+
 export const deleteCartItem = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 
@@ -558,8 +560,9 @@ export const deleteCartItem = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. USER LOGOUT
+// 20. USER LOGOUT
 // ======================================================================
+
 export const userLogout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -573,7 +576,7 @@ export const userLogout = (req, res) => {
 };
 
 // ======================================================================
-// 6. ORDER SUCCESS
+// 21. ORDER SUCCESS
 // ======================================================================
 
 export const orderSuccess = wrapAsync(async (req, res) => {
@@ -610,9 +613,9 @@ export const orderSuccess = wrapAsync(async (req, res) => {
   });
 });
 
-//
-//
-//
+// ======================================================================
+// 22. ORDER FAILED
+// ======================================================================
 
 export const orderFailed = (req, res) => {
   delete req.session.orderId;
@@ -626,7 +629,7 @@ export const orderFailed = (req, res) => {
 };
 
 // ======================================================================
-// 6. PLACE ORDER
+// 23. PLACE ORDER
 // ======================================================================
 
 export const placeOrder = wrapAsync(async (req, res) => {
@@ -659,7 +662,7 @@ export const placeOrder = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. ORDER LISTING PAGE
+// 24. ORDER LISTING PAGE
 // ======================================================================
 
 export const orderPayVerify = wrapAsync(async (req, res) => {
@@ -694,17 +697,15 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.razorpayOrderVerify.PAYMENT_FAILED);
   }
 
-  // ── Transaction ───────────────────────────────────────────────────────────
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    // Update order status
     await Order.updateOne(
       { _id: order._id },
       {
-        paymentStatus: "Paid",
-        orderStatus: "Placed",
+        paymentStatus: userConstants.ORDER_PAY_STATUS.PAID,
+        orderStatus: userConstants.ORDER_STATUS.PLACED,
         paidAt: new Date(),
         "razorpay.paymentId": razorpay_payment_id,
         "razorpay.signature": razorpay_signature,
@@ -712,7 +713,6 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
       { session },
     );
 
-    // Release lock — stock already deducted at place order
     for (const item of order.products) {
       await Variant.updateOne(
         { _id: item.variant_id },
@@ -721,13 +721,13 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
       );
     }
 
-    // Apply coupon usage
     if (order.is_couponed) {
       const couponUsage = await couponChecks.applyCouponUsage(
         order.coupon.code,
         user_id,
         session,
       );
+
       if (couponUsage?.error) {
         await session.abortTransaction();
         session.endSession();
@@ -735,7 +735,6 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
       }
     }
 
-    // Clear cart
     await Cart.deleteOne({ user_id }, { session });
 
     await session.commitTransaction();
@@ -749,9 +748,9 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
   }
 });
 
-//
-//
-//
+// ======================================================================
+// 25. ORDER FAILED
+// ======================================================================
 
 export const orderPayFailed = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
@@ -761,37 +760,32 @@ export const orderPayFailed = wrapAsync(async (req, res) => {
   const order = await Order.findOne({
     _id: orderId,
     user_id,
-    orderStatus: "Pending",
-    paymentStatus: "Pending",
+    orderStatus: userConstants.ORDER_STATUS.PENDING,
+    paymentStatus: userConstants.ORDER_PAY_STATUS.PENDING,
   });
 
-  if (!order)
-    return sendResponse(res, { code: 404, message: "Order not found" });
+  if (!order) return sendResponse(res, Responses.order.NO_ORDER);
 
-  // Release locked stock
   for (const item of order.products) {
     await Variant.updateOne(
       { _id: item.variant_id },
       { $inc: { stock: +item.quantity, lockedStock: -item.quantity } },
     );
   }
-
-  // Mark order as failed
   await Order.updateOne(
     { _id: order._id },
-    { orderStatus: "Failed", paymentStatus: "Failed" },
+    {
+      orderStatus: userConstants.ORDER_STATUS.FAILED,
+      paymentStatus: userConstants.ORDER_PAY_STATUS.FAILED,
+    },
   );
 
-  return sendResponse(res, {
-    code: 200,
-    message: "Razorpay payment Failed",
-    redirectToFrontend: "/user/order/failed",
-  });
+  return sendResponse(res, Responses.order.RAZORPAY_FAILED);
 });
 
-//
-//
-//
+// ======================================================================
+// 26. ORDER LISTING PAGE
+// ======================================================================
 
 export const orderListingPage = (req, res) => {
   res.render("user/layouts/profilelayout", {
@@ -806,7 +800,7 @@ export const orderListingPage = (req, res) => {
 };
 
 // ======================================================================
-// 6. ORDER LISTING PAGE
+// 27. ORDER LISTING PAGE DATA
 // ======================================================================
 
 export const orderListingData = wrapAsync(async (req, res) => {
@@ -823,7 +817,7 @@ export const orderListingData = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. ORDER DETAILS PAGE
+// 28. ORDER DETAILS PAGE
 // ======================================================================
 
 export const orderDetailsPage = wrapAsync(async (req, res) => {
@@ -843,7 +837,7 @@ export const orderDetailsPage = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. DOWNLOAD INVOICE
+// 29. DOWNLOAD INVOICE
 // ======================================================================
 
 export const downloadInvoice = wrapAsync(async (req, res) => {
@@ -853,14 +847,14 @@ export const downloadInvoice = wrapAsync(async (req, res) => {
   const order = await Order.findOne({ orderId, user_id }).lean();
 
   if (!order) {
-    return res.status(404).json({ message: "Order not found" });
+    return sendResponse(res, Responses.order.NO_ORDER);
   }
 
   generateInvoice(order, res);
 });
 
 // ======================================================================
-// 6. ORDER CANCELLATION
+// 30. ORDER CANCELLATION
 // ======================================================================
 
 export const orderCancelReturn = wrapAsync(async (req, res) => {
@@ -885,9 +879,9 @@ export const orderCancelReturn = wrapAsync(async (req, res) => {
   }
 });
 
-/* =================================
-   WALLET PAGE RENDER
-================================= */
+// ======================================================================
+// 31. WALLET PAGE
+// ======================================================================
 
 export const walletPage = (req, res) => {
   res.render("user/layouts/profilelayout", {
@@ -901,9 +895,9 @@ export const walletPage = (req, res) => {
   });
 };
 
-/* =================================
-   WALLET PAGE DATA
-================================= */
+// ======================================================================
+// 32. WALLET DATA
+// ======================================================================
 
 export const walletData = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
@@ -930,9 +924,9 @@ export const walletData = wrapAsync(async (req, res) => {
   });
 });
 
-/* ==============================
-   CREATE WALLET ORDER
-============================== */
+// ======================================================================
+// 33. WALLET TOP UP
+// ======================================================================
 
 export const walletTopupOrder = wrapAsync(async (req, res) => {
   const { amount } = req.body;
@@ -944,7 +938,7 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
 
   const razorpayOrder = await razorpay.orders.create({
     amount: Math.round(amount * 100), // paise
-    currency: "INR",
+    currency: userConstants.PAY_DETAILS.CURRENCY,
     receipt: `wallet_${user_id}`,
   });
 
@@ -955,8 +949,8 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
   await walletHandler.creditWallet(
     user_id,
     amount,
-    "PENDING",
-    "Wallet Top-up",
+    userConstants.TRANSACTION_STATUS.PENDING,
+    userConstants.TRANSACTION_REASON.TOPUP,
     razorpayOrder.id,
   );
 
@@ -967,16 +961,16 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
       key: process.env.RAZORPAY_KEY,
       orderId: razorpayOrder.id,
       amount: razorpayOrder.amount,
-      currency: "INR",
-      name: "JerseyGarage",
-      description: "Wallet Top-up",
+      currency: userConstants.PAY_DETAILS.CURRENCY,
+      name: userConstants.PAY_DETAILS.NAME,
+      description: userConstants.TRANSACTION_REASON.TOPUP,
     },
   });
 });
 
-/* ==============================
-   VERIFY WALLET PAYMENT
-============================== */
+// ======================================================================
+// 34. WALLET TOP UP VERIFICATION
+// ======================================================================
 
 export const verifyWalletTopup = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
@@ -1015,11 +1009,8 @@ export const verifyWalletTopup = wrapAsync(async (req, res) => {
     return sendResponse(res, Responses.walletPayment.PAYMENT_FAILED);
   }
 
-  if (transaction.status !== "PENDING") {
-    return sendResponse(res, {
-      code: 409,
-      message: "Wallet top-up already processed",
-    });
+  if (transaction.status !== userConstants.TRANSACTION_STATUS.PENDING) {
+    return sendResponse(res, Responses.wallet.PROCESSED);
   }
 
   wallet.balance += transaction.amount;
@@ -1034,9 +1025,9 @@ export const verifyWalletTopup = wrapAsync(async (req, res) => {
   return sendResponse(res, Responses.walletPayment.SUCCESS);
 });
 
-//
-
-//
+// ======================================================================
+// 35. REFERRAL PAGE
+// ======================================================================
 
 export const referralPage = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;

@@ -19,7 +19,7 @@ wishlistBtn.forEach((btn) => {
       }
     } catch (err) {
       const error = err.response?.data;
-
+      console.error(error);
       toastr.error(error?.message, "Error!!");
     }
   });
@@ -45,7 +45,8 @@ addToCart.forEach((btn) => {
 
       if (res.data.success) {
         toastr.success(res.data.message, "Success");
-        document.querySelector(".cart-count").innerText = `${res.data.data.items_count}`;
+        document.querySelector(".cart-count").innerText =
+          `${res.data.data.items_count}`;
       }
     } catch (err) {
       const error = err.response?.data;

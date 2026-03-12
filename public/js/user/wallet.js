@@ -34,16 +34,20 @@ function loadWallet(data) {
         <p>${formatDate(item.date)}</p>
       </div>
 
-      ${item.orderId ? `
+      ${
+        item.orderId
+          ? `
         <div class='center'>
           <h4>Order ID: </h4>
           <p>${item.orderId}</p>
         </div>
-      ` : ""}
+      `
+          : ""
+      }
 
       <div class="amount ${item.type === "credit" ? (item.status === "PENDING" ? "status-pending" : "credit") : item.status === "PENDING" ? "status-pending" : "debit"} ">
 
-        ${item.type === "credit" ? "+ ₹" + item.amount.toFixed(2) : "- ₹" + item.amount.toFixed(2)}
+        ${item.type === "credit" ? (item.status === "PENDING" ? " ₹" + item.amount.toFixed(2) : "+ ₹" + item.amount.toFixed(2)) : item.status === "PENDING" ? " ₹" + item.amount.toFixed(2) : "- ₹" + item.amount.toFixed(2)}
 
       </div>
 
@@ -229,6 +233,8 @@ proceedBtn.addEventListener("click", async () => {
 
       modal: {
         ondismiss: function () {
+          walletData();
+          closeModal();
           resetBtn();
         },
       },

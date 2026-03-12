@@ -15,7 +15,6 @@ import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
 import { createUniqueReferralCode } from "../../utils/referralCodeGenerator.js";
-import buildBreadcrumbs from "../../utils/breadcrumbs/product.crumb.js";
 import * as authServices from "../../services/user/authServices.js";
 import * as userConstants from "../../constants/userConstants.js";
 import Offer from "../../models/offerModel.js";
@@ -566,152 +565,17 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
 export const productDetailPage = wrapAsync(async (req, res) => {
   const id = req.params.id;
 
-  const product = await Product.aggregate([
-    { $match: { _id: new ObjectId(id), is_active: true } },
-    {
-      $lookup: {
-        from: "variants",
-        localField: "_id",
-        foreignField: "product_id",
-        as: "variants",
-      },
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "category",
-        foreignField: "_id",
-        as: "category_details",
-      },
-    },
-  ]);
-
-  const productData = product[0];
-
-  const now = new Date();
-
-  const offers = await Offer.find({
-    isActive: true,
-    startDate: { $lte: now },
-    endDate: { $gte: now },
-    $or: [
-      {
-        offerApplyType: "product",
-        productIds: productData._id,
-      },
-      {
-        offerApplyType: "category",
-        categoryIds: productData.category,
-      },
-    ],
-  }).lean();
-
-  if (offers.length > 0) {
-    const referencePrice = Math.min(
-      ...productData.variants.map((v) => v.base_price),
-    );
-
-    let bestOffer = null;
-    let bestPrice = referencePrice;
-
-    for (const offer of offers) {
-      let priceAfterOffer = referencePrice;
-
-      if (offer.discountType === "percentage") {
-        priceAfterOffer -= (priceAfterOffer * offer.discountValue) / 100;
-      } else if (offer.discountType === "flat") {
-        priceAfterOffer -= offer.discountValue;
-      }
-
-      if (priceAfterOffer < 0) priceAfterOffer = 0;
-
-      if (priceAfterOffer < bestPrice) {
-        bestPrice = priceAfterOffer;
-        bestOffer = offer;
-      }
-    }
-
-    if (bestOffer) {
-      productData.offer = bestOffer;
-      for (const variant of productData.variants) {
-        let price = variant.base_price;
-
-        if (bestOffer.discountType === "percentage") {
-          price -= (price * bestOffer.discountValue) / 100;
-        } else if (bestOffer.discountType === "flat") {
-          price -= bestOffer.discountValue;
-        }
-
-        variant.offer_price = Math.max(price, 0);
-      }
-    }
-  }
-
-  const relatedProducts = await Product.aggregate([
-    {
-      $match: {
-        category: new ObjectId(product[0].category),
-        _id: { $ne: new ObjectId(id) },
-        is_active: true,
-      },
-    },
-    {
-      $lookup: {
-        from: "variants",
-        localField: "_id",
-        foreignField: "product_id",
-        as: "variants",
-      },
-    },
-  ]);
-
-  let finalRelatedProducts = [...relatedProducts];
-
-  if (finalRelatedProducts.length < 4) {
-    const remaining = 4 - finalRelatedProducts.length;
-
-    const extraProducts = await Product.aggregate([
-      {
-        $match: {
-          _id: {
-            $nin: [
-              new mongoose.Types.ObjectId(id),
-              ...finalRelatedProducts.map((p) => p._id),
-            ],
-          },
-          is_active: true,
-        },
-      },
-      { $sample: { size: remaining } },
-      {
-        $lookup: {
-          from: "variants",
-          localField: "_id",
-          foreignField: "product_id",
-          as: "variants",
-        },
-      },
-    ]);
-
-    finalRelatedProducts = finalRelatedProducts.concat(extraProducts);
-  }
-
-  finalRelatedProducts.sort(() => 0.5 - Math.random());
-
-  const pCategory = product[0].category_details[0].name;
-  const pName = product[0].name;
-
-  const breadcrumbs = buildBreadcrumbs({ category: pCategory, product: pName });
+  const result = await authServices.productDetailPage(id);
 
   res.render("user/pages/productdetails", {
     title: "Product detail",
     pageCSS: "productdetails",
-    product: productData,
-    relatedProducts: finalRelatedProducts,
+    product: result.product,
+    relatedProducts: result.relatedProducts,
     showFooter: true,
     showHeader: true,
     pageJS: "productdetails.js",
-    breadcrumbs,
+    breadcrumbs: result.breadcrumbs,
   });
 });
 
