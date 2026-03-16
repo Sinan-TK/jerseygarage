@@ -145,7 +145,6 @@ h1 {
     caret-color: transparent;
     outline: none;
     transition: border-color .18s, background .18s, box-shadow .18s, transform .18s;
-    -moz-appearance: textfield;
 }
 
 .otp-box::-webkit-outer-spin-button,
