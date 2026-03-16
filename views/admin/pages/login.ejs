@@ -1,7 +1,3 @@
-<div class="logo">
-  <div class="icon">i</div>
-  <div>JerseyGarage Admin Panel</div>
-</div>
 
 <main class="card" aria-labelledby="title">
   <h2 id="title">Admin Sign In</h2>
@@ -23,7 +19,7 @@
     <div class="input-group">
       <div class="password-row">
         <label for="pw">Password</label>
-        <!-- <a href="#" tabindex="-1">Forgot Password?</a> -->
+        <a href="/admin/forgot-password" tabindex="-1">Forgot Password?</a>
       </div>
       <div class="password-field">
         <input id="pw" type="password" name="password" placeholder="Enter your password" />
@@ -31,7 +27,7 @@
       </div>
 
     </div>
-    <button class="btn" type="button" onclick="loginVerification()">Sign In</button>
+    <button class="btn" type="button" id="login-btn" onclick="loginVerification()">Sign In</button>
   </div>
 
 </main>

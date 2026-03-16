@@ -168,6 +168,9 @@ export const otpVerification = wrapAsync(async (req, res) => {
 
     return sendResponse(res, Responses.otpVerify.REGISTER);
   }
+
+  req.session.resetPass = true;
+
   return sendResponse(res, Responses.otpVerify.NEWPASSWORD);
 });
 
@@ -330,6 +333,7 @@ export const newPassValidation = wrapAsync(async (req, res) => {
 
   delete req.session.tempEmail;
   delete req.session.otpPurpose;
+  delete req.session.resetPass;
 
   return sendResponse(res, Responses.forgetPass.PASS_CHANGE);
 });

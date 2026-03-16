@@ -1,16 +1,19 @@
 import bcrypt from "bcrypt";
 import Admin from "../../models/adminModel.js";
 import User from "../../models/userModel.js";
+import Otp from "../../models/otpModel.js";
 import Category from "../../models/categoryModel.js";
 import Product from "../../models/productModel.js";
 import * as Responses from "../../utils/responses/admin/admin.response.js";
 import sendResponse from "../../utils/sendResponse.js";
 import wrapAsync from "../../utils/wrapAsync.js";
-import { adminSchema } from "../../validators/adminValidators.js";
+import * as adminValidators from "../../validators/adminValidators.js";
 import paginate from "../../utils/pagination.js";
 import * as adminService from "../../services/admin/adminService.js";
 import Order from "../../models/orderModel.js";
+import generateOtp from "../../utils/GenerateOtp.js";
 import XLSX from "xlsx";
+import * as adminConstants from "../../constants/adminConstants.js";
 
 // ======================================================================
 // 1. RENDER LOGIN PAGE
@@ -29,7 +32,7 @@ export const renderLoginPage = (req, res) => {
 // 2. ADMIN LOGIN CONTROLLER (POST /admin/login)
 // ======================================================================
 export const loginAdmin = wrapAsync(async (req, res) => {
-  const { error } = adminSchema.validate(req.body);
+  const { error } = adminValidators.loginValidation.validate(req.body);
 
   if (error) {
     return sendResponse(res, {
@@ -49,6 +52,145 @@ export const loginAdmin = wrapAsync(async (req, res) => {
   req.session.admin = result.admin;
 
   return sendResponse(res, Responses.adminLogin.LOGIN_SUCCESS);
+});
+
+// ======================================================================
+// 4.FORGOT PASSWORD PAGE
+// ======================================================================
+
+export const forgotPasswordPage = wrapAsync((req, res) => {
+  res.render("admin/pages/forgotPassword", {
+    showLayout: false,
+    title: "Forgot Password",
+    cssFile: "/css/admin/forgotPassword.css",
+    pageJS: "forgotPassword.js",
+  });
+});
+
+// ======================================================================
+// 4.FORGOT PASSWORD VERIFICATION
+// ======================================================================
+
+export const forgotPasswordVerify = wrapAsync(async (req, res) => {
+  const { error } = adminValidators.emailCheck.validate(req.body);
+
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
+  }
+
+  const { email } = req.body;
+
+  const admin = await Admin.findOne({ email });
+  if (!admin) return sendResponse(res, Responses.adminLogin.ADMIN_NOT_FOUND);
+
+  await generateOtp(email, "forget_password", "Forget password OTP");
+
+  req.session.tempEmail = email;
+  req.session.otpPurpose = "forget_password";
+
+  return sendResponse(res, Responses.adminLogin.OTP_GENERATED);
+});
+
+// ======================================================================
+// 4. RENDER OTP PAGE
+// ======================================================================
+
+export const renderOtpPage = wrapAsync((req, res) => {
+  res.render("admin/pages/otp", {
+    title: "OTP Verification",
+    cssFile: "/css/admin/otp.css",
+    showLayout: false,
+    pageJS: "otp.js",
+  });
+});
+
+// ======================================================================
+// 5. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
+// ======================================================================
+
+export const otpVerification = wrapAsync(async (req, res) => {
+  const email = req.session.tempEmail;
+  const purpose = req.session.otpPurpose;
+
+  if (!email || !purpose) {
+    return sendResponse(res, Responses.otpVerify.DATA_NOT_FOUND);
+  }
+
+  const { error } = adminValidators.otpSchema.validate(req.body);
+
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
+  }
+
+  const { otpValue } = req.body;
+
+  const otpDoc = await Otp.findOne({ email, purpose, is_used: false });
+
+  if (!otpDoc) {
+    return sendResponse(res, Responses.otpVerify.OTP_EXPIRED);
+  }
+
+  if (otpDoc.otp_code !== otpValue) {
+    return sendResponse(res, Responses.otpVerify.INCORRECT_OTP);
+  }
+
+  otpDoc.is_used = true;
+  await otpDoc.save();
+
+  req.session.resetPass = true;
+
+  return sendResponse(res, Responses.otpVerify.NEWPASSWORD);
+});
+
+// ======================================================================
+// 4. RENDER RESET PASSWORD PAGE
+// ======================================================================
+
+export const resetPasswordPage = wrapAsync((req, res) => {
+  res.render("admin/pages/resetPassword", {
+    title: "Reset Password",
+    cssFile: "/css/admin/resetPassword.css",
+    showLayout: false,
+    pageJS: "resetPassword.js",
+  });
+});
+
+// ======================================================================
+// 4. RENDER RESET PASSWORD PAGE
+// ======================================================================
+
+export const newPassValidation = wrapAsync(async (req, res) => {
+  const email = req.session.tempEmail;
+  if (!email) return sendResponse(res, Responses.forgetPass.DATA_NOT_FOUND);
+
+  const { error } = adminValidators.newPassSchema.validate(req.body);
+
+  if (error) {
+    return sendResponse(res, {
+      code: 400,
+      message: error.details[0].message,
+    });
+  }
+
+  const { password, confirmPassword } = req.body;
+
+  const admin = await Admin.findOne({ email });
+  if (!admin) return sendResponse(res, Responses.forgetPass.NOT_FOUND);
+
+  admin.password_hash = password;
+  await admin.save();
+
+  delete req.session.tempEmail;
+  delete req.session.otpPurpose;
+  delete req.session.resetPass;
+
+  return sendResponse(res, Responses.forgetPass.PASS_CHANGE);
 });
 
 // ======================================================================
@@ -214,116 +356,21 @@ export const dashboardTopThrees = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const dashboardChart = wrapAsync(async (req, res) => {
-  const { filter } = req.query;
+  const result = await adminService.adminDashboardFilter(req.query);
 
-  let groupBy;
-  let labels = [];
-  let matchStage = {};
-  const now = new Date();
-
-  if (filter === "weekly") {
-    const start = new Date(now);
-    start.setDate(now.getDate() - 6);
-    start.setHours(0, 0, 0, 0);
-
-    matchStage = { createdAt: { $gte: start } };
-    groupBy = { $dayOfWeek: "$createdAt" };
-
-    labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  } else if (filter === "monthly") {
-    const start = new Date(now.getFullYear(), 0, 1);
-    matchStage = { createdAt: { $gte: start } };
-    groupBy = { $month: "$createdAt" };
-
-    labels = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-  } else if (filter === "yearly") {
-    const startYear = now.getFullYear() - 5;
-    const start = new Date(startYear, 0, 1);
-    matchStage = { createdAt: { $gte: start } };
-    groupBy = { $year: "$createdAt" };
-
-    labels = Array.from({ length: 6 }, (_, i) => String(startYear + i));
+  if (result?.error) {
+    return sendResponse(res, result.error);
   } else {
-    return sendResponse(res, { code: 400, message: "Invalid filter" });
-  }
-
-  const result = await Order.aggregate([
-    {
-      $match: {
-        ...matchStage,
-        paymentStatus: { $in: ["Paid", "Refunded"] },
+    return sendResponse(res, {
+      code: 200,
+      message: "Chart data fetched",
+      data: {
+        labels: result.labels,
+        revenue: result.revenue,
+        orders: result.orders,
       },
-    },
-    {
-      $group: {
-        _id: groupBy,
-        revenue: { $sum: "$totalPrice" },
-        orders: { $sum: 1 },
-      },
-    },
-    { $sort: { _id: 1 } },
-  ]);
-
-  const revenue = [];
-  const orders = [];
-
-  if (filter === "weekly") {
-    const filled = Array(7).fill(0);
-    const filledOrders = Array(7).fill(0);
-
-    result.forEach((r) => {
-      filled[r._id - 1] = r.revenue;
-      filledOrders[r._id - 1] = r.orders;
     });
-
-    revenue.push(...filled);
-    orders.push(...filledOrders);
-  } else if (filter === "monthly") {
-    const filled = Array(12).fill(0);
-    const filledOrders = Array(12).fill(0);
-
-    result.forEach((r) => {
-      filled[r._id - 1] = r.revenue;
-      filledOrders[r._id - 1] = r.orders;
-    });
-
-    revenue.push(...filled);
-    orders.push(...filledOrders);
-  } else if (filter === "yearly") {
-    const startYear = now.getFullYear() - 5;
-    const filled = Array(6).fill(0);
-    const filledOrders = Array(6).fill(0);
-
-    result.forEach((r) => {
-      const idx = r._id - startYear;
-      if (idx >= 0 && idx < 6) {
-        filled[idx] = r.revenue;
-        filledOrders[idx] = r.orders;
-      }
-    });
-
-    revenue.push(...filled);
-    orders.push(...filledOrders);
   }
-
-  return sendResponse(res, {
-    code: 200,
-    message: "Chart data fetched",
-    data: { labels, revenue, orders },
-  });
 });
 
 //

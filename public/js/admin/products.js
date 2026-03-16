@@ -41,16 +41,7 @@ document.querySelectorAll(".dropdown-options li").forEach((item) => {
 
 /* APPLY FILTER */
 document.getElementById("applyFilter").addEventListener("click", () => {
-  const search = document.getElementById("searchInput").value.toLowerCase();
-  const status = dd.dataset.value || "all";
-
-  document.querySelectorAll(".product-row").forEach((row) => {
-    const matchesSearch = row.dataset.name.includes(search);
-    const matchesStatus = status === "all" || row.dataset.status === status;
-
-    row.style.display = matchesSearch && matchesStatus ? "table-row" : "none";
-    document.getElementById(`drop-${row.dataset.id}`).style.display = "none";
-  });
+  loadProducts();
 });
 
 /* CLEAR FILTER */
@@ -59,10 +50,7 @@ document.getElementById("clearFilter").addEventListener("click", () => {
   dd.dataset.value = "all";
   dd.querySelector(".dropdown-selected").textContent = "All Products";
 
-  document.querySelectorAll(".product-row").forEach((row) => {
-    row.style.display = "table-row";
-    document.getElementById(`drop-${row.dataset.id}`).style.display = "none";
-  });
+  loadProducts()
 });
 
 /* ===============================
@@ -187,7 +175,7 @@ function renderPreviews() {
     recropBtn.onclick = () => {
       openCropperFor(
         new File([blob], `recrop_${index}.webp`, { type: OUTPUT_FORMAT }),
-        index
+        index,
       );
     };
 
@@ -257,14 +245,13 @@ cropNextBtn.addEventListener("click", () => {
 
   canvas.toBlob(
     (blob) => {
-      
       const isEdit = editSelectedFiles.length > 0;
 
       if (isEdit) {
         editNewBlobs.push(blob);
         editSelectedFiles.shift();
 
-        renderEditNewPreviews(); 
+        renderEditNewPreviews();
 
         if (editSelectedFiles.length > 0) {
           openEditCropperFor(editSelectedFiles[0]);
@@ -288,7 +275,7 @@ cropNextBtn.addEventListener("click", () => {
       }
     },
     OUTPUT_FORMAT,
-    OUTPUT_QUALITY
+    OUTPUT_QUALITY,
   );
 });
 
@@ -321,11 +308,7 @@ cancelCropBtn.addEventListener("click", () => {
 document.getElementById("addBtn").addEventListener("click", async () => {
   document.getElementById("fileInput").value = "";
 
-  const addBtn = document.getElementById("addBtn");
-
-  //  Proper lock
-  addBtn.disabled = true;
-  addBtn.innerHTML = "Loading...";
+  addBtnControl(true);
 
   const productName = document.getElementById("productName").value.trim();
   const teamName = document.getElementById("teamName").value.trim();
@@ -340,10 +323,10 @@ document.getElementById("addBtn").addEventListener("click", async () => {
   sizes.forEach((size) => {
     stock[size] = document.querySelector(`input[name="stock_${size}"]`).value;
     normalPrice[size] = document.querySelector(
-      `input[name="normalPrice_${size}"]`
+      `input[name="normalPrice_${size}"]`,
     ).value;
     basePrice[size] = document.querySelector(
-      `input[name="basePrice_${size}"]`
+      `input[name="basePrice_${size}"]`,
     ).value;
   });
 
@@ -369,16 +352,13 @@ document.getElementById("addBtn").addEventListener("click", async () => {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    console.log(res);
-
     if (res.data.success) {
       toastr.success(res.data.message, "Product added!");
       croppedBlobs = [];
       renderPreviews();
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      document.getElementById("addProductModal").style.display = "none";
+      loadProducts();
+      addBtnControl(false);
     }
   } catch (err) {
     const error = err.response?.data;
@@ -386,53 +366,55 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     console.log(error?.message);
 
     toastr.error(error?.message || "Something went wrong", "Failed");
-
-    //  Proper unlock on error
-    addBtn.disabled = false;
-    addBtn.innerHTML = "Add Product";
+    addBtnControl(false);
   }
 });
+
+function addBtnControl(loading) {
+  const addBtn = document.getElementById("addBtn");
+  addBtn.innerText = loading ? "Loading..." : "Add Product";
+  addBtn.disabled = loading;
+}
 
 /* ===============================
    BLOCK / UNBLOCK PRODUCT
 ================================ */
-document.querySelectorAll(".action-btn").forEach((actionBtn) => {
-  actionBtn.addEventListener("click", async () => {
-    const row = actionBtn.closest(".product-row");
-    const productId = row.dataset.id;
-    const productStatus = row.querySelector(".status-badge");
+document.addEventListener("click", async (e) => {
+  const actionBtn = e.target.closest(".action-btn"); // ← e.target and dot before action-btn
 
-    const status =
-      productStatus.innerText.trim() === "List" ? "block" : "unblock";
+  if (!actionBtn) return; // ← guard
 
-    try {
-      const res = await axios.patch(`/admin/products/${status}/${productId}`);
+  const row = actionBtn.closest(".product-row");
+  const productId = row.dataset.id;
+  const productStatus = row.querySelector(".status-badge");
 
-      if (res.data.success) {
-        if (status === "block") {
-          productStatus.innerText = "Unlist";
-          productStatus.classList.replace("active", "inactive");
-          actionBtn.classList.replace("block", "list");
-          actionBtn.innerHTML = `<i class="fa-solid fa-unlock"></i> List`;
-          toastr.error(res.data.message, "Status:");
-        } else {
-          productStatus.innerText = "List";
-          productStatus.classList.replace("inactive", "active");
-          actionBtn.classList.replace("list", "block");
-          actionBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block`;
-          toastr.success(res.data.message, "Status:");
-        }
+  const status =
+    productStatus.innerText.trim() === "List" ? "block" : "unblock";
+
+  try {
+    const res = await axios.patch(`/admin/products/${status}/${productId}`);
+
+    if (res.data.success) {
+      if (status === "block") {
+        productStatus.innerText = "Unlist";
+        productStatus.classList.replace("active", "inactive");
+        actionBtn.classList.replace("block", "list");
+        actionBtn.innerHTML = `<i class="fa-solid fa-unlock"></i> List`;
+        toastr.error(res.data.message, "Status:");
+      } else {
+        productStatus.innerText = "List";
+        productStatus.classList.replace("inactive", "active");
+        actionBtn.classList.replace("list", "block");
+        actionBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block`;
+        toastr.success(res.data.message, "Status:");
       }
-    } catch (err) {
-      const error = err.response?.data;
-
-      console.log(error);
-
-      toastr.error(error.message||"Something went wrong", "Failed");
     }
-  });
+  } catch (err) {
+    const error = err.response?.data;
+    console.log(error);
+    toastr.error(error?.message || "Something went wrong", "Failed");
+  }
 });
-
 /* ===============================
    EDIT PRODUCT FLOW
 ================================ */
@@ -467,15 +449,15 @@ function editModalOpen(e) {
 
   sizes.forEach((size) => {
     document.querySelector(
-      `#editModal input[name="edit_stock_${size}"]`
+      `#editModal input[name="edit_stock_${size}"]`,
     ).value = variantMap[size]?.stock ?? "";
 
     document.querySelector(
-      `#editModal input[name="edit_normalPrice_${size}"]`
+      `#editModal input[name="edit_normalPrice_${size}"]`,
     ).value = variantMap[size]?.normal_price ?? "";
 
     document.querySelector(
-      `#editModal input[name="edit_basePrice_${size}"]`
+      `#editModal input[name="edit_basePrice_${size}"]`,
     ).value = variantMap[size]?.base_price ?? "";
   });
 
@@ -513,6 +495,7 @@ function loadEditImages(images) {
 
     removeBtn.onclick = async () => {
       const productId = document.getElementById("editModal").dataset.id;
+      imgRemoveBtn(removeBtn, true);
 
       try {
         const res = await axios.patch("/admin/products/remove-image", {
@@ -521,24 +504,26 @@ function loadEditImages(images) {
         });
 
         if (res.data.success) {
-          editImages.splice(index, 1);
+          editImages = editImages.filter((img) => img !== imgUrl);
 
           const editBtn = document.querySelector(
-            `.product-row[data-id="${productId}"] .edit-btn`
+            `.product-row[data-id="${productId}"] .edit-btn`,
           );
 
           const productData = JSON.parse(editBtn.dataset.product);
           productData.images = productData.images.filter(
-            (img) => img !== imgUrl
+            (img) => img !== imgUrl,
           );
           editBtn.dataset.product = JSON.stringify(productData);
 
           loadEditImages(editImages);
 
-          toastr.success("Image removed");
+          toastr.success(res.data.message, "Success");
         }
       } catch (err) {
-        toastr.error("Image delete error");
+        const error = err.response?.data;
+        console.log(error);
+        toastr.error(error?.message || "Image delete error", "Failed");
       }
     };
 
@@ -548,12 +533,18 @@ function loadEditImages(images) {
   });
 }
 
+function imgRemoveBtn(btn, loading) {
+  btn.innerText = loading ? "Removing..." : "Remove";
+  btn.disabled = loading;
+}
+
 let editNewBlobs = [];
 
 const editFileInput = document.getElementById("fileInputEdit");
 
 /* SUBMIT EDIT PRODUCT */
 async function submitEdit() {
+  editBtnControl(true);
   const productName = document.getElementById("editProductName").value.trim();
   const teamName = document.getElementById("teamNameEdit").value.trim();
   const description = document.getElementById("descriptionEdit").value;
@@ -567,13 +558,13 @@ async function submitEdit() {
 
   sizes.forEach((size) => {
     stock[size] = document.querySelector(
-      `input[name="edit_stock_${size}"]`
+      `input[name="edit_stock_${size}"]`,
     ).value;
     normalPrice[size] = document.querySelector(
-      `input[name="edit_normalPrice_${size}"]`
+      `input[name="edit_normalPrice_${size}"]`,
     ).value;
     basePrice[size] = document.querySelector(
-      `input[name="edit_basePrice_${size}"]`
+      `input[name="edit_basePrice_${size}"]`,
     ).value;
   });
 
@@ -605,23 +596,32 @@ async function submitEdit() {
   try {
     const res = await axios.patch(
       `/admin/products/edit/${productId}`,
-      formData
+      formData,
     );
 
     if (res.data.success) {
       toastr.success(res.data.message, "Product updated!");
       editNewBlobs = [];
       editFileInput.value = "";
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
+      document.getElementById("editModal").style.display = "none";
+      editBtnControl(false);
+      loadProducts();
     } else {
+      editBtnControl(false);
       toastr.error(res.data.message, "Failed:");
     }
   } catch (err) {
-    console.error("UPLOAD ERROR", err);
-    toastr.error(err.response?.data?.message || "Error", "Error");
+    const error = err.response?.data;
+    console.error("UPLOAD ERROR", error);
+    toastr.error(error?.message || "Something went wrong", "Error");
+    editBtnControl(false);
   }
+}
+
+function editBtnControl(loading) {
+  const btn = document.getElementById("editConfirm");
+  btn.innerText = loading ? "Editing..." : "Submit";
+  btn.disabled = loading;
 }
 
 let editSelectedFiles = [];
@@ -633,7 +633,7 @@ if (editFileInput) {
     if (incoming.length === 0) return;
 
     editSelectedFiles = incoming;
-    editCropTargetIndex = null; 
+    editCropTargetIndex = null;
     openEditCropperFor(editSelectedFiles[0]);
   });
 }
@@ -661,8 +661,12 @@ function openEditCropperFor(file) {
 function renderEditNewPreviews() {
   const container = document.getElementById("previewContainerEdit");
 
+  // Remove only previously added new blob previews
+  container.querySelectorAll(".new-blob-card").forEach((el) => el.remove());
+
   editNewBlobs.forEach((blob, index) => {
     const card = document.createElement("div");
+    card.className = "new-blob-card"; // ← add class to identify
     card.style =
       "display:flex; flex-direction:column; align-items:center; gap:6px;";
 
@@ -676,7 +680,6 @@ function renderEditNewPreviews() {
     removeBtn.innerText = "Remove";
     removeBtn.onclick = () => {
       editNewBlobs.splice(index, 1);
-      container.innerHTML = "";
       renderEditNewPreviews();
     };
 
@@ -684,4 +687,179 @@ function renderEditNewPreviews() {
     card.appendChild(removeBtn);
     container.appendChild(card);
   });
+}
+
+loadProducts();
+
+async function loadProducts(page = 1) {
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  const status = dd.dataset.value || "all";
+  try {
+    const res = await axios.get("/admin/products/data", {
+      params: { page, search, status },
+    });
+    console.log(res.data.data);
+    const data = res.data.data;
+
+    renderProducts(data.products);
+    document.querySelector(".pagination").innerHTML = pagination(
+      data.pagination,
+    );
+  } catch (err) {
+    const error = err.response?.data;
+    console.log(error);
+    toastr.error(error?.message || "Something went wrong", "Failed");
+  }
+}
+
+function productRow(product) {
+  return `
+    <tr class="product-row" data-id="${product._id}" data-name="${product.name.toLowerCase()}"
+        data-status="${product.is_active ? "active" : "inactive"}">
+
+      <td class="arrow-cell">
+        <i class="fa-solid fa-chevron-down row-arrow" data-id="${product._id}"></i>
+      </td>
+
+      <td class="image-cell">
+        <img src="${product.images[0]}" class="product-thumb">
+      </td>
+
+      <td>${product.name}</td>
+
+      <td id="categoryTd">${product.catName}</td>
+
+      <td>
+        <span class="status-badge ${product.is_active ? "active" : "inactive"}">
+          ${product.is_active ? "List" : "Unlist"}
+        </span>
+      </td>
+
+      <td>
+        <span data-product='${JSON.stringify(product)}' data-category="${product.catName}" class="edit-btn">
+          <i class="fa-solid fa-pen-to-square"></i> Edit
+        </span>
+      </td>
+
+      <td>
+        ${
+          product.is_active
+            ? `<span class="action-btn block"><i class="fa-solid fa-ban block-icon"></i> Block</span>`
+            : `<span class="action-btn list"><i class="fa-solid fa-unlock unblock-icon"></i> List</span>`
+        }
+      </td>
+    </tr>
+
+    <tr class="dropdown-row" id="drop-${product._id}" style="display:none">
+      <td colspan="7">
+        <div class="dropdown-box">
+          <table class="size-preview-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>S</th><th>M</th><th>L</th><th>XL</th><th>XXL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Stock</td>
+                ${["S", "M", "L", "XL", "XXL"]
+                  .map((size) => {
+                    const variant = product.variants.find(
+                      (v) => v.size === size,
+                    );
+                    return `<td>${variant ? variant.stock : "-"}</td>`;
+                  })
+                  .join("")}
+              </tr>
+              <tr>
+                <td>Normal Price</td>
+                ${["S", "M", "L", "XL", "XXL"]
+                  .map((size) => {
+                    const variant = product.variants.find(
+                      (v) => v.size === size,
+                    );
+                    return `<td>${variant ? variant.normal_price : "-"}</td>`;
+                  })
+                  .join("")}
+              </tr>
+              <tr>
+                <td>Base Price</td>
+                ${["S", "M", "L", "XL", "XXL"]
+                  .map((size) => {
+                    const variant = product.variants.find(
+                      (v) => v.size === size,
+                    );
+                    return `<td>${variant ? variant.base_price : "-"}</td>`;
+                  })
+                  .join("")}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+function renderProducts(products) {
+  const tbody = document.getElementById("productTableBody");
+  tbody.innerHTML = "";
+
+  if (products.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:#9ca3af;">No products found</td></tr>`;
+    return;
+  }
+
+  products.forEach((product) => {
+    tbody.insertAdjacentHTML("beforeend", productRow(product));
+  });
+
+  // Re-attach event listeners after render
+  attachRowArrowListeners();
+  // attachActionBtnListeners();
+}
+
+function attachRowArrowListeners() {
+  document.querySelectorAll(".row-arrow").forEach((arrow) => {
+    arrow.addEventListener("click", () => {
+      const id = arrow.dataset.id;
+      const panel = document.getElementById(`drop-${id}`);
+
+      document.querySelectorAll(".dropdown-row").forEach((p) => {
+        if (p !== panel) p.style.display = "none";
+      });
+
+      document.querySelectorAll(".row-arrow").forEach((a) => {
+        if (a !== arrow) a.classList.remove("open");
+      });
+
+      const open = panel.style.display === "table-row";
+      panel.style.display = open ? "none" : "table-row";
+      arrow.classList.toggle("open", !open);
+    });
+  });
+}
+
+function pagination(data) {
+  const backward = data.page > 1 ? true : false;
+  const forward = data.page < data.totalPages ? true : false;
+  return `${
+    backward
+      ? `<button onclick="loadProducts(${data.page - 1})" class="arrow-btn">
+      <i class="fa-solid fa-chevron-left"></i>
+  </button>`
+      : ""
+  }
+
+  <span class="current-page-display">
+      ${data.page}
+  </span>
+    ${
+      forward
+        ? `<button onclick="loadProducts(${data.page + 1})" class="arrow-btn">
+      <i class="fa-solid fa-chevron-right"></i>
+  </button>`
+        : ""
+    }`;
 }

@@ -46,126 +46,7 @@
 
             <tbody id="productTableBody">
 
-                <% products.forEach(product=> { %>
-
-                    <!-- MAIN PRODUCT ROW -->
-                    <tr class="product-row" data-id="<%= product._id %>" data-name="<%= product.name.toLowerCase() %>"
-                        data-status="<%= product.is_active ? 'active' : 'inactive' %>">
-
-                        <!-- DROPDOWN ARROW -->
-                        <td class="arrow-cell">
-                            <i class="fa-solid fa-chevron-down row-arrow" data-id="<%= product._id %>"></i>
-                        </td>
-
-                        <!-- IMAGE -->
-                        <td class="image-cell">
-                            <img src="<%= product.images[0] %>" class="product-thumb">
-                        </td>
-
-                        <!-- PRODUCT NAME -->
-                        <td>
-                            <%= product.name %>
-                        </td>
-
-                        <% let catName="" ; categoriesName.forEach(category=> {
-                            if (category._id.toString() === product.category.toString()) {
-                            catName = category.name;
-                            }
-                            });
-                            %>
-
-                            <!-- CATEGORY -->
-                            <td id="categoryTd">
-                                <%= catName %>
-                            </td>
-
-                            <!-- STATUS -->
-                            <td>
-                                <span class="status-badge <%= product.is_active ? 'active' : 'inactive' %>">
-                                    <%= product.is_active ? 'List' : 'Unlist' %>
-                                </span>
-                            </td>
-
-                            <!-- EDIT -->
-                            <td>
-                                <span data-product="<%= JSON.stringify(product) %>" data-category="<%= catName %>"
-                                    class="edit-btn">
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                                </span>
-                            </td>
-
-                            <!-- ACTION -->
-                            <td>
-                                <% if (product.is_active) { %>
-                                    <span class="action-btn block"><i class="fa-solid fa-ban block-icon"></i>
-                                        Block</span>
-                                    <% } else { %>
-                                        <span class="action-btn list"><i class="fa-solid fa-unlock unblock-icon"></i>
-                                            List</span>
-                                        <% } %>
-                            </td>
-                    </tr>
-
-                    <!-- DROPDOWN ROW -->
-                    <tr class="dropdown-row" id="drop-<%= product._id %>">
-                        <td colspan="7">
-                            <div class="dropdown-box">
-                                <table class="size-preview-table">
-                                    <thead>
-                                        <tr>
-
-                                            <th></th>
-                                            <th>S</th>
-                                            <th>M</th>
-                                            <th>L</th>
-                                            <th>XL</th>
-                                            <th>XXL</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <tr>
-                                            <td>Stock</td>
-                                            <% ["S","M","L","XL","XXL"].forEach(size=> {
-                                                const variant = product.variants.find(v => v.size === size);
-                                                %>
-                                                <td>
-                                                    <%= variant ? variant.stock : "-" %>
-                                                </td>
-                                                <% }) %>
-
-
-                                        </tr>
-
-
-                                        <tr>
-                                            <td>Normal Price</td>
-                                            <% ["S","M","L","XL","XXL"].forEach(size=> {
-                                                const variant = product.variants.find(v => v.size === size);
-                                                %>
-                                                <td>
-                                                    <%= variant ? variant.normal_price : "-" %>
-                                                </td>
-                                                <% }) %>
-                                        </tr>
-
-                                        <tr>
-                                            <td>Base Price</td>
-                                            <% ["S","M","L","XL","XXL"].forEach(size=> {
-                                                const variant = product.variants.find(v => v.size === size);
-                                                %>
-                                                <td>
-                                                    <%= variant ? variant.base_price : "-" %>
-                                                </td>
-                                                <% }) %>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <% }) %>
+                
 
             </tbody>
         </table>
@@ -173,24 +54,7 @@
         <div class="pagination">
 
             <!-- LEFT ARROW: show ONLY if NOT first page -->
-            <% if (pagination.page> 1) { %>
-                <a href="/admin/products?page=<%= pagination.page - 1 %>" class="arrow-btn">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </a>
-                <% } %>
-
-                    <!-- CURRENT PAGE NUMBER -->
-                    <span class="current-page-display">
-                        <%= pagination.page %>
-                    </span>
-
-                    <!-- RIGHT ARROW: show ONLY if NOT last page -->
-                    <% if (pagination.page < pagination.totalPages) { %>
-                        <a href="/admin/products?page=<%= pagination.page + 1 %>" class="arrow-btn">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </a>
-                        <% } %>
-        </div>
+                    </div>
 
     </div>
 </div>
@@ -406,7 +270,7 @@
         <!-- FOOTER -->
         <div class="modal-footer">
             <button type="button" class="btn cancel-btn">Cancel</button>
-            <button type="button" class="btn add-btn-confirm" onclick="submitEdit()">Edit Submit</button>
+            <button type="button" class="btn add-btn-confirm" id="editConfirm" onclick="submitEdit()">Submit</button>
         </div>
 
     </div>

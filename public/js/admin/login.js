@@ -3,7 +3,7 @@ async function loginVerification() {
   const password = document.getElementById("pw").value.trim();
   const errorBox = document.getElementById("loginError");
   const errorText = document.getElementById("loginErrorText");
-
+  btnControl(true);
   try {
     const res = await axios.post("/admin/login", { email, password });
 
@@ -18,6 +18,7 @@ async function loginVerification() {
       }, 2000);
     }
   } catch (err) {
+    btnControl(false);
     // Axios always puts failed validation inside err.response
     const error = err.response?.data;
 
@@ -26,10 +27,11 @@ async function loginVerification() {
     errorBox.style.display = "flex";
     errorText.innerText = error?.message || "Something went wrong.";
 
-    setTimeout(() => {
-      errorBox.style.display = "none";
-      errorText.innerHTML = "";
-    }, 3000);
+    document.querySelectorAll("input").forEach((input) => {
+      input.addEventListener("input", () => {
+        if (errorBox) errorBox.style.display = "none";
+      });
+    });
   }
 }
 
@@ -43,3 +45,9 @@ togglePw.addEventListener("click", () => {
   togglePw.classList.toggle("fa-eye");
   togglePw.classList.toggle("fa-eye-slash");
 });
+
+function btnControl(loading) {
+  const btn = document.getElementById("login-btn");
+  btn.disabled = loading;
+  btn.innerText = loading ? "Signing in..." : "Sign In";
+}

@@ -1,10 +1,12 @@
 import express from "express";
 import * as productController from "../../controllers/admin/productController.js";
-import * as adminMiddleware from "../../middlewares/adminMiddleware.js";
+import * as adminMiddleware from "../../middlewares/admin/adminMiddleware.js";
 
 const router = express.Router();
 
 router.get("/", productController.productsPageRender);
+
+router.get("/data", productController.productsPageData);
 
 router.post("/add", adminMiddleware.uploadProductImages, productController.addProduct);
 

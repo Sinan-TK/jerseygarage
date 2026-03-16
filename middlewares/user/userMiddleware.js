@@ -1,9 +1,9 @@
 import express from "express";
-import sendResponse from "../utils/sendResponse.js";
-import Cart from "../models/cartModel.js";
-import wrapAsync from "../utils/wrapAsync.js";
-import User from "../models/userModel.js";
-import { avatarUpload } from "../config/multer.js";
+import sendResponse from "../../utils/sendResponse.js";
+import Cart from "../../models/cartModel.js";
+import wrapAsync from "../../utils/wrapAsync.js";
+import User from "../../models/userModel.js";
+import { avatarUpload } from "../../config/multer.js";
 import multer from "multer";
 
 export const Userdetails = async (req, res, next) => {

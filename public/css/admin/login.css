@@ -28,30 +28,6 @@ body {
   padding: 30px;
 }
 
-/* Logo */
-.logo {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 40px;
-  font-weight: 600;
-  font-size: 18px;
-  color: var(--black);
-  text-align: center;
-}
-
-.logo .icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: inline-grid;
-  place-items: center;
-  border: 2px solid var(--black);
-  font-size: 16px;
-  line-height: 1;
-  font-weight: 600;
-}
-
 /* Card */
 .card {
   width: 420px;
@@ -177,19 +153,6 @@ input:focus {
 @media (max-width: 768px) {
   body {
     padding: 20px;
-  }
-
-  .logo {
-    flex-direction: column;
-    gap: 8px;
-    font-size: 16px;
-    margin-bottom: 30px;
-  }
-
-  .logo .icon {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
   }
 
   .card {

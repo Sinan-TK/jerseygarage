@@ -1,0 +1,52 @@
+<div class="page">
+    <div class="card">
+
+        <div class="email-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d0d0d" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m2 7 10 7 10-7" />
+            </svg>
+        </div>
+
+        <h1>Check your email</h1>
+        <p class="subtitle">
+            We've sent a 6-digit code to your email.
+            Please enter it below to reset your password.
+        </p>
+
+        <div class="alert" id="alert" role="alert" aria-live="polite"></div>
+
+        <label class="otp-label">Verification Code</label>
+
+        <div class="otp-inputs" id="otpInputs">
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="off" />
+        </div>
+
+        <div class="resend-row">
+            <span class="resend-text">Didn't receive the code?</span>
+            <button class="resend-btn" id="resendBtn" type="button" disabled>
+                Resend <span class="timer-badge" id="timerBadge"></span>
+            </button>
+        </div>
+
+        <button class="verify-btn" id="verifyBtn" type="button">
+            <span id="btnText">Verify Code</span>
+            <span class="btn-spinner" id="btnSpinner"></span>
+        </button>
+
+        <a href="/admin/login" class="back-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 5l-7 7 7 7" />
+            </svg>
+            Back to Sign In
+        </a>
+
+    </div>
+</div>

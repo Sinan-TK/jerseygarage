@@ -55,7 +55,7 @@ export const addProduct = Object.freeze({
   },
   PRODUCT_EDITED: {
     code: 200,
-    message: "Product added successfully!",
+    message: "Product edited successfully!",
   },
   ERROR_500: {
     code: 500,
@@ -79,6 +79,10 @@ export const productStatus = Object.freeze({
 });
 
 export const removeImg = Object.freeze({
+  NO_REQUIRED: {
+    code: 400,
+    message: "Product ID and Image URL are required",
+  },
   IMG_ROMOVED: {
     code: 200,
     message: "Image removed successfully!",

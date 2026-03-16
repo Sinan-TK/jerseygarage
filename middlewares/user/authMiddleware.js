@@ -1,7 +1,7 @@
-import User from "../models/userModel.js";
-import Category from "../models/categoryModel.js";
-import Product from "../models/productModel.js";
-import wrapAsync from "../utils/wrapAsync.js";
+import User from "../../models/userModel.js";
+import Category from "../../models/categoryModel.js";
+import Product from "../../models/productModel.js";
+import wrapAsync from "../../utils/wrapAsync.js";
 
 export const isLoggedIn = (req, res, next) => {
   if (req.session.user) {
@@ -75,4 +75,11 @@ export const sidebarData = async (req, res, next) => {
     res.locals.categories = [];
     next();
   }
+};
+
+export const otpVerifyReset = (req, res, next) => {
+  if (!req.session?.resetPass) {
+    return res.redirect("/");
+  }
+  next();
 };

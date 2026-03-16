@@ -1,6 +1,6 @@
 import express from "express";
-import * as userMiddleware from "../../middlewares/userMiddleware.js";
-import * as authMiddleware from "../../middlewares/authMiddleware.js";
+import * as userMiddleware from "../../middlewares/user/userMiddleware.js";
+import * as authMiddleware from "../../middlewares/user/authMiddleware.js";
 import * as userController from "../../controllers/user/userController.js";
 import wishlistRoutes from "./wishlistRoutes.js";
 

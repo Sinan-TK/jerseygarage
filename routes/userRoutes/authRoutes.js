@@ -1,8 +1,8 @@
 import express from "express";
 import passport from "passport";
 import * as authController from "../../controllers/user/authController.js";
-import * as authMiddleware from "../../middlewares/authMiddleware.js";
-import * as userMiddleware from "../../middlewares/userMiddleware.js";
+import * as authMiddleware from "../../middlewares/user/authMiddleware.js";
+import * as userMiddleware from "../../middlewares/user/userMiddleware.js";
 
 const router = express.Router();
 
@@ -77,11 +77,15 @@ router.post(
 
 router.get(
   "/newpassword",
-  authMiddleware.noMailFound,
+  authMiddleware.otpVerifyReset,
   authController.renderNewPassPage,
 );
 
-router.post("/newpassword", authController.newPassValidation);
+router.post(
+  "/newpassword",
+  authMiddleware.otpVerifyReset,
+  authController.newPassValidation,
+);
 
 router.get("/", authController.renderHomePage);
 
