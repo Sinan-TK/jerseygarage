@@ -404,9 +404,7 @@ export const placeOrderService = async ({
   const totalPrice = price + userConstants.SHIPPING_CHARGE + gstAmount;
 
   if (paymentMethod === userConstants.PAY_METHOD.COD && totalPrice > 1000) {
-    return {
-      error: Responses.placeOrder.COD_NOT_AVAILABLE,
-    };
+    return { error: Responses.placeOrder.COD_NOT_AVAILABLE };
   }
 
   const products = items.map((item) => ({
@@ -426,7 +424,7 @@ export const placeOrderService = async ({
 
   const orderId = await generateOrderId();
 
-  // ── Razorpay — no transaction, stock locked, paid later ─────────────────
+  // ── Razorpay ─────────────────────────────────────────────────────────────
   if (paymentMethod === userConstants.PAY_METHOD.RAZORPAY) {
     const order = await Order.create({
       orderId,
@@ -454,7 +452,6 @@ export const placeOrderService = async ({
       orderStatus: userConstants.ORDER_STATUS.PENDING,
     });
 
-    // Lock stock
     for (const item of items) {
       await Variant.updateOne(
         { _id: item.variant_id },
@@ -486,100 +483,84 @@ export const placeOrderService = async ({
     };
   }
 
-  // ── COD / Wallet — with transaction ──────────────────────────────────────
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  // ── COD / Wallet ──────────────────────────────────────────────────────────
+  const order = await Order.create({
+    orderId,
+    user_id,
+    products,
+    shippingAddress: {
+      full_name: address.full_name,
+      phone_no: address.phone_no,
+      address_line: address.address_line,
+      city: address.city,
+      state: address.state,
+      zip_code: address.zip_code,
+      country: address.country,
+    },
+    paymentMethod,
+    paymentStatus: userConstants.ORDER_STATUS.PENDING,
+    paidAt: null,
+    itemsPrice,
+    shippingCharge: userConstants.SHIPPING_CHARGE,
+    totalGST: gstAmount,
+    totalPrice,
+    totalDiscount,
+    is_couponed: isCouponed,
+    coupon: isCouponed ? coupon : null,
+    orderStatus: userConstants.ORDER_STATUS.PLACED,
+  });
 
-  try {
-    const [order] = await Order.create(
-      [
-        {
-          orderId,
-          user_id,
-          products,
-          shippingAddress: {
-            full_name: address.full_name,
-            phone_no: address.phone_no,
-            address_line: address.address_line,
-            city: address.city,
-            state: address.state,
-            zip_code: address.zip_code,
-            country: address.country,
-          },
-          paymentMethod,
-          paymentStatus: userConstants.ORDER_STATUS.PENDING,
-          paidAt: null,
-          itemsPrice,
-          shippingCharge: userConstants.SHIPPING_CHARGE,
-          totalGST: gstAmount,
-          totalPrice,
-          totalDiscount,
-          is_couponed: isCouponed,
-          coupon: isCouponed ? coupon : null,
-          orderStatus: userConstants.ORDER_STATUS.PLACED,
-        },
-      ],
-      { session },
+  // Deduct stock
+  for (const item of items) {
+    await Variant.updateOne(
+      { _id: item.variant_id },
+      { $inc: { stock: -item.quantity } },
+    );
+  }
+
+  // Wallet debit
+  if (paymentMethod === userConstants.PAY_METHOD.WALLET) {
+    const wallet = await walletHandler.debitWallet(
+      user_id,
+      order.totalPrice,
+      userConstants.TRANSACTION_STATUS.SUCCESS,
+      userConstants.TRANSACTION_REASON.ORDER,
+      order.orderId,
     );
 
-    // Deduct stock
-    for (const item of items) {
-      await Variant.updateOne(
-        { _id: item.variant_id },
-        { $inc: { stock: -item.quantity } },
-        { session },
-      );
-    }
-
-    // Wallet debit
-    if (paymentMethod === userConstants.PAY_METHOD.WALLET) {
-      const wallet = await walletHandler.debitWallet(
-        user_id,
-        order.totalPrice,
-        userConstants.TRANSACTION_STATUS.SUCCESS,
-        userConstants.TRANSACTION_REASON.ORDER,
-        order.orderId,
-        session,
-      );
-      order.paymentStatus = userConstants.ORDER_PAY_STATUS.PAID;
-      order.save();
-      if (wallet?.error) {
-        await session.abortTransaction();
-        session.endSession();
-        return { error: wallet.error };
+    if (wallet?.error) {
+      // Rollback: restore stock and delete order manually
+      for (const item of items) {
+        await Variant.updateOne(
+          { _id: item.variant_id },
+          { $inc: { stock: +item.quantity } },
+        );
       }
+      await Order.deleteOne({ _id: order._id });
+      return { error: wallet.error };
     }
 
-    // Coupon usage
-    if (isCouponed) {
-      const couponUsage = await couponChecks.applyCouponUsage(
-        couponCode,
-        user_id,
-        session,
-      );
-      if (couponUsage?.error) {
-        await session.abortTransaction();
-        session.endSession();
-        return { error: couponUsage.error };
-      }
-    }
-
-    // Clear cart
-    await Cart.deleteOne({ user_id }, { session });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return {
-      success: true,
-      paymentMethod,
-      orderId: order._id,
-    };
-  } catch (err) {
-    await session.abortTransaction();
-    session.endSession();
-    throw err;
+    order.paymentStatus = userConstants.ORDER_PAY_STATUS.PAID;
+    await order.save();
   }
+
+  // Coupon usage
+  if (isCouponed) {
+    const couponUsage = await couponChecks.applyCouponUsage(
+      couponCode,
+      user_id,
+    );
+    if (couponUsage?.error) return { error: couponUsage.error };
+  }
+
+  // Clear cart
+  await Cart.deleteOne({ user_id });
+
+  return {
+    success: true,
+    paymentMethod,
+    orderId: order._id,
+  };
 };
 
 //

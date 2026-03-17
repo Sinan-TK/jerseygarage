@@ -21,21 +21,29 @@ export const adminLogin = Object.freeze({
   },
 });
 
-// export const userStatus = Object.freeze({
-//   USER_BLOCK: {
-//     code: 200,
-//     message: "User blocked successfully!",
-//   },
-//   USER_UNBLOCK: {
-//     code: 200,
-//     message: "user unblocked successfully!",
-//   },
-// });
+export const userStatus = Object.freeze({
+  USER_BLOCK: {
+    code: 200,
+    message: "User blocked successfully!",
+  },
+  USER_UNBLOCK: {
+    code: 200,
+    message: "user unblocked successfully!",
+  },
+});
 
 export const dashboard = Object.freeze({
   INVALID_FILTER: {
     code: 400,
     message: "Invalid filter",
+  },
+  FUTURE_FROM: {
+    code: 400,
+    message: "From date cannot be in the future",
+  },
+  TO_FROM: {
+    code: 400,
+    message: "To date cannot be in the future",
   },
 });
 
@@ -84,5 +92,24 @@ export const forgetPass = Object.freeze({
     code: 200,
     message: "Password changed successfully!",
     redirectToFrontend: "/admin/login",
+  },
+});
+
+export const userRes = Object.freeze({
+  INVALID: {
+    code: 400,
+    message: "Invalid request",
+  },
+  INVALID_ACTION: {
+    code: 400,
+    message: "Invalid action",
+  },
+  USER_NOT_FOUND: {
+    code: 404,
+    message: "User not found",
+  },
+  ALREADY_BLOCKED: {
+    code: 400,
+    message: "User is Already Blocked",
   },
 });

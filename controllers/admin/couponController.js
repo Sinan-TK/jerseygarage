@@ -7,12 +7,12 @@ import { couponSchema } from "../../validators/couponValidator.js";
 import offerSchema from "../../validators/offerValidator.js";
 import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
-import * as Responses from "../../utils/responses/admin/offer.response.js";
+import * as Responses from "../../utils/responses/admin/coupon.response.js";
 import Coupon from "../../models/couponModel.js";
 
-//
-
-//
+// ======================================================================
+// 1. RENDER COUPON PAGE
+// ======================================================================
 
 export const couponPage = (req, res) => {
   res.render("admin/pages/coupons", {
@@ -23,9 +23,9 @@ export const couponPage = (req, res) => {
   });
 };
 
-//
-
-//
+// ======================================================================
+// 2. COUPON DATA
+// ======================================================================
 
 export const fetchCoupons = wrapAsync(async (req, res) => {
   const { search, statusFilter, page } = req.query;
@@ -56,9 +56,9 @@ export const fetchCoupons = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 3. ADD COUPON PAGE
+// ======================================================================
 
 export const addCouponPage = (req, res) => {
   res.render("admin/pages/addcoupon", {
@@ -69,9 +69,9 @@ export const addCouponPage = (req, res) => {
   });
 };
 
-//
-
-//
+// ======================================================================
+// 4. ADD COUPON
+// ======================================================================
 
 export const addCoupon = wrapAsync(async (req, res) => {
   const { error, value } = couponSchema.validate(req.body, {
@@ -124,9 +124,9 @@ export const addCoupon = wrapAsync(async (req, res) => {
   return sendResponse(res, Responses.addCoupon.SUCCESS);
 });
 
-//
-
-//
+// ======================================================================
+// 5. EDIT COUPON PAGE
+// ======================================================================
 
 export const editCouponPage = (req, res) => {
   res.render("admin/pages/addcoupon", {
@@ -137,9 +137,9 @@ export const editCouponPage = (req, res) => {
   });
 };
 
-//
-
-//
+// ======================================================================
+// 6. EDIT COUPON DATA
+// ======================================================================
 
 export const editCouponData = wrapAsync(async (req, res) => {
   const { couponId } = req.params;
@@ -157,9 +157,9 @@ export const editCouponData = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 7. EDIT COUPON
+// ======================================================================
 
 export const editCoupon = wrapAsync(async (req, res) => {
   const { couponId } = req.params;
@@ -224,9 +224,9 @@ export const editCoupon = wrapAsync(async (req, res) => {
   return sendResponse(res, Responses.editCoupon.SUCCESS);
 });
 
-//
-
-//
+// ======================================================================
+// 8. COUPON DETAILS PAGE
+// ======================================================================
 
 export const couponDetailsPage = wrapAsync(async (req, res) => {
   const { couponId } = req.params;
@@ -246,9 +246,9 @@ export const couponDetailsPage = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 9. DELETE COUPON
+// ======================================================================
 
 export const deleteCoupon = wrapAsync(async (req, res) => {
   const { couponId } = req.params;
@@ -256,14 +256,8 @@ export const deleteCoupon = wrapAsync(async (req, res) => {
   const deleted = await Coupon.findByIdAndDelete(couponId);
 
   if (!deleted) {
-    return sendResponse(res, {
-      code: 404,
-      message: "Coupon not found",
-    });
+    return sendResponse(res, Responses.deleteCoupon.NOT_FOUND);
   }
 
-  return sendResponse(res, {
-    code: 200,
-    message: "Coupon deleted successfully",
-  });
+  return sendResponse(res, Responses.deleteCoupon.DELETED);
 });

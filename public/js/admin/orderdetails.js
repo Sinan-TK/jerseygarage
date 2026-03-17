@@ -13,8 +13,9 @@ if (updateStatus) {
       });
 
       if (res.data.success) {
-        document.getElementById("orderStatus").innerText = res.data.data.orderStatus;
-        toastr.success(res.data.message, "success");
+        document.getElementById("orderStatus").innerText =
+          res.data.data.orderStatus;
+        toastr.success(res.data.message, "Success");
       }
     } catch (err) {
       const error = err.response?.data;
@@ -89,8 +90,10 @@ async function returnModalAxios(type, returnId) {
       orderId,
     });
 
-    console.log(res);
     toastr.success(res.data.message, "Success");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   } catch (err) {
     const error = err.response?.data;
     console.error(error);

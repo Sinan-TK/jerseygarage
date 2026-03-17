@@ -863,3 +863,10 @@ function pagination(data) {
         : ""
     }`;
 }
+
+document.getElementById("searchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.activeElement === e.target) {
+    e.preventDefault();
+    loadProducts();
+  }
+});

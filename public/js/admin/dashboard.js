@@ -204,13 +204,40 @@ async function loadTopLists() {
 }
 
 // Ledger
-function downloadLedger() {
+async function downloadLedger() {
   const from = document.getElementById("ledgerFrom").value;
   const to = document.getElementById("ledgerTo").value;
   const params = new URLSearchParams();
   if (from) params.append("from", from);
   if (to) params.append("to", to);
-  window.location.href = `/admin/ledger/download?${params.toString()}`;
+
+  try {
+    const res = await axios.get(`/admin/ledger/download?${params.toString()}`, {
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+
+    // Get filename from header (optional)
+    const contentDisposition = res.headers["content-disposition"];
+    const fileName =
+      contentDisposition?.split("filename=")[1]?.replace(/"/g, "") ||
+      "ledger.xlsx";
+
+    // Create download link
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    const error = err.response?.data;
+    console.log(error);
+    toastr.error(error?.message || "Something went wrong", "Failed");
+  }
 }
 
 loadStats();

@@ -69,7 +69,8 @@
                 <input type="radio" name="payment" value="Wallet" />
                 <div class="radio-content">
                     <div class="title">Wallet</div>
-                    <p class="muted">Wallet Balance : ₹<%= (wallet.balance).toFixed(2) %></p>
+                    <p class="muted">Wallet Balance : ₹<%= (wallet.balance).toFixed(2) %>
+                    </p>
                 </div>
             </label>
 
@@ -151,6 +152,10 @@
                                 <span>GST</span>
                                 <span>₹<%= (gstAmount).toFixed(2) %></span>
                             </div>
+                            <div class="row coupon-price">
+                                <!-- <span>Coupon()</span>
+                                <span>₹<%= (gstAmount).toFixed(2) %></span> -->
+                            </div>
 
                             <div class="row total">
                                 <span>Total</span>
@@ -163,7 +168,7 @@
 
                             <div class="promo-dropdown">
                                 <select id="promoSelect">
-                                    <option  value="">Select Coupon</option>
+                                    <option value="">Select Coupon</option>
                                     <% coupons.forEach((coupon)=>{ %>
                                         <option value="<%= coupon.code %>">
                                             <%= coupon.code %>
@@ -326,8 +331,8 @@
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-box">
-    <div class="loading-spinner"></div>
-    <p>Placing your order...</p>
-  </div>
+    <div class="loading-box">
+        <div class="loading-spinner"></div>
+        <p>Placing your order...</p>
+    </div>
 </div>

@@ -282,6 +282,14 @@ document.getElementById("applyPromoBtn").addEventListener("click", async () => {
         document.querySelector("input[value='COD']").disabled = true;
         document.getElementById("codText").classList.replace("small", "hidden");
       }
+      const coupon = data.coupon;
+      const couponPrice = document.querySelector(".coupon-price");
+      couponPrice.style.display = "flex";
+      couponPrice.innerHTML = "";
+      couponPrice.innerHTML = `
+      <span>Coupon(${coupon.code})</span>
+      <span>₹${coupon.discountAmount.toFixed(2)}</span>`;
+
       const couponDiv = document.getElementById("couponText");
       couponDiv.classList.replace("hidden", "success");
       couponDiv.innerHTML = `"${data.coupon.code}" Coupon applied successfully 🎉 `;

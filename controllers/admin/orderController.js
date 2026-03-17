@@ -3,6 +3,7 @@ import Order from "../../models/orderModel.js";
 import User from "../../models/userModel.js";
 import sendResponse from "../../utils/sendResponse.js";
 import * as walletHandler from "../../utils/walletHandler.js";
+import * as Responses from "../../utils/responses/admin/order.response.js";
 import paginate from "../../utils/pagination.js";
 import * as handleReturnCancel from "../../utils/handleReturnCancel.js";
 
@@ -20,7 +21,7 @@ export const orderPageRender = (req, res) => {
 };
 
 // ======================================================================
-// 6. ORDER DATA
+// 2. ORDER LISTING
 // ======================================================================
 
 export const ordersListing = wrapAsync(async (req, res) => {
@@ -73,7 +74,7 @@ export const ordersListing = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. PLACE ORDER
+// 3. ORDER DETAILS PAGE
 // ======================================================================
 
 export const orderDetailsPageRender = wrapAsync(async (req, res) => {
@@ -94,7 +95,7 @@ export const orderDetailsPageRender = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6. STATUS CHANGE
+// 4. STATUS CHANGE
 // ======================================================================
 
 export const changeStatus = wrapAsync(async (req, res) => {
@@ -103,10 +104,7 @@ export const changeStatus = wrapAsync(async (req, res) => {
   const order = await Order.findById(orderId);
 
   if (!order) {
-    return sendResponse(res, {
-      code: 404,
-      message: "Order not found",
-    });
+    return sendResponse(res, Responses.orderRes.NOT_FOUND);
   }
 
   if (orderStatus && orderStatus !== order.orderStatus) {
@@ -124,10 +122,7 @@ export const changeStatus = wrapAsync(async (req, res) => {
     ];
 
     if (!validStatuses.includes(orderStatus)) {
-      return sendResponse(res, {
-        code: 400,
-        message: "Invalid order status",
-      });
+      return sendResponse(res, Responses.orderRes.INVALID_STATUS);
     }
 
     const terminalStatuses = ["Cancelled", "Failed"];
@@ -152,10 +147,7 @@ export const changeStatus = wrapAsync(async (req, res) => {
         orderStatus === "Cancelled"
       ) {
         return {
-          error: {
-            code: 400,
-            message: "Order cannot be cancelled at this stage",
-          },
+          error: Responses.orderRes.NON_CANCELLABLE,
         };
       }
 
@@ -229,31 +221,19 @@ export const changeStatus = wrapAsync(async (req, res) => {
     const validPayments = ["Pending", "Paid", "Failed"];
 
     if (!validPayments.includes(paymentStatus)) {
-      return sendResponse(res, {
-        code: 400,
-        message: "Invalid payment status",
-      });
+      return sendResponse(res, Responses.orderRes.INVALID_PAY_STATUS);
     }
 
     if (order.paymentStatus === "Refunded") {
-      return sendResponse(res, {
-        code: 400,
-        message: "Payment is already refunded. Status cannot be changed.",
-      });
+      return sendResponse(res, Responses.orderRes.CANNOT_CHANGE_REFUNDED);
     }
 
     if (order.paymentStatus === "Failed") {
-      return sendResponse(res, {
-        code: 400,
-        message: "Payment is already failed. Status cannot be changed.",
-      });
+      return sendResponse(res, Responses.orderRes.CANNOT_CHANGE_CANCELLED);
     }
 
     if (order.paymentStatus === "Paid" && paymentStatus === "Pending") {
-      return sendResponse(res, {
-        code: 400,
-        message: "Cannot change payment status from Paid to Pending",
-      });
+      return sendResponse(res, Responses.orderRes.CANNOT_CHANGE);
     }
 
     order.paymentStatus = paymentStatus;
@@ -275,20 +255,20 @@ export const changeStatus = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 5. RETURN REQUEST
+// ======================================================================
 
 export const returnRequest = wrapAsync(async (req, res) => {
   const { type, returnId, orderId } = req.body;
 
   if (!type || !returnId || !orderId) {
-    return sendResponse(res, { code: 403, message: "Something went wrong" });
+    return sendResponse(res, Responses.orderRes.SOMETHING_WRONG);
   }
 
   const order = await Order.findById(orderId);
   if (!order) {
-    return sendResponse(res, { code: 400, message: "Order not found" });
+    return sendResponse(res, Responses.orderRes.NOT_FOUND);
   }
 
   const returnEntry = order.returnHistory.find(
@@ -296,17 +276,11 @@ export const returnRequest = wrapAsync(async (req, res) => {
   );
 
   if (!returnEntry) {
-    return sendResponse(res, {
-      code: 400,
-      message: "Return request not found",
-    });
+    return sendResponse(res, Responses.orderRes.RETURN_REQ_NOT_FOUND);
   }
 
   if (returnEntry.status !== "Pending") {
-    return sendResponse(res, {
-      code: 400,
-      message: "Return request already processed",
-    });
+    return sendResponse(res, Responses.orderRes.RETURN_ALREADY_PROCCESSED);
   }
 
   if (type === "accept") {
@@ -364,7 +338,7 @@ export const returnRequest = wrapAsync(async (req, res) => {
 
     returnEntry.status = "Rejected";
   } else {
-    return sendResponse(res, { code: 400, message: "Invalid type" });
+    return sendResponse(res, Responses.orderRes.INVALID_TYPE);
   }
 
   await order.save();

@@ -612,3 +612,10 @@ window.addEventListener("click", (e) => {
     detailsModal.style.display = "none";
   }
 });
+
+document.getElementById("searchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.activeElement === e.target) {
+    e.preventDefault();
+    getOffers();
+  }
+});

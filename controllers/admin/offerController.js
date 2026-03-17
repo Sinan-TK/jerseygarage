@@ -8,9 +8,9 @@ import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/offer.response.js";
 
-//
-
-//
+// ======================================================================
+// 1. OFFER LISTING PAGE
+// ======================================================================
 
 export const offerListingPage = wrapAsync(async (req, res) => {
   res.render("admin/pages/offers", {
@@ -21,9 +21,9 @@ export const offerListingPage = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 2. OFFER DATA
+// ======================================================================
 
 export const offerData = wrapAsync(async (req, res) => {
   const { search, typeFilter, statusFilter, page } = req.query;
@@ -63,9 +63,9 @@ export const offerData = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 3. ADD OFFER
+// ======================================================================
 
 export const addOffer = wrapAsync(async (req, res) => {
   const { error } = offerSchema.validate(req.body);
@@ -90,10 +90,7 @@ export const addOffer = wrapAsync(async (req, res) => {
   } = req.body;
 
   if (discountType === "percentage" && discountValue > 100) {
-    return sendResponse(res, {
-      code: 400,
-      message: "Percentage discount cannot exceed 100%",
-    });
+    return sendResponse(res, Responses.offerRes.EXCEED_100);
   }
 
   if (offerApplyType === "product") {
@@ -103,10 +100,7 @@ export const addOffer = wrapAsync(async (req, res) => {
     });
 
     if (validProducts.length !== productIds.length) {
-      return sendResponse(res, {
-        code: 400,
-        message: "One or more selected products are invalid or blocked",
-      });
+      return sendResponse(res, Responses.offerRes.INVALID_PRODUCT);
     }
   }
   if (offerApplyType === "category") {
@@ -116,10 +110,7 @@ export const addOffer = wrapAsync(async (req, res) => {
     });
 
     if (validCategories.length !== categoryIds.length) {
-      return sendResponse(res, {
-        code: 400,
-        message: "One or more selected categories are invalid or blocked",
-      });
+      return sendResponse(res, Responses.offerRes.INVALID_CATEGORY);
     }
   }
   const existing = await Offer.findOne({
@@ -127,10 +118,7 @@ export const addOffer = wrapAsync(async (req, res) => {
   });
 
   if (existing) {
-    return sendResponse(res, {
-      code: 400,
-      message: "Offer name already exists",
-    });
+    return sendResponse(res, Responses.offerRes.NAME_EXIST);
   }
 
   const newOffer = new Offer({
@@ -147,15 +135,12 @@ export const addOffer = wrapAsync(async (req, res) => {
 
   await newOffer.save();
 
-  return sendResponse(res, {
-    code: 201,
-    message: "Offer created successfully",
-  });
+  return sendResponse(res, Responses.offerRes.CREATED);
 });
 
-//
-
-//
+// ======================================================================
+// 4. EDIT OFFER
+// ======================================================================
 
 export const editOffer = wrapAsync(async (req, res) => {
   const id = req.params.id;
@@ -163,10 +148,7 @@ export const editOffer = wrapAsync(async (req, res) => {
   const offer = await Offer.findById(id);
 
   if (!offer) {
-    return sendResponse(res, {
-      code: 404,
-      message: "Offer not found",
-    });
+    return sendResponse(res, Responses.offerRes.NOT_FOUND);
   }
 
   const { error } = offerSchema.validate(req.body);
@@ -191,10 +173,7 @@ export const editOffer = wrapAsync(async (req, res) => {
   } = req.body;
 
   if (discountType === "percentage" && discountValue > 100) {
-    return sendResponse(res, {
-      code: 400,
-      message: "Percentage discount cannot exceed 100%",
-    });
+    return sendResponse(res, Responses.offerRes.EXCEED_100);
   }
 
   if (offerApplyType === "product") {
@@ -204,10 +183,7 @@ export const editOffer = wrapAsync(async (req, res) => {
     });
 
     if (validProducts.length !== productIds.length) {
-      return sendResponse(res, {
-        code: 400,
-        message: "One or more selected products are invalid or blocked",
-      });
+      return sendResponse(res, Responses.offerRes.INVALID_PRODUCT);
     }
   }
 
@@ -218,10 +194,7 @@ export const editOffer = wrapAsync(async (req, res) => {
     });
 
     if (validCategories.length !== categoryIds.length) {
-      return sendResponse(res, {
-        code: 400,
-        message: "One or more selected categories are invalid or blocked",
-      });
+      return sendResponse(res, Responses.offerRes.INVALID_CATEGORY);
     }
   }
 
@@ -231,10 +204,7 @@ export const editOffer = wrapAsync(async (req, res) => {
   });
 
   if (existing) {
-    return sendResponse(res, {
-      code: 400,
-      message: "Offer name already exists",
-    });
+    return sendResponse(res, Responses.offerRes.NAME_EXIST);
   }
 
   await Offer.findByIdAndUpdate(id, {
@@ -249,15 +219,12 @@ export const editOffer = wrapAsync(async (req, res) => {
     isActive,
   });
 
-  return sendResponse(res, {
-    code: 200,
-    message: "Offer updated successfully",
-  });
+  return sendResponse(res, Responses.offerRes.UPDATED);
 });
 
-//
-
-//
+// ======================================================================
+// 5. DELETE OFFER
+// ======================================================================
 
 export const deleteOffer = wrapAsync(async (req, res) => {
   const { id } = req.params;
@@ -265,14 +232,8 @@ export const deleteOffer = wrapAsync(async (req, res) => {
   const deleted = await Offer.findByIdAndDelete(id);
 
   if (!deleted) {
-    return sendResponse(res, {
-      code: 404,
-      message: "Offer not found",
-    });
+    return sendResponse(res, Responses.offerRes.NOT_FOUND);
   }
 
-  return sendResponse(res, {
-    code: 200,
-    message: "Offer deleted successfully",
-  });
+  return sendResponse(res, Responses.offerRes.DELETED);
 });

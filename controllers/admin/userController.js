@@ -19,31 +19,29 @@ export const getUsers = (req, res) => {
 };
 
 // ======================================================================
-// 4. BLOCK & UNBLOCK USER
+// 2. BLOCK & UNBLOCK USER
 // ======================================================================
+
 export const statusAction = wrapAsync(async (req, res) => {
   const { action, id } = req.params;
 
   if (!action || !id) {
-    return sendResponse(res, { code: 400, message: "Invalid request" });
+    return sendResponse(res, Responses.userRes.INVALID);
   }
 
   if (action !== "block" && action !== "unblock") {
-    return sendResponse(res, { code: 400, message: "Invalid action" });
+    return sendResponse(res,Responses.userRes.INVALID_ACTION);
   }
 
   const user = await User.findById(id);
 
   if (!user) {
-    return sendResponse(res, { code: 404, message: "User not found" });
+    return sendResponse(res, Responses.userRes.USER_NOT_FOUND);
   }
 
   if (action === "block") {
     if (user.is_blocked) {
-      return sendResponse(res, {
-        code: 400,
-        message: "User is Already Blocked",
-      });
+      return sendResponse(res, Responses.userRes.ALREADY_BLOCKED);
     }
 
     user.is_blocked = true;
@@ -55,10 +53,7 @@ export const statusAction = wrapAsync(async (req, res) => {
     });
   } else {
     if (!user.is_blocked) {
-      return sendResponse(res, {
-        code: 400,
-        message: "User is Already Unblocked",
-      });
+      return sendResponse(res, Responses.userRes.ALREADY_BLOCKED);
     }
 
     user.is_blocked = false;
@@ -72,7 +67,7 @@ export const statusAction = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6.SEARCH USER
+// 3.USER DATA
 // ======================================================================
 
 export const userData = wrapAsync(async (req, res) => {

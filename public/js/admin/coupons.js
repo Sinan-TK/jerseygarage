@@ -192,3 +192,10 @@ document.addEventListener("click", function (e) {
     window.location.href = `/admin/coupons/details/${couponId}`;
   }
 });
+
+document.getElementById("searchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.activeElement === e.target) {
+    e.preventDefault();
+    fetchCoupons();
+  }
+});

@@ -78,8 +78,8 @@ export const generateInvoice = (order, res) => {
       [
         address.addressLine1,
         address.addressLine2,
-        `${address.city}, ${address.state} - ${address.pincode}`,
-        address.phone,
+        `${address.city}, ${address.state} - ${address.zip_code}`,
+        address.phone_no,
       ]
         .filter(Boolean)
         .join("\n"),

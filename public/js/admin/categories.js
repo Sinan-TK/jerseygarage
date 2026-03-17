@@ -497,3 +497,10 @@ cancelBtn.addEventListener("click", () => {
 window.addEventListener("click", (e) => {
   if (e.target === confirmModal) confirmModal.style.display = "none";
 });
+
+document.getElementById("filterInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.activeElement === e.target) {
+    e.preventDefault();
+    loadData();
+  }
+});

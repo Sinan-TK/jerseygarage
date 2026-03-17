@@ -1,27 +1,34 @@
-export const addCoupon = Object.freeze({
-  COUPON_EXIST: {
-    code: 409,
-    message: "Coupon code already exists!",
-  },
-  SUCCESS: {
-    code: 201,
-    message: "Coupon created successfully",
-    redirectToFrontend: "/admin/coupons",
-  },
-});
-
-export const editCoupon = Object.freeze({
-  COUPON_EXIST: {
-    code: 409,
-    message: "Coupon code already exists!",
-  },
-  NO_COUPONID: {
+export const offerRes = Object.freeze({
+  EXCEED_100: {
     code: 400,
-    message: "Coupon ID is required",
+    message: "Percentage discount cannot exceed 100%",
   },
-  SUCCESS: {
+  INVALID_PRODUCT: {
+    code: 400,
+    message: "One or more selected products are invalid or blocked",
+  },
+  INVALID_CATEGORY: {
+    code: 400,
+    message: "One or more selected categories are invalid or blocked",
+  },
+  NAME_EXIST: {
+    code: 400,
+    message: "Offer name already exists",
+  },
+  CREATED: {
     code: 201,
-    message: "Coupon edited successfully",
-    redirectToFrontend: "/admin/coupons",
+    message: "Offer created successfully",
+  },
+  UPDATED: {
+    code: 200,
+    message: "Offer updated successfully",
+  },
+  NOT_FOUND: {
+    code: 404,
+    message: "Offer not found",
+  },
+  DELETED: {
+    code: 200,
+    message: "Offer deleted successfully",
   },
 });

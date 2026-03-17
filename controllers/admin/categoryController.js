@@ -11,22 +11,11 @@ import * as Responses from "../../utils/responses/admin/category.response.js";
 // 1. GET CATEGORY LIST (ADMIN CATEGORIES PAGE)
 // ======================================================================
 export const getCategories = wrapAsync(async (req, res) => {
-  // let page = req.query.page || 1;
-
-  // const result = await paginate(Category, page, 8);
-
-  // const products = await Product.find({});
-
   res.render("admin/pages/categories", {
     title: "Categories",
     showLayout: true,
     cssFile: "/css/admin/categories.css",
-    // categories: result.data,
-    // pagination: result.meta,
     pageJS: "categories.js",
-    // products,
-    // categoryStatus: req.query.categoryStatus || "all",
-    // searchContent: req.query.searchContent,
   });
 });
 

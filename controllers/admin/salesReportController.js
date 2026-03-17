@@ -8,14 +8,14 @@ import { couponSchema } from "../../validators/couponValidator.js";
 import offerSchema from "../../validators/offerValidator.js";
 import paginate from "../../utils/pagination.js";
 import Order from "../../models/orderModel.js";
-import * as Responses from "../../utils/responses/admin/offer.response.js";
+import * as Responses from "../../utils/responses/admin/coupon.response.js";
 import Coupon from "../../models/couponModel.js";
 import XLSX from "xlsx";
 import PDFDocument from "pdfkit";
 
-//
-
-//
+// ======================================================================
+// 1. SALES REPORT PAGE
+// ======================================================================
 
 export const salesReportPage = (req, res) => {
   res.render("admin/pages/salesReport", {
@@ -26,9 +26,9 @@ export const salesReportPage = (req, res) => {
   });
 };
 
-//
-
-//
+// ======================================================================
+// 2. SALES REPORT PAGE DATA
+// ======================================================================
 
 export const productDatas = wrapAsync(async (req, res) => {
   const products = await Product.find();
@@ -39,9 +39,9 @@ export const productDatas = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 3. SALES REPORT FILTER
+// ======================================================================
 
 export const getSalesReport = wrapAsync(async (req, res) => {
   const { filter, from, to, paymentStatus, orderStatus, productId, page } =
@@ -144,14 +144,13 @@ export const getSalesReport = wrapAsync(async (req, res) => {
   });
 });
 
-//
-
-//
+// ======================================================================
+// 4. DOWNLOAD EXCEL
+// ======================================================================
 
 export const downloadSalesExcel = wrapAsync(async (req, res) => {
   const { filter, from, to, paymentStatus, orderStatus, productId } = req.query;
 
-  // ── Build query ─────────────────────────────────────────────────────────
   const query = {};
 
   if (filter && filter !== "all") {
@@ -183,7 +182,6 @@ export const downloadSalesExcel = wrapAsync(async (req, res) => {
   if (orderStatus) query.orderStatus = orderStatus;
   if (productId) query["products.product_id"] = productId;
 
-  // ── Fetch all matching orders (no pagination) ────────────────────────────
   const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
 
   for (const order of orders) {
@@ -191,7 +189,6 @@ export const downloadSalesExcel = wrapAsync(async (req, res) => {
     order.user_id = user;
   }
 
-  // ── Shape into rows ──────────────────────────────────────────────────────
   const rows = orders.map((o) => ({
     "Order ID": o.orderId,
     Date: o.createdAt.toISOString().slice(0, 10),
@@ -206,10 +203,8 @@ export const downloadSalesExcel = wrapAsync(async (req, res) => {
     Status: o.orderStatus,
   }));
 
-  // ── Generate Excel ───────────────────────────────────────────────────────
   const ws = XLSX.utils.json_to_sheet(rows);
 
-  // ── Column widths ────────────────────────────────────────────────────────
   ws["!cols"] = [
     { wch: 28 }, // Order ID
     { wch: 12 }, // Date
@@ -240,14 +235,13 @@ export const downloadSalesExcel = wrapAsync(async (req, res) => {
   res.send(buffer);
 });
 
-//
-
-//
+// ======================================================================
+// 5. DOWNLOAD PDF
+// ======================================================================
 
 export const downloadSalesPDF = wrapAsync(async (req, res) => {
   const { filter, from, to, paymentStatus, orderStatus, productId } = req.query;
 
-  // ── Build query ─────────────────────────────────────────────────────────
   const query = {};
 
   if (filter && filter !== "all") {
@@ -283,7 +277,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
     order.user_id = user;
   }
 
-  // ── Summary stats ────────────────────────────────────────────────────────
   const totalOrders = orders.length;
   const totalRevenue = orders.reduce((s, o) => s + o.totalPrice, 0);
   const totalDiscount = orders.reduce(
@@ -300,7 +293,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
     )
     .reduce((s, o) => s + o.totalPrice, 0);
 
-  // ── Timeline label ───────────────────────────────────────────────────────
   const filterLabels = {
     all: "All Time",
     "1day": "Today",
@@ -313,7 +305,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
     timelineLabel = `${new Date(from).toLocaleDateString()} – ${new Date(to).toLocaleDateString()}`;
   }
 
-  // ── PDF Setup ────────────────────────────────────────────────────────────
   const doc = new PDFDocument({ margin: 30, size: "A4", layout: "landscape" });
 
   res.setHeader(
@@ -326,7 +317,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
   const pageW = doc.page.width - 60;
   const startX = 30;
 
-  // ── Title ────────────────────────────────────────────────────────────────
   doc
     .fontSize(20)
     .font("Helvetica-Bold")
@@ -346,7 +336,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
       { align: "center", width: pageW },
     );
 
-  // ── Summary Cards ────────────────────────────────────────────────────────
   const cards = [
     { label: "TOTAL ORDERS", value: String(totalOrders), color: "#e53935" },
     {
@@ -390,7 +379,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
       .text(card.value, cx + 8, cardY + 24, { width: cardW - 16 });
   });
 
-  // ── Table ────────────────────────────────────────────────────────────────
   const rowH = 20;
 
   const cols = [
@@ -423,7 +411,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
     Refunded: "#2563eb",
   };
 
-  // ── Draw Header ───────────────────────────────────────────────────────────
   function drawTableHeader(y) {
     doc.rect(startX, y, pageW, rowH).fill("#e53935");
     let cx = startX;
@@ -446,7 +433,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
   let currentY = tableY + rowH;
 
   orders.forEach((o, i) => {
-    // ── Page Break ──────────────────────────────────────────────────────────
     if (currentY + rowH > doc.page.height - 30) {
       doc.addPage();
       currentY = 30;
@@ -454,7 +440,6 @@ export const downloadSalesPDF = wrapAsync(async (req, res) => {
       currentY += rowH;
     }
 
-    // ── Row Background ──────────────────────────────────────────────────────
     if (i % 2 === 0) {
       doc.rect(startX, currentY, pageW, rowH).fill("#f9fafb");
     }

@@ -506,6 +506,7 @@ export const addToCart = wrapAsync(async (req, res) => {
 // ======================================================================
 // 18. CHECKOUT RECHECKING THE CART PRODUCT BEFORE THE CHECKOUT
 // ======================================================================
+
 export const proceedToCheckout = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
 

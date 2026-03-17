@@ -31,6 +31,7 @@ export const renderLoginPage = (req, res) => {
 // ======================================================================
 // 2. ADMIN LOGIN CONTROLLER (POST /admin/login)
 // ======================================================================
+
 export const loginAdmin = wrapAsync(async (req, res) => {
   const { error } = adminValidators.loginValidation.validate(req.body);
 
@@ -55,7 +56,7 @@ export const loginAdmin = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4.FORGOT PASSWORD PAGE
+// 3.FORGOT PASSWORD PAGE
 // ======================================================================
 
 export const forgotPasswordPage = wrapAsync((req, res) => {
@@ -95,7 +96,7 @@ export const forgotPasswordVerify = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. RENDER OTP PAGE
+// 5. RENDER OTP PAGE
 // ======================================================================
 
 export const renderOtpPage = wrapAsync((req, res) => {
@@ -108,7 +109,7 @@ export const renderOtpPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 5. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
+// 6. VERIFY OTP (SIGNUP / FORGOT PASSWORD)
 // ======================================================================
 
 export const otpVerification = wrapAsync(async (req, res) => {
@@ -149,7 +150,7 @@ export const otpVerification = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 4. RENDER RESET PASSWORD PAGE
+// 7. RENDER RESET PASSWORD PAGE
 // ======================================================================
 
 export const resetPasswordPage = wrapAsync((req, res) => {
@@ -162,7 +163,7 @@ export const resetPasswordPage = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 4. RENDER RESET PASSWORD PAGE
+// 8. RENDER RESET PASSWORD PAGE
 // ======================================================================
 
 export const newPassValidation = wrapAsync(async (req, res) => {
@@ -194,7 +195,7 @@ export const newPassValidation = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 3.LOGOUT
+// 9.LOGOUT
 // ======================================================================
 
 export const logOut = wrapAsync((req, res) => {
@@ -210,7 +211,7 @@ export const logOut = wrapAsync((req, res) => {
 });
 
 // ======================================================================
-// 4.DASHBOARD
+// 10.DASHBOARD
 // ======================================================================
 
 export const dashboardPage = (req, res) => {
@@ -223,7 +224,7 @@ export const dashboardPage = (req, res) => {
 };
 
 // ======================================================================
-// 5.DASHBOARD DATA
+// 11.DASHBOARD DATA
 // ======================================================================
 
 export const dashboardStats = wrapAsync(async (req, res) => {
@@ -266,7 +267,7 @@ export const dashboardStats = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 6.DASHBOARD DATA
+// 12.DASHBOARD DATA
 // ======================================================================
 
 export const dashboardTopThrees = wrapAsync(async (req, res) => {
@@ -352,7 +353,7 @@ export const dashboardTopThrees = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 7.DASHBOARD CHART
+// 13.DASHBOARD CHART
 // ======================================================================
 
 export const dashboardChart = wrapAsync(async (req, res) => {
@@ -373,9 +374,9 @@ export const dashboardChart = wrapAsync(async (req, res) => {
   }
 });
 
-//
-//
-//
+// ======================================================================
+// 14. DONUT CHART
+// ======================================================================
 
 export const dashboardDonut = wrapAsync(async (req, res) => {
   const result = await Order.aggregate([
@@ -416,11 +417,20 @@ export const dashboardDonut = wrapAsync(async (req, res) => {
 });
 
 // ======================================================================
-// 8.DASHBOARD LEDGER
+// 15.DASHBOARD LEDGER
 // ======================================================================
 
 export const downloadLedger = wrapAsync(async (req, res) => {
   const { from, to } = req.query;
+  const now = new Date();
+
+  if (from && new Date(from) > now) {
+    return sendResponse(res, Responses.dashboard.FUTURE_FROM);
+  }
+
+  if (to && new Date(to) > now) {
+    return sendResponse(res, Responses.dashboard.TO_FROM);
+  }
 
   const query = {
     paymentStatus: { $in: ["Paid", "Refunded"] },
@@ -436,14 +446,12 @@ export const downloadLedger = wrapAsync(async (req, res) => {
     }
   }
 
-  const orders = await Order.find(query).sort({ createdAt: 1 }).lean();
+  const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
 
-  // Build ledger entries
   let balance = 0;
   const entries = [];
 
   for (const order of orders) {
-    // Credit — payment received
     balance += order.totalPrice;
     entries.push({
       date: order.createdAt.toISOString().slice(0, 10),
@@ -453,7 +461,6 @@ export const downloadLedger = wrapAsync(async (req, res) => {
       balance,
     });
 
-    // Debit — refund given
     if (order.refundAmount > 0) {
       balance -= order.refundAmount;
       entries.push({
