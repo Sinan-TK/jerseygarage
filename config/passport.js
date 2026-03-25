@@ -16,10 +16,6 @@ export default () => {
           const email = profile.emails[0].value;
           const googleId = profile.id;
 
-          // Handles all 3 cases in one query:
-          // 1. Existing Google user → returns them
-          // 2. Existing normal-signup user → links googleId
-          // 3. Brand new user → creates them
           const user = await User.findOneAndUpdate(
             { email },
             {

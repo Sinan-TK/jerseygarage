@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       uppercase: true,
       index: true,
+      sparse: true
     },
 
     referred_by: {
