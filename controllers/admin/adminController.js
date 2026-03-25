@@ -507,3 +507,24 @@ export const downloadLedger = wrapAsync(async (req, res) => {
   );
   res.send(buffer);
 });
+
+// ======================================================================
+// 16. RESEND OTP
+// ======================================================================
+
+export const resendOtp = wrapAsync(async (req, res) => {
+  const email = req.session.tempEmail;
+  const purpose = req.session.otpPurpose;
+
+  if (!email || !purpose) {
+    return sendResponse(res, Responses.resendOtp.DATA_NOT_FOUND);
+  }
+
+  await generateOtp(
+    email,
+    purpose,
+    `Resend OTP - ${purpose === userConstants.OTPPURPOSE.SIGNUP ? userConstants.OTP_MESSAGES.SIGNUP : userConstants.OTP_MESSAGES.FORGOTPASSWORD} `,
+  );
+
+  return sendResponse(res, Responses.resendOtp.RESEND_OTP);
+});

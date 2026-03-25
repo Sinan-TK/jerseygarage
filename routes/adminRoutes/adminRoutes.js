@@ -62,6 +62,13 @@ router.post(
   adminController.newPassValidation,
 );
 
+router.post(
+  "/resend-otp",
+  authMiddleware.otpVerifyReset,
+  adminMiddleware.adminExists,
+  adminController.resendOtp,
+);
+
 router.use(authMiddleware.isLoggedIn);
 
 router.get("/dashboard", adminController.dashboardPage);
