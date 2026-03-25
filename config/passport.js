@@ -14,42 +14,37 @@ export default () => {
       async (accessToken, refreshToken, profile, done) => {
         try {
           const email = profile.emails[0].value;
+          const googleId = profile.id;
 
-          // const avatar =
-          //   profile._json?.picture ||
-          //   profile.photos?.[0]?.value ||
-          //   "https://res.cloudinary.com/dn6i64qk6/image/upload/v1763988711/user-default-image_ifyyaj.webp";
+          // Handles all 3 cases in one query:
+          // 1. Existing Google user → returns them
+          // 2. Existing normal-signup user → links googleId
+          // 3. Brand new user → creates them
+          const user = await User.findOneAndUpdate(
+            { email },
+            {
+              $set: {
+                googleId,
+                is_verified: true,
+              },
+              $setOnInsert: {
+                full_name: profile.displayName,
+                email,
+                avatar:
+                  "https://t3.ftcdn.net/jpg/06/33/54/78/360_F_633547842_AugYzexTpMJ9z1YcpTKUBoqBF0CUCk10.jpg",
+                password_hash: null,
+              },
+            },
+            { upsert: true, new: true },
+          );
 
-          // 🟢 1. Check if user already exists by email (normal signup user)
-          let existingUser = await User.findOne({ email });
-
-          if (existingUser) {
-            // If user signed up normally before, but now using Google login
-            if (!existingUser.googleId) {
-              existingUser.googleId = profile.id;
-              existingUser.is_verified = true; // because Google email verified
-              await existingUser.save();
-            }
-            return done(null, existingUser);
-          }
-
-          // 🔵 2. If new Google user, create new record
-          let newUser = await User.create({
-            googleId: profile.id,
-            full_name: profile.displayName,
-            email: email,
-            avatar:"https://t3.ftcdn.net/jpg/06/33/54/78/360_F_633547842_AugYzexTpMJ9z1YcpTKUBoqBF0CUCk10.jpg",
-            password_hash: null,
-            is_verified: true,
-          });
-
-          return done(null, newUser);
+          return done(null, user);
         } catch (err) {
           console.log(err);
           return done(err, null);
         }
-      }
-    )
+      },
+    ),
   );
 
   // Save user to session
