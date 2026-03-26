@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     googleId: {
       type: String,
       unique: true,
-      sparse: true, 
+      sparse: true,
     },
 
     password_hash: {
@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       uppercase: true,
       index: true,
-      sparse: true
+      sparse: true,
     },
 
     referred_by: {
@@ -62,6 +62,11 @@ const userSchema = new mongoose.Schema(
     wallet: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Wallet",
+    },
+
+    is_verified: {
+      type: Boolean,
+      default: false,
     },
 
     is_blocked: {
