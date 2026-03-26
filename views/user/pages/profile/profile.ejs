@@ -40,11 +40,13 @@
         </p>
       </div>
 
-      <div class="info-item" onclick="openPasswordModal()">
-        <span>Password</span>
-        <p>******** <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
-        </p>
-      </div>
+      <% if(userDetails.password_hash){ %>
+        <div class="info-item" onclick="openPasswordModal()">
+          <span>Password</span>
+          <p>******** <a href="#" class="link"><i class="fa-regular fa-pen-to-square"></i> New Password</a>
+          </p>
+        </div>
+        <% } %>
     </div>
   </section>
 
