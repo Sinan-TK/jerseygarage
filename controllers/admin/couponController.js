@@ -61,7 +61,7 @@ export const fetchCoupons = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const addCouponPage = (req, res) => {
-  res.render("admin/pages/addcoupon", {
+  res.render("admin/pages/addCoupon", {
     title: "Add Coupon",
     showLayout: true,
     cssFile: "/css/admin/addCoupon.css",
@@ -129,7 +129,7 @@ export const addCoupon = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const editCouponPage = (req, res) => {
-  res.render("admin/pages/addcoupon", {
+  res.render("admin/pages/addCoupon", {
     title: "Edit Coupon",
     showLayout: true,
     cssFile: "/css/admin/addCoupon.css",
