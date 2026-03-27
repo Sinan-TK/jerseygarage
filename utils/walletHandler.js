@@ -1,5 +1,7 @@
 import Wallet from "../models/walletModel.js";
 import WalletTransaction from "../models/walletTransactionModel.js";
+import statusCode from "../constants/statusCode.js";
+import * as Responses from "../utils/responses/user/user.response.js";
 
 /* =========================
    CREDIT WALLET
@@ -60,7 +62,7 @@ export const debitWallet = async (
   }
 
   if (wallet.balance < amount) {
-    return { error: { code: 402, message: "Insufficient wallet balance" } };
+    return { error: Responses.wallet.INSUFFICIENT };
   }
 
   if (status === "SUCCESS") {

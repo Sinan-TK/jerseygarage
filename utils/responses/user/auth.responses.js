@@ -1,18 +1,20 @@
+import statusCode from "../../../constants/statusCode.js";
+
 export const loginUser = Object.freeze({
   USER_NOT_FOUND: {
-    code: 404,
+    code: statusCode.CLIENT.NOT_FOUND,
     message: "User not found!",
   },
   PASSWORD_NOT_MATCH: {
-    code: 401,
+    code: statusCode.CLIENT.UNAUTHORIZED,
     message: "Invalid password!",
   },
   USER_BLOCKED: {
-    code: 403,
+    code: statusCode.CLIENT.FORBIDDEN,
     message: "Your account has been blocked. Please contact support.",
   },
   LOGIN: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Login successful!",
     redirectToFrontend: "/",
   },
@@ -20,7 +22,7 @@ export const loginUser = Object.freeze({
 
 export const otpVerify = Object.freeze({
   DATA_NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Session expired. Please try again!",
   },
   OTP_EXPIRED: {
@@ -29,16 +31,16 @@ export const otpVerify = Object.freeze({
     redirectToFrontend: "/verify-otp",
   },
   INCORRECT_OTP: {
-    code: 401,
+    code: statusCode.CLIENT.UNAUTHORIZED,
     message: "Incorrect OTP. Please try again!",
   },
   REGISTER: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Account created successfully!",
     redirectToFrontend: "/login",
   },
   NEWPASSWORD: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "OTP verified successfully!",
     redirectToFrontend: "/newpassword",
   },
@@ -46,30 +48,30 @@ export const otpVerify = Object.freeze({
 
 export const resendOtp = Object.freeze({
   DATA_NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Session expired. Please try again!",
   },
   RESEND_OTP: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "OTP resended successfully!",
   },
 });
 
 export const registerLogic = Object.freeze({
   USER_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Email already registered!",
   },
   DATA_NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Session expired. Please try again!",
   },
   INVALID_REF_CODE: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "Invalid referral code",
   },
   ACCOUNT_CREATED: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "OTP sended successfully!",
     redirectToFrontend: "/verify-otp",
   },
@@ -77,16 +79,16 @@ export const registerLogic = Object.freeze({
 
 export const forgetPass = Object.freeze({
   NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "No account found with this email!",
   },
   OTP_GENERATED: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "OTP generated!",
     redirectToFrontend: "/verify-otp",
   },
   PASS_CHANGE: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Password changed successfully!",
     redirectToFrontend: "/login",
   },

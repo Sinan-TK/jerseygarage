@@ -2,6 +2,7 @@ import User from "../../models/userModel.js";
 import Category from "../../models/categoryModel.js";
 import Product from "../../models/productModel.js";
 import wrapAsync from "../../utils/wrapAsync.js";
+import statusCode from "../../constants/statusCode.js";
 
 export const isLoggedIn = (req, res, next) => {
   if (req.session.user) {
@@ -23,7 +24,7 @@ export const productNotFound = wrapAsync(async (req, res, next) => {
   const product = await Product.findById(productId);
 
   if (!product || !product.is_active) {
-    return next({ status: 404 });
+    return next({ status: statusCode.CLIENT.NOT_FOUND });
   }
 
   req.product = product;
@@ -58,7 +59,7 @@ export const checkBlockedUser = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("checkBlockedUser error:", error);
-    res.status(500).send("Server Error");
+    res.status(statusCode.SERVER.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 

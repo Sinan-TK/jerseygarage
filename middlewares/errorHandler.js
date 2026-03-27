@@ -1,8 +1,9 @@
 import sendResponse from "../utils/sendResponse.js";
 import globalResponses from "../utils/responses/global.responses.js";
+import statusCode from "../constants/statusCode.js";
 
 export const PageNotFound = (req, res, next) => {
-  res.status(404).render("user/pages/404", {
+  res.status(statusCode.CLIENT.NOT_FOUND).render("user/pages/404", {
     title: "404 Page not found",
     pageCSS: "404",
     showHeader: true,
@@ -20,15 +21,15 @@ export const errorHandler = (err, req, res, next) => {
     err.code ||
     globalResponses.SERVER_ERROR.code;
 
-  if (statusCode === 404) {
+  if (statusCode === statusCode.CLIENT.NOT_FOUND) {
     if (req.xhr || req.headers.accept?.includes("application/json")) {
       return sendResponse(res, {
-        code: 404,
+        code: statusCode.CLIENT.NOT_FOUND,
         message: err.message || "Page not found",
       });
     }
 
-    return res.status(404).render("user/pages/404", {
+    return res.status(statusCode.CLIENT.NOT_FOUND).render("user/pages/404", {
       title: "404 Page not found",
       pageCSS: "404",
       showHeader: true,

@@ -5,6 +5,7 @@ import wrapAsync from "../../utils/wrapAsync.js";
 import { ObjectId } from "mongodb";
 import sendResponse from "../../utils/sendResponse.js";
 import * as Responses from "../../utils/responses/user/user.response.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. WISHLIST PAGE RENDER
@@ -41,7 +42,7 @@ export const wishlistData = wrapAsync(async (req, res) => {
   const items = wishlist ? wishlist.items : [];
 
   sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "product render successfully",
     data: items,
   });

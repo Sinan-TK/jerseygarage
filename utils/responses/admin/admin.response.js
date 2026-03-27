@@ -1,21 +1,22 @@
 // utils/responses.js
+import statusCode from "../../../constants/statusCode.js";
 
 export const adminLogin = Object.freeze({
   ADMIN_NOT_FOUND: {
-    code: 404,
+    code: statusCode.CLIENT.NOT_FOUND,
     message: "Admin not found!",
   },
   INVALID_PASSWORD: {
-    code: 401,
+    code: statusCode.CLIENT.UNAUTHORIZED,
     message: "Invalid password!",
   },
   LOGIN_SUCCESS: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Login successful!",
     redirectToFrontend: "/admin/dashboard",
   },
   OTP_GENERATED: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "OTP generated!",
     redirectToFrontend: "/admin/verify-otp",
   },
@@ -23,33 +24,33 @@ export const adminLogin = Object.freeze({
 
 export const userStatus = Object.freeze({
   USER_BLOCK: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "User blocked successfully!",
   },
   USER_UNBLOCK: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "user unblocked successfully!",
   },
 });
 
 export const dashboard = Object.freeze({
   INVALID_FILTER: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "Invalid filter",
   },
   FUTURE_FROM: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "From date cannot be in the future",
   },
   TO_FROM: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "To date cannot be in the future",
   },
 });
 
 export const otpVerify = Object.freeze({
   DATA_NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Session expired. Please try again!",
   },
   OTP_EXPIRED: {
@@ -58,11 +59,11 @@ export const otpVerify = Object.freeze({
     redirectToFrontend: "/admin/verify-otp",
   },
   INCORRECT_OTP: {
-    code: 401,
+    code: statusCode.CLIENT.UNAUTHORIZED,
     message: "Incorrect OTP. Please try again!",
   },
   NEWPASSWORD: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "OTP verified successfully!",
     redirectToFrontend: "/admin/reset-password",
   },
@@ -70,26 +71,26 @@ export const otpVerify = Object.freeze({
 
 export const resendOtp = Object.freeze({
   DATA_NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Session expired. Please try again!",
   },
   RESEND_OTP: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "OTP resended successfully!",
   },
 });
 
 export const forgetPass = Object.freeze({
   NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "No account found with this email!",
   },
   DATA_NOT_FOUND: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Session expired. Please try again!",
   },
   PASS_CHANGE: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Password changed successfully!",
     redirectToFrontend: "/admin/login",
   },
@@ -97,19 +98,19 @@ export const forgetPass = Object.freeze({
 
 export const userRes = Object.freeze({
   INVALID: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "Invalid request",
   },
   INVALID_ACTION: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "Invalid action",
   },
   USER_NOT_FOUND: {
-    code: 404,
+    code: statusCode.CLIENT.NOT_FOUND,
     message: "User not found",
   },
   ALREADY_BLOCKED: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "User is Already Blocked",
   },
 });

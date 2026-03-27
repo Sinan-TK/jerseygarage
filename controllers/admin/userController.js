@@ -4,6 +4,7 @@ import * as Responses from "../../utils/responses/admin/admin.response.js";
 import sendResponse from "../../utils/sendResponse.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import paginate from "../../utils/pagination.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1.USER LISTING
@@ -117,7 +118,7 @@ export const userData = wrapAsync(async (req, res) => {
   );
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Users data rendered",
     data: {
       users: shapedUsers,

@@ -12,6 +12,7 @@ import * as Responses from "../../utils/responses/admin/coupon.response.js";
 import Coupon from "../../models/couponModel.js";
 import XLSX from "xlsx";
 import PDFDocument from "pdfkit";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. SALES REPORT PAGE
@@ -33,7 +34,7 @@ export const salesReportPage = (req, res) => {
 export const productDatas = wrapAsync(async (req, res) => {
   const products = await Product.find();
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Products data loaded",
     data: products,
   });
@@ -124,7 +125,7 @@ export const getSalesReport = wrapAsync(async (req, res) => {
     .reduce((s, o) => s + o.totalPrice, 0);
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "filered successfully",
     data: {
       orders: shaped,

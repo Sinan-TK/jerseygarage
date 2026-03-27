@@ -14,6 +14,7 @@ import Order from "../../models/orderModel.js";
 import generateOtp from "../../utils/GenerateOtp.js";
 import XLSX from "xlsx";
 import * as adminConstants from "../../constants/adminConstants.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. RENDER LOGIN PAGE
@@ -37,7 +38,7 @@ export const loginAdmin = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -77,7 +78,7 @@ export const forgotPasswordVerify = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -124,7 +125,7 @@ export const otpVerification = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -174,7 +175,7 @@ export const newPassValidation = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -255,7 +256,7 @@ export const dashboardStats = wrapAsync(async (req, res) => {
   });
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Stats Data rendered successfully",
     data: {
       totalOrders,
@@ -343,7 +344,7 @@ export const dashboardTopThrees = wrapAsync(async (req, res) => {
   ]);
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Top Three Data rendered successfully",
     data: {
       topProducts,
@@ -363,7 +364,7 @@ export const dashboardChart = wrapAsync(async (req, res) => {
     return sendResponse(res, result.error);
   } else {
     return sendResponse(res, {
-      code: 200,
+      code: statusCode.SUCCESS.OK,
       message: "Chart data fetched",
       data: {
         labels: result.labels,
@@ -410,7 +411,7 @@ export const dashboardDonut = wrapAsync(async (req, res) => {
   const colors = result.map((r) => colorMap[r._id] || "#94a3b8");
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Donut data fetched",
     data: { labels, data, colors },
   });

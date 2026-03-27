@@ -18,7 +18,7 @@ export const handleCancel = async (order, action, items, reason) => {
   ];
   if (nonCancellableStatuses.includes(order.orderStatus)) {
     return {
-      error: { code: 400, message: "Order cannot be cancelled at this stage" },
+      error: { code: statusCode.CLIENT.BAD_REQUEST, message: "Order cannot be cancelled at this stage" },
     };
   }
 
@@ -37,7 +37,7 @@ export const handleCancel = async (order, action, items, reason) => {
       if (coupon.minPurchaseAmount > totalAfterCancel) {
         return {
           error: {
-            code: 400,
+            code: statusCode.CLIENT.BAD_REQUEST,
             message: `Cancellation of ${item.name} isn't possible because it would make the order total fall below the minimum amount required for the applied coupon. As an alternative, you can choose to cancel the full order.`,
           },
         };
@@ -123,7 +123,7 @@ export const handleReturn = async (order, action, items, reason) => {
       if (coupon.minPurchaseAmount > totalAfterReturn) {
         return {
           error: {
-            code: 400,
+            code: statusCode.CLIENT.BAD_REQUEST,
             message: `Return of ${item.name} isn't possible because it would make the order total fall below the minimum amount required for the applied coupon. As an alternative, you can choose to return the full order.`,
           },
         };

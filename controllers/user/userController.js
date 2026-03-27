@@ -29,6 +29,7 @@ import Coupon from "../../models/couponModel.js";
 import * as couponChecks from "../../utils/checkCoupon.js";
 import paginate from "../../utils/pagination.js";
 import cloudinary from "../../config/cloudinary.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. CART PAGE RENDER
@@ -90,7 +91,7 @@ export const cartQuantity = wrapAsync(async (req, res) => {
   }
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Quantity changed successfully",
     data: {
       quantity: result?.quantity || 0,
@@ -134,7 +135,7 @@ export const editPersonalInfo = wrapAsync(async (req, res) => {
 
   if (user.email === result.email) {
     return sendResponse(res, {
-      code: 200,
+      code: statusCode.SUCCESS.OK,
       message: "Personal Info edited",
       data: result.data,
     });
@@ -181,7 +182,7 @@ export const changeAvatar = wrapAsync(async (req, res) => {
   await User.updateOne({ _id: user_id }, { avatar: result.secure_url });
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Profile picture updated",
     data: { avatar: result.secure_url },
   });
@@ -199,7 +200,7 @@ export const deleteDp = wrapAsync(async (req, res) => {
   const user = await User.findById(user_id);
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Profile picture removed",
     data: { avatar: user.avatar },
   });
@@ -288,7 +289,7 @@ export const addressData = wrapAsync(async (req, res) => {
     .lean();
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "data retrieved successfully",
     data: {
       addresses,
@@ -305,7 +306,7 @@ export const addAddress = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -348,7 +349,7 @@ export const editAddress = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -469,7 +470,7 @@ export const applyCoupon = wrapAsync(async (req, res) => {
   const total = result.finalAmount + userConstants.SHIPPING_CHARGE + gstAmount;
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Coupon Applied succussfully",
     data: { coupon: result, total },
   });
@@ -495,7 +496,7 @@ export const addToCart = wrapAsync(async (req, res) => {
   }
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Item added to cart",
     data: {
       items_count: result.items_count,
@@ -519,7 +520,7 @@ export const proceedToCheckout = wrapAsync(async (req, res) => {
 
   if (warning.length > 0) {
     return sendResponse(res, {
-      code: 200,
+      code: statusCode.SUCCESS.OK,
       message: "Some Products are not available",
       data: { warnings: warning },
     });
@@ -550,7 +551,7 @@ export const deleteCartItem = wrapAsync(async (req, res) => {
   }
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Item removed from cart",
     data: {
       subtotal: result.subtotal,
@@ -647,7 +648,7 @@ export const placeOrder = wrapAsync(async (req, res) => {
       req.session.pendingOrderId = result.orderId;
       req.session.orderId = result.orderId;
       return sendResponse(res, {
-        code: 200,
+        code: statusCode.SUCCESS.OK,
         message: "paying through razorpay",
         data: { ...result.razorpay, paymentMethod: result.paymentMethod },
       });
@@ -811,7 +812,7 @@ export const orderListingData = wrapAsync(async (req, res) => {
   const result = await paginate(Order, page, 5, { user_id });
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Orders rendered successfully",
     data: { orders: result.data, pagination: result.meta },
   });
@@ -915,7 +916,7 @@ export const walletData = wrapAsync(async (req, res) => {
   const pagination = await paginate(WalletTransaction, page, 6, filter);
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "wallet data successfully got",
     data: {
       balance: wallet.balance,
@@ -956,7 +957,7 @@ export const walletTopupOrder = wrapAsync(async (req, res) => {
   );
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Order created",
     data: {
       key: process.env.RAZORPAY_KEY,

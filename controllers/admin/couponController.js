@@ -9,6 +9,7 @@ import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/coupon.response.js";
 import Coupon from "../../models/couponModel.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. RENDER COUPON PAGE
@@ -50,7 +51,7 @@ export const fetchCoupons = wrapAsync(async (req, res) => {
   const pagination = await paginate(Coupon, page, 10, filter);
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "coupons fetched successfully",
     data: { coupons: pagination.data, pagination: pagination.meta },
   });
@@ -80,7 +81,7 @@ export const addCoupon = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -151,7 +152,7 @@ export const editCouponData = wrapAsync(async (req, res) => {
   const coupon = await Coupon.findById(couponId);
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "coupon data fetched",
     data: coupon,
   });
@@ -180,7 +181,7 @@ export const editCoupon = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }

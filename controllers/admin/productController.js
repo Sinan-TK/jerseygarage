@@ -9,6 +9,7 @@ import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/product.response.js";
 import * as adminConstants from "../../constants/adminConstants.js";
 import * as productService from "../../services/admin/productService.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1.PRODUCT PAGE RENDER
@@ -69,7 +70,7 @@ export const productsPageData = wrapAsync(async (req, res) => {
   });
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Product listing data rendered",
     data: { products: productsWithVariants, pagination: result.meta },
   });

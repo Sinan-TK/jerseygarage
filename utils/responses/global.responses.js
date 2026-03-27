@@ -1,22 +1,24 @@
-export default  Object.freeze({
+import statusCode from "../../constants/statusCode.js";
+
+export default Object.freeze({
   SERVER_ERROR: {
-    code: 500,
+    code: statusCode.SERVER.INTERNAL_SERVER_ERROR,
     message: "Something went wrong. Please try again later!",
   },
   BAD_REQUEST: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "Invalid request!",
   },
   UNAUTHORIZED: {
-    code: 401,
+    code: statusCode.CLIENT.UNAUTHORIZED,
     message: "Unauthorized access!",
   },
   FORBIDDEN: {
-    code: 403,
+    code: statusCode.CLIENT.FORBIDDEN,
     message: "You do not have permission to perform this action!",
   },
   NOT_FOUND: {
-    code: 404,
+    code: statusCode.CLIENT.NOT_FOUND,
     message: "Resource not found!",
-  }
+  },
 });

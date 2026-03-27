@@ -6,6 +6,7 @@ import categorySchema from "../../validators/categoryValidator.js";
 import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/category.response.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. GET CATEGORY LIST (ADMIN CATEGORIES PAGE)
@@ -27,7 +28,7 @@ export const addCategory = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -97,7 +98,7 @@ export const editCategory = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -141,7 +142,7 @@ export const searchCategory = wrapAsync(async (req, res) => {
   const products = await Product.find();
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "data rendered successfully",
     data: { categories: result.data, pagination: result.meta, products },
   });

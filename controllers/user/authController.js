@@ -20,6 +20,7 @@ import * as userConstants from "../../constants/userConstants.js";
 import Offer from "../../models/offerModel.js";
 import WalletTransaction from "../../models/walletTransactionModel.js";
 import * as walletHandler from "../../utils/walletHandler.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. LOGIN PAGE
@@ -58,7 +59,7 @@ export const userVerification = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -106,7 +107,7 @@ export const otpVerification = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -218,7 +219,7 @@ export const signupVerification = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -270,7 +271,7 @@ export const emailVerification = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -318,7 +319,7 @@ export const newPassValidation = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -453,7 +454,7 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
 
     if (!productIds.length) {
       return sendResponse(res, {
-        code: 200,
+        code: statusCode.SUCCESS.OK,
         message: "Filter products rendered(0 products)",
 
         data: {
@@ -546,7 +547,7 @@ export const shopPageProducts = wrapAsync(async (req, res) => {
   });
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Filter products rendered",
 
     data: {

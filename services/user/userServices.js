@@ -21,6 +21,7 @@ import * as couponChecks from "../../utils/checkCoupon.js";
 import * as walletHandler from "../../utils/walletHandler.js";
 import razorpay from "../../config/razorpay.js";
 import Wallet from "../../models/walletModel.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // CART PAGE RENDER
@@ -101,7 +102,7 @@ export const editPersonalInfoService = async ({
   if (error) {
     return {
       error: {
-        code: 400,
+        code: statusCode.CLIENT.BAD_REQUEST,
         message: error.details[0].message,
       },
     };
@@ -145,7 +146,7 @@ export const emailVerificationService = async ({
   if (error) {
     return {
       error: {
-        code: 400,
+        code: statusCode.CLIENT.BAD_REQUEST,
         message: error.details[0].message,
       },
     };
@@ -181,7 +182,7 @@ export const editPasswordSerive = async (body, user_id) => {
   if (error) {
     return {
       error: {
-        code: 400,
+        code: statusCode.CLIENT.BAD_REQUEST,
         message: error.details[0].message,
       },
     };
@@ -236,7 +237,7 @@ export const addToCartService = async (
     let size = "This";
     return {
       error: {
-        code: 404,
+        code: statusCode.CLIENT.NOT_FOUND,
         message: `${variant.size} is not available`,
       },
     };
@@ -245,7 +246,7 @@ export const addToCartService = async (
   if (variant.stock < quantity) {
     return {
       error: {
-        code: 400,
+        code: statusCode.CLIENT.BAD_REQUEST,
         message: `Only ${variant.stock} items left in stock`,
       },
     };
@@ -267,7 +268,7 @@ export const addToCartService = async (
     if (newQty > variant.stock) {
       return {
         error: {
-          code: 400,
+          code: statusCode.CLIENT.BAD_REQUEST,
           message: `Only ${variant.stock} items left in stock`,
         },
       };
@@ -368,7 +369,7 @@ export const placeOrderService = async ({
   if (warning.length > 0) {
     return {
       error: {
-        code: 200,
+        code: statusCode.SUCCESS.OK,
         message: "Some items are unavailable",
         data: { warnings: warning },
       },

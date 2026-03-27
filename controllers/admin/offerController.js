@@ -1,12 +1,14 @@
 import Category from "../../models/categoryModel.js";
 import Offer from "../../models/offerModel.js";
 import Product from "../../models/productModel.js";
+import Variant from "../../models/variantModel.js";
 import wrapAsync from "../../utils/wrapAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 import offerSchema from "../../validators/offerValidator.js";
 import paginate from "../../utils/pagination.js";
 import { ObjectId } from "mongodb";
 import * as Responses from "../../utils/responses/admin/offer.response.js";
+import statusCode from "../../constants/statusCode.js";
 
 // ======================================================================
 // 1. OFFER LISTING PAGE
@@ -52,7 +54,7 @@ export const offerData = wrapAsync(async (req, res) => {
   const products = await Product.find({ is_active: true }).select("name");
   const categories = await Category.find({ is_active: true }).select("name");
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Offers listed successfully",
     data: {
       offers: pagination.data,
@@ -72,7 +74,7 @@ export const addOffer = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -91,6 +93,53 @@ export const addOffer = wrapAsync(async (req, res) => {
 
   if (discountType === "percentage" && discountValue > 100) {
     return sendResponse(res, Responses.offerRes.EXCEED_100);
+  }
+
+  if (discountType === "flat") {
+    let productsToCheck = [];
+
+    if (offerApplyType === "product") {
+      productsToCheck = productIds;
+    } else if (offerApplyType === "category") {
+      const categoryProducts = await Product.find({
+        category: { $in: categoryIds },
+        is_active: true,
+      }).select("_id");
+      productsToCheck = categoryProducts.map((p) => p._id);
+    }
+
+    if (productsToCheck.length > 0) {
+      const variants = await Variant.find({
+        product_id: { $in: productsToCheck },
+        is_available: true,
+      }).populate("product_id", "name");
+
+      // Group by product, find the minimum base_price per product
+      const productMinPrice = {};
+      for (const variant of variants) {
+        const pid = variant.product_id._id.toString();
+        if (
+          !productMinPrice[pid] ||
+          variant.base_price < productMinPrice[pid].price
+        ) {
+          productMinPrice[pid] = {
+            price: variant.base_price,
+            name: variant.product_id.name,
+          };
+        }
+      }
+
+      const invalidProducts = Object.values(productMinPrice).filter(
+        (p) => discountValue >= p.price,
+      );
+
+      if (invalidProducts.length > 0) {
+        return sendResponse(res, {
+          code: statusCode.CLIENT.BAD_REQUEST,
+          message: `Discount exceeds or equals the minimum price of: ${invalidProducts.map((p) => p.name).join(", ")}`,
+        });
+      }
+    }
   }
 
   if (offerApplyType === "product") {
@@ -155,7 +204,7 @@ export const editOffer = wrapAsync(async (req, res) => {
 
   if (error) {
     return sendResponse(res, {
-      code: 400,
+      code: statusCode.CLIENT.BAD_REQUEST,
       message: error.details[0].message,
     });
   }
@@ -174,6 +223,53 @@ export const editOffer = wrapAsync(async (req, res) => {
 
   if (discountType === "percentage" && discountValue > 100) {
     return sendResponse(res, Responses.offerRes.EXCEED_100);
+  }
+
+  if (discountType === "flat") {
+    let productsToCheck = [];
+
+    if (offerApplyType === "product") {
+      productsToCheck = productIds;
+    } else if (offerApplyType === "category") {
+      const categoryProducts = await Product.find({
+        category: { $in: categoryIds },
+        is_active: true,
+      }).select("_id");
+      productsToCheck = categoryProducts.map((p) => p._id);
+    }
+
+    if (productsToCheck.length > 0) {
+      const variants = await Variant.find({
+        product_id: { $in: productsToCheck },
+        is_available: true,
+      }).populate("product_id", "name");
+
+      // Group by product, find the minimum base_price per product
+      const productMinPrice = {};
+      for (const variant of variants) {
+        const pid = variant.product_id._id.toString();
+        if (
+          !productMinPrice[pid] ||
+          variant.base_price < productMinPrice[pid].price
+        ) {
+          productMinPrice[pid] = {
+            price: variant.base_price,
+            name: variant.product_id.name,
+          };
+        }
+      }
+
+      const invalidProducts = Object.values(productMinPrice).filter(
+        (p) => discountValue >= p.price,
+      );
+
+      if (invalidProducts.length > 0) {
+        return sendResponse(res, {
+          code: statusCode.CLIENT.BAD_REQUEST,
+          message: `Discount exceeds or equals the minimum price of: ${invalidProducts.map((p) => p.name).join(", ")}`,
+        });
+      }
+    }
   }
 
   if (offerApplyType === "product") {

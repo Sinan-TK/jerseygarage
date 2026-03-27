@@ -67,7 +67,7 @@ export const couponApply = async (userId, couponCode, total) => {
   if (total < coupon.minPurchaseAmount) {
     return {
       error: {
-        code: 400,
+        code: statusCode.CLIENT.BAD_REQUEST,
         message: `Minimum purchase amount is ₹${coupon.minPurchaseAmount}`,
       },
     };

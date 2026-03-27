@@ -1,10 +1,12 @@
+import statusCode from "../../../constants/statusCode.js";
+
 export const addCoupon = Object.freeze({
   COUPON_EXIST: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Coupon code already exists!",
   },
   SUCCESS: {
-    code: 201,
+    code: statusCode.SUCCESS.CREATED,
     message: "Coupon created successfully",
     redirectToFrontend: "/admin/coupons",
   },
@@ -12,15 +14,15 @@ export const addCoupon = Object.freeze({
 
 export const editCoupon = Object.freeze({
   COUPON_EXIST: {
-    code: 409,
+    code: statusCode.CLIENT.CONFLICT,
     message: "Coupon code already exists!",
   },
   NO_COUPONID: {
-    code: 400,
+    code: statusCode.CLIENT.BAD_REQUEST,
     message: "Coupon ID is required",
   },
   SUCCESS: {
-    code: 201,
+    code: statusCode.SUCCESS.CREATED,
     message: "Coupon edited successfully",
     redirectToFrontend: "/admin/coupons",
   },
@@ -28,11 +30,11 @@ export const editCoupon = Object.freeze({
 
 export const deleteCoupon = Object.freeze({
   NOT_FOUND: {
-    code: 404,
+    code: statusCode.CLIENT.NOT_FOUND,
     message: "Coupon not found",
   },
   DELETED: {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Coupon deleted successfully",
   },
 });

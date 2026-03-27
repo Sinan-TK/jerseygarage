@@ -5,6 +5,7 @@ import wrapAsync from "../../utils/wrapAsync.js";
 import User from "../../models/userModel.js";
 import { avatarUpload } from "../../config/multer.js";
 import multer from "multer";
+import statusCode from "../../constants/statusCode.js";
 
 export const Userdetails = async (req, res, next) => {
   try {
@@ -25,7 +26,7 @@ export const userNotFound = (req, res, next) => {
   if (!req.session.user) {
     if (req.xhr || req.headers.accept?.includes("json")) {
       return sendResponse(res, {
-        code: 401,
+        code: statusCode.CLIENT.UNAUTHORIZED,
         message: "Please login first",
         redirectToFrontend: "/login",
       });
@@ -72,13 +73,13 @@ export const uploadAvatar = (req, res, next) => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
         return sendResponse(res, {
-          code: 400,
+          code: statusCode.CLIENT.BAD_REQUEST,
           message: "Avatar must be under 2MB",
         });
       }
-      return sendResponse(res, { code: 400, message: err.message });
+      return sendResponse(res, { code: statusCode.CLIENT.BAD_REQUEST, message: err.message });
     } else if (err) {
-      return sendResponse(res, { code: 400, message: err.message });
+      return sendResponse(res, { code: statusCode.CLIENT.BAD_REQUEST, message: err.message });
     }
     next();
   });

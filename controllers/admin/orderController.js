@@ -5,6 +5,7 @@ import sendResponse from "../../utils/sendResponse.js";
 import * as walletHandler from "../../utils/walletHandler.js";
 import * as Responses from "../../utils/responses/admin/order.response.js";
 import paginate from "../../utils/pagination.js";
+import statusCode from "../../constants/statusCode.js";
 import * as handleReturnCancel from "../../utils/handleReturnCancel.js";
 
 // ======================================================================
@@ -64,7 +65,7 @@ export const ordersListing = wrapAsync(async (req, res) => {
   }
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "listing successfully",
     data: {
       orders: pagination.data,
@@ -129,7 +130,7 @@ export const changeStatus = wrapAsync(async (req, res) => {
 
     if (terminalStatuses.includes(order.orderStatus)) {
       return sendResponse(res, {
-        code: 400,
+        code: statusCode.CLIENT.BAD_REQUEST,
         message: `Order is already ${order.orderStatus}. Status cannot be changed.`,
       });
     }
@@ -204,7 +205,7 @@ export const changeStatus = wrapAsync(async (req, res) => {
 
       if (currentIndex !== -1 && newIndex !== -1 && newIndex <= currentIndex) {
         return sendResponse(res, {
-          code: 400,
+          code: statusCode.CLIENT.BAD_REQUEST,
           message: `Cannot change status from ${order.orderStatus} to ${orderStatus}`,
         });
       }
@@ -246,7 +247,7 @@ export const changeStatus = wrapAsync(async (req, res) => {
   await order.save();
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: "Status updated successfully!",
     data: {
       orderStatus: order.orderStatus,
@@ -344,7 +345,7 @@ export const returnRequest = wrapAsync(async (req, res) => {
   await order.save();
 
   return sendResponse(res, {
-    code: 200,
+    code: statusCode.SUCCESS.OK,
     message: type === "accept" ? "Return accepted" : "Return rejected",
   });
 });
