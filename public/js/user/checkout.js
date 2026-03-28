@@ -104,8 +104,6 @@ document
 
     const addressId = form.address_id.value;
 
-    console.log(addressId);
-
     const formData = {
       full_name: form.full_name.value.trim(),
       address_type: form.address_type.value.trim(),

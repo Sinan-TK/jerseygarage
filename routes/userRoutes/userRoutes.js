@@ -118,6 +118,8 @@ router.get("/orders/data", userController.orderListingData);
 
 router.get("/orders/:id", userController.orderDetailsPage);
 
+router.post("/retry-payment", userController.retryPayment);
+
 router.get("/orders/invoice/:orderId", userController.downloadInvoice);
 
 router.patch("/orders/order-action", userController.orderCancelReturn);

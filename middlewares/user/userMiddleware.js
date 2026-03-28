@@ -77,9 +77,15 @@ export const uploadAvatar = (req, res, next) => {
           message: "Avatar must be under 2MB",
         });
       }
-      return sendResponse(res, { code: statusCode.CLIENT.BAD_REQUEST, message: err.message });
+      return sendResponse(res, {
+        code: statusCode.CLIENT.BAD_REQUEST,
+        message: err.message,
+      });
     } else if (err) {
-      return sendResponse(res, { code: statusCode.CLIENT.BAD_REQUEST, message: err.message });
+      return sendResponse(res, {
+        code: statusCode.CLIENT.BAD_REQUEST,
+        message: err.message,
+      });
     }
     next();
   });

@@ -620,11 +620,13 @@ export const orderSuccess = wrapAsync(async (req, res) => {
 // ======================================================================
 
 export const orderFailed = (req, res) => {
+  const orderId = req.session.orderId;
   delete req.session.orderId;
   res.render("user/pages/paymentfailed", {
     title: "Order Failed",
     pageJS: "",
     pageCSS: "paymentfailed",
+    orderId,
     showFooter: false,
     showHeader: false,
   });
@@ -669,7 +671,7 @@ export const placeOrder = wrapAsync(async (req, res) => {
 
 export const orderPayVerify = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
-  const orderId = req.session.pendingOrderId;
+  const orderId = req.session.pendingOrderId || req.session.retryOrderId;
   delete req.session.pendingOrderId;
 
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
@@ -737,10 +739,15 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
       }
     }
 
-    await Cart.deleteOne({ user_id }, { session });
+    if (!req.session.retryOrderId) {
+      await Cart.deleteOne({ user_id }, { session });
+    }
 
     await session.commitTransaction();
     session.endSession();
+
+    delete req.session.retryOrderId;
+    req.session.orderId = orderId;
 
     return sendResponse(res, Responses.razorpayOrderVerify.SUCCESS);
   } catch (err) {
@@ -757,13 +764,22 @@ export const orderPayVerify = wrapAsync(async (req, res) => {
 export const orderPayFailed = wrapAsync(async (req, res) => {
   const user_id = req.session.user.id;
   const orderId = req.session.pendingOrderId;
-  delete req.session.pendingOrderId;
 
   const order = await Order.findOne({
     _id: orderId,
     user_id,
-    orderStatus: userConstants.ORDER_STATUS.PENDING,
-    paymentStatus: userConstants.ORDER_PAY_STATUS.PENDING,
+    orderStatus: {
+      $in: [
+        userConstants.ORDER_STATUS.PENDING,
+        userConstants.ORDER_STATUS.FAILED,
+      ],
+    },
+    paymentStatus: {
+      $in: [
+        userConstants.ORDER_PAY_STATUS.PENDING,
+        userConstants.ORDER_PAY_STATUS.FAILED,
+      ],
+    },
   });
 
   if (!order) return sendResponse(res, Responses.order.NO_ORDER);
@@ -781,6 +797,8 @@ export const orderPayFailed = wrapAsync(async (req, res) => {
       paymentStatus: userConstants.ORDER_PAY_STATUS.FAILED,
     },
   );
+
+  delete req.session.pendingOrderId;
 
   return sendResponse(res, Responses.order.RAZORPAY_FAILED);
 });
@@ -1051,5 +1069,59 @@ export const referralPage = wrapAsync(async (req, res) => {
     showHeader: true,
     showFooter: true,
     pageJS: "referral.js",
+  });
+});
+
+// ======================================================================
+// 36. RETRY PAYMENT
+// ======================================================================
+
+export const retryPayment = wrapAsync(async (req, res) => {
+  const user_id = req.session.user.id;
+  const { orderId } = req.body;
+
+  const order = await Order.findOne({ user_id, _id: orderId });
+
+  const { checkoutItems, warning } = await buildCheckoutItems(order.products);
+  if (warning.length > 0) {
+    return sendResponse(res, {
+      code: statusCode.SUCCESS.OK,
+      message: "Some items are unavailable",
+      data: { warnings: warning },
+    });
+  }
+
+  for (const item of order.products) {
+    await Variant.updateOne(
+      { _id: item.variant_id },
+      { $inc: { stock: -item.quantity, lockedStock: +item.quantity } },
+    );
+  }
+
+  const razorpayOrder = await razorpay.orders.create({
+    amount: Math.round(order.totalPrice * 100),
+    currency: userConstants.PAY_DETAILS.CURRENCY,
+    receipt: order.orderId,
+  });
+
+  order.razorpay = { orderId: razorpayOrder.id };
+  await order.save();
+
+  req.session.retryOrderId = order._id;
+
+  return sendResponse(res, {
+    code: 200,
+    message: "Retry razorpay order created",
+    data: {
+      razorpay: {
+        key: process.env.RAZORPAY_KEY,
+        orderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: userConstants.PAY_DETAILS.CURRENCY,
+        name: userConstants.PAY_DETAILS.NAME,
+        description: userConstants.PAY_DETAILS.DES,
+      },
+      orderId: order._id,
+    },
   });
 });

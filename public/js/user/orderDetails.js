@@ -296,3 +296,90 @@ function btnSubmit(loading) {
   btn.disabled = loading;
   btn.innerText = loading ? "Submitting..." : "Submit";
 }
+
+const retryPayment = document.getElementById("retryPayment");
+
+function btnControlRetry(loading) {
+  retryPayment.disabled = loading;
+  retryPayment.innerText = loading ? "Retrying...." : "Retry Payment";
+}
+
+retryPayment.addEventListener("click", async () => {
+  btnControlRetry(true);
+  const orderId = window.location.pathname.split("/").pop();
+  try {
+    const res = await axios.post("/user/retry-payment", { orderId });
+
+    if (res.data.data?.warnings?.length > 0) {
+      btnControlRetry(false);
+      toastr.warning(res.data.message, "Sorry");
+    } else {
+      if (res.data.success) {
+        const data = res.data.data;
+
+        const order = data.razorpay;
+
+        const options = {
+          key: order.key,
+          amount: order.amount,
+          currency: order.currency,
+          name: order.name,
+          description: order.description,
+          order_id: order.orderId,
+
+          handler: async function (response) {
+            try {
+              const verifyRes = await axios.post("/user/payment/verify", {
+                ...response,
+              });
+
+              if (verifyRes.data.success) {
+                toastr.success(verifyRes.data.message, "Paid");
+                setTimeout(() => {
+                  window.location.href = verifyRes.data.redirect;
+                }, 1500);
+              }
+            } catch (err) {
+              const error = err.response?.data;
+              toastr.error(
+                error?.message || "Payment verification failed",
+                "Failed",
+              );
+              btnControlRetry(false);
+            }
+          },
+
+          modal: {
+            ondismiss: function () {
+              btnControlRetry(false);
+              axios
+                .post("/user/payment/failed")
+                .then((res) => {
+                  if (res.data.success) {
+                    toastr.error(res.data.message, "Failed");
+                  }
+                })
+                .catch((err) => {
+                  const error = err.response?.data;
+                  console.error(error?.message || "Something went wrong", err);
+                  toastr.error(
+                    error?.message || "Something went wrong",
+                    "Error",
+                  );
+                });
+            },
+          },
+
+          theme: { color: "#000" },
+        };
+
+        new Razorpay(options).open();
+      }
+    }
+  } catch (err) {
+    const error = err.response?.data;
+    btnControlRetry(false);
+    console.log(error);
+    toastr.error(error?.message || "Something went wrong", "Failed");
+  }
+});
