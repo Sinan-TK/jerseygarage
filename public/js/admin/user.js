@@ -234,6 +234,8 @@ function renderUsers(data) {
 
       <td>${new Date(user.createdAt).toDateString()}</td>
 
+      <td>${new Date(user.updatedAt).toDateString()}</td>
+
       <td>
         <span class="status ${user.is_blocked ? "inactive" : "active"}" data-id="${user._id}">
           ${user.is_blocked ? "Blocked" : "Active"}
